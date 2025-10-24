@@ -1,0 +1,14 @@
+CustomerRating =Customer Rating
+SupplierRating=Supplier Rating
+CommandeRating=Order Rating
+ProductRating=Rating
+SupplierOrderRating=Order Rating
+AddRating =Rate
+AddRatingclient =Rate this customer
+AddRatingfournisseur =Rate this supplier
+AddRatingcommande =Rate this order
+AddRatingproduct =Rate this product / service
+AddRatingcommandefournisseur =Rate this supplier order
+SubmitRating =Rate
+PlaceholderComment =Leave a comment to justify your rating
+ByOn=By %s %s on %s

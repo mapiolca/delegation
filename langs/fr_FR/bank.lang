@@ -1,0 +1,78 @@
+
+# Dolibarr language file - fr_FR - tos
+# Admin form
+CHARSET=iso-8859-1
+
+card=Carte Bancaire
+qonto_fee=Frais Qonto
+income=Virement entrant
+transfer=Virement sortant
+direct_debit=Prélèvement
+cheque=Chèque
+
+completed=Terminé
+pending=En attente
+declined=Refusé
+reversed=Retourné
+
+BalanceActual = Solde Actuel
+BalanceAuthorized = Solde Autorisé
+
+lmdb_complement_slug_number=Numéro d'identifiant de compte
+
+ValueDate=Date de Valeur
+Thirdparty=Tiers
+Id=ID
+
+messagemax=Le nombre de ligne pouvant être affichée simultanément est de 100 au maximum.
+LineMax=Nombre de ligne à afficher par page (25 au maximum par défaut)
+SecretKey=Clé Secrète
+IdAPI=Identifiant API
+
+LMDBQontoSetup=Réglages LMDB - QONTO
+
+qonto=Qonto
+SetupG=Général
+
+ConciliateQonto = Rapprocher avec Qonto 
+
+Qonto_create_payement_client = Création de Paiement Client :
+
+Qonto_create_payement_fourn = Création de Paiement Fournisseur :
+
+Qonto_create_payement_text1 = paiement a pu être créé avec le contenu du Logiciel.
+
+Qonto_create_payement_text2 = paiements ont pu être créés avec le contenu du Logiciel.
+
+Qonto_rappro = Rapprochement de Compte Bancaire :
+
+Qonto_rappro_text1 = écriture a pu être rapprochée avec le contenu du Logiciel.
+
+Qonto_rappro_text2 = écritures ont pu être rapprochées avec le contenu du Logiciel.
+
+Qonto_info = Informations :
+
+Qonto_info_text = Pour le moment, les charges fiscales et sociales ne sont pas supportée par le rapprochement automatique.
+
+Qonto_warning = Désolé...
+
+Qonto_warning_text = Aucun paiement n'a pu être rapproché ou créé par rapport le contenu de Logiciel. Pour facilité le rapprochement, veillez à ce que les informations dans les lignes de votre compte QONTO mentionne, le numéro de la facture, le tiers, ou toute(s) autre(s) référence(s) explicite(s) présente(nt) dans vos factures clients ou fournisseurs (Référence, Libellé, Référence Fournisseur, etc.).
+
+Qonto_alertcreatemessage_client = Le paiement client %s a été crée pour la facture %s malgré l'absence explicite de la référence dans l'écriture bancaire <b>%s</b> de votre compte QONTO. Il est conseillé de vérifier et de corriger si nécessaire. 
+
+Qonto_alertcreatemessage_fourn = Le paiement fournisseur %s a été crée pour la facture %s malgré l'absence explicite de la référence dans l'écriture bancaire <b>%s</b> de votre compte QONTO. Il est conseillé de vérifier et de corriger si nécessaire. 
+
+Qonto_commit_error = Ne peut pas effectuer le commit des fonctions.
+
+Qonto_set_invoice_to_payed_error = Impossible de classer la facture comme payée.
+Qonto_set_fourn_invoice_to_payed_error = Impossible de classer la facture fournisseur comme payée.
+
+Qonto_Cannot_insert_link_between_facture_and_paiement = Impossible d'inserer le lien entre la facture et le paiement dans la base de donnée.
+Qonto_Cannot_insert_link_between_facture_fourn_and_paiement_fourn = Impossible d'inserer le lien entre la facture fournisseur et le paiement fournisseur dans la base de donnée.
+
+Qonto_Cannot_insert_bank_url = Impossible de créer les liens dans l'écriture.
+
+Qonto_Cannot_insert_payment_into_payment_table = Impossible de créer le paiement.
+Qonto_Cannot_insert_payment_into_payment_fourn_table = Impossible de créer le paiement fournisseur.
+
+Qonto_Cannot_insert_bank_entry_into_bank_table = Impossible de d'ajouter l'ecriture bancaire dans le compte.

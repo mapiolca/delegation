@@ -1,0 +1,27 @@
+# Dolibarr language file - Source file is en_US - qualityreports
+##
+##
+##
+
+RatingConfigTitle=Évaluation
+CustomerRating = Évaluation du client
+SupplierRating= Évaluation du fournisseur
+CommandeRating=Évaluation de la commande
+ProductRating=Évaluation
+SupplierOrderRating=Évaluation de la commande
+AddRating = Évaluer
+AddRatingclient = Évaluer ce client
+AddRatingfournisseur = Évaluer ce fournisseur
+AddRatingcommande = Évaluer cette commande
+AddRatingproduct = Évaluer ce produit/service
+AddRatingcommandefournisseur = Évaluer cette commande fournisseur
+SubmitRating = Evaluer
+PlaceholderComment = Laissez un commentaire pour justifier votre note
+ByOn=Par %s %s (%s) le %s
+Childcommandefournisseur= Commande fournisseur (id: %d)
+LMDB_Comment = Commentaire
+LMDB_Datec = Date d'ajout
+LMDB_RatingList = Liste des Notes/Commentaires pour ce produit
+RatingLineDeleted = Évaluation supprimée
+RatingLineUpdated = Évaluation mise à jour
+Evaluations = Évaluations

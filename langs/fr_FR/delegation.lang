@@ -1,0 +1,216 @@
+# Dolibarr language file - fr_FR - tos
+# Admin form
+CHARSET=iso-8859-1
+Module440300Desc=Module permettant de joindre des lignes de délégation aux factures d'avancement, et contenant divers modèles avancés(Nécessite le module BTP disponible sur le Dolistore)
+Module440300Name=Délégation
+Delegation=Délégation
+
+SetupG=Général 
+
+LMDB_USE_IDPROF3_DICTIONARY=Utiliser le Dictionnaire Identifiant Professionel 3 (NAF/APE)
+LMDBSetup=Réglages LMDB - Général
+
+lmdb_for = pour
+
+lmdb_envoi_auto = Envoi automatique
+
+lmdb_envoi_auto_help = Cochez la case si le mail doit partir automatiquement après sa génération.
+
+lmdb_template = Modèle de courriel automatique
+
+lmdb_template_help = Choisissez le modèle de courriel qui sera envoyé automatiquement lors de la validation de la facture.
+
+lmdb_commande_account = Compte Bancaire
+
+lmdb_commande_account_help = Utile pour les DC4, etc.
+
+lmdb_error_empty_line = La ligne est vide, veuillez saisir un libellé et un montant pour la délégation que vous souhaitez déduire de votre facture.
+
+lmdb_error_empty_label = Le libellé est vide, veuillez saisir un libellé pour la délégation que vous souhaitez déduire de votre facture.
+
+lmdb_error_amount_null = Le montant est vide, veuillez saisir un montant pour la délégation que vous souhaitez déduire de votre facture.
+
+NotAProgressInvoice=La facture sélectionnée n'est pas une facture d'avancement
+NotAnInvoice=L'objet sélectionné n'est pas une facture
+ObjectNotFound=La facture n'a pas été trouvée
+DelegationLineUpdated=La ligne a été mise à jour
+DelegationLineDeleted=La ligne a été supprimée
+DelegationLineAdded=La ligne a été ajoutée
+DelegationLineDoesNotExist=La ligne n'existe pas
+HTAmount=Montant HT
+AmountToPay=Montant à Payer (TTC)
+PDFCrabeDelegationTitle = Procès Verbal de Situation n° %d
+DelegationTotalHTRestant = Reste à payer HT sur situation 
+DelegationTotalTVARestant = Reste à payer TVA sur situation 
+DelegationTotalTTCRestant = Reste à payer TTC sur situation
+CompteProrataTTCDeduit = Compte Prorata TTC à déduire de la situation
+RetenueGarantieTTCDeduit = Retenue de Garantie TTC à déduire de la situation
+Deleg = Délégation de Paiement
+RefChantierClient = Référence Chantier du Client
+Total_HT_Marche = Total HT Marché
+Total_HT = Total HT
+Situ_encours = Situation en Cours
+Total_HT_Cumul = Total HT Cumulé
+DocumentModellmdbproduitsPDF = Modèle de fiche produit par Les Métiers du Bâtiment.
+PDFBTPLMDBDescription = Modèle de Facture pour les Situations de Travaux par Les Métiers du Bâtiment.
+PDFLMDBDescription = Modèle de Facture par Les Métiers du Bâtiment.
+PDFdevisLMDBDescription = Modèle de Proposition Commerciale par Les Métiers du Bâtiment.
+
+idprof3 = Code NAF/APE
+country_code = Code Pays
+
+lmdb_budget = Budget
+
+SuppliersDeliveryModelLMDB = Modèle de Bon de Livraison par Les Métiers du Bâtiment.
+SuppliersCommandModelLMBD = Modèle de Bon de Commande par Les Métiers de Bâtiment.
+SuppliersCommandModelINPOSE = Modèle de Bon de Commande par Les Métiers de Bâtiment avec forçage de l'affichage de la description des produits.
+SuppliersDelegationModelLMBDv2 = Modèle de Délégation de paiement v2 par Les Métiers du Bâtiment.
+SuppliersDC4ModelLMDB = Modèle de formulaire DC4 par Les Métiers du Bâtiment.
+SuppliersDelegationModelLMDB = Modèle de Délégation de paiement par Les Métiers du Bâtiment.
+
+SuppliersDelegationModelLMBD_SPIEBATSO_Title = Délégation SPIE BATIGNOLLES S-O
+SuppliersDelegationModelLMBD_SPIEBATSO_Desc = Modèle de Délégation de paiement SPIE BATIGNOLLES SUD-OUEST par Les Métiers du Bâtiment.
+
+CSTBTP2014ModelLMBD = Contrat de Sous-traitance simplifié 2014 par Les Métiers du Bâtiment.
+SuppliersDelegationModelEIFFAGE2017 = Modèle de Délégation de Paiement par EIFFAGE (2017).
+DocumentModelPaymentPDFLMDB = Modèle de courrier de règlement fournisseurs par Les Métiers du Bâtiment.
+SuppliersInvoiceModelLMDB = Modèle de Facture Fournisseur par Les Métiers du Bâtiment.
+RetenueGarantieTTCDeduitFacture = Retenue de Garantie TTC déduit
+CompteProrataTTCDeduitFacture = Compte Prorata TTC déduit
+LMDBAmounttopay = Montant à payer
+LMDBtotaldelegationdeduit = Total des Délégations à déduire
+LMDBTotalHTRestantFacture = Reste à payer HT
+LMDBotalTVARestantFacture = Reste à payer TVA
+LMDBTotalTTCRestantFacture = Reste à payer TTC
+Invoice = Facture
+linkfiles = Lien vers les fichiers
+
+lmdb_link = Lien vers les fichiers
+
+lmdb_representant = Représentant
+lmdb_representant_help = Idéalement, sous le format : M. NOM Prénom.
+lmdb_compte_tiers = N° de compte chez ce tiers
+
+lmdb_qualite_representant =  Qualité du Représentant
+lmdb_qualite_representant_help = Directeur, Gérant, Président, etc.
+
+lmdb_retenue_garantie = Retenue de Garantie
+lmdb_retenue_garantie_help = Exprimé en pourcentage (ne pas mettre le symbole) avec un Point (.) à la place de la virgule (,).
+
+lmdb_compte_prorata = Compte Prorata
+lmdb_compte_prorata_help = Exprimé en pourcentage (ne pas mettre le symbole) avec un Point (.) à la place de la virgule (,).
+
+lmdb_project_amount = Montant du Projet (HT)
+
+lmdb_n_devis_fourn = N° de Devis Fournisseur
+
+lmdb_date_devis_fourn = Date du Devis Fournisseur
+
+lmdb_marque = Fabricant/Marque
+
+lmdb_date_lcr = Date d'Echéance pour la LCR
+
+lmdb_poste_info = Libellé du poste
+
+Details = Détails 
+
+private = Privé
+public = Publique
+
+ProjectDetails = Détails du projet
+project_details = Détails du projet
+
+PROJECTDETAILS_type_mou = Type de Maître d'Ouvrage.
+PROJECTDETAILS_type_mou_Tooltip = Selectionnez  « Publique » si le maître d&apos;ouvrage est une administration ou une entreprise publique (ex : bailleur social), ou « Privé » si c&apos;est un client privée.
+
+PROJECTDETAILS_refchantier = Référence du chantier.
+PROJECTDETAILS_refchantier_tooltip = Notez la référence du chantier qui vous a été donné par le client lors de la consultation, ou lors de la signature du marché.
+
+PROJECTDETAILS_adresse_chantier = Adresse du Chantier.
+
+PROJECTDETAILS_nature_travaux = Nature des travaux.
+PROJECTDETAILS_nature_travaux_tooltip = Enoncez la nature des travaux en commeençant par un pronom personnel défini ( « le », « la », « les », « l' » )
+
+PROJECTDETAILS_fk_moe = Maître d'Oeuvre du chantier.
+PROJECTDETAILS_fk_moe_Tooltip = Mentionnez le nom du Tiers, s'il n'est pas dans la liste, créez le dans la section « Tiers ».
+
+PROJECTDETAILS_n_lot = Numéro du Lot.
+
+PROJECTDETAILS_libelle_lot = Libellé du Lot.
+
+PROJECTDETAILS_marche_defense = Marchés publics de défense ou de sécurité ?
+PROJECTDETAILS_marche_defense_Tooltip = Si le maître d'ouvrage est une entreprise publique, ce marché concerne-t'il la Défense ou la Sécurité ?
+
+PROJECTDETAILS_rg_sstt = Taux de retenue de garantie répercuté Sous-traitants ?
+PROJECTDETAILS_rg_sstt_Tooltip = Exprimé en pourcent, si aucune retenue de garantie est appliquée aux sous-traitants, mettre « 0 ».
+
+none = Aucun
+
+DC4form =  DC4 | Contrat de Sous-Traitance
+
+DC4 = DC4 | Délégation de Paiement | Contrats de Sous-Traitance
+dc4 = Informations nécessaires à l'établissement d'une déclaration DC4, un contrat de sous-traitance, ou une délégation de paiement.
+
+dc4_only = Informations nécessaires à l'établissement d'une déclaration DC4.
+dc4_errordatemessage = Vous cette commande n'est pas au statut « commandé » ou ultérieur, la date initiale sélectionnée par défaut sera donc celle du statut courant.
+
+DC4_dc4_object_declaration = Objet de la Déclaration du Sous-Traitant (DC4)
+DC4_dc4_object_declaration_Tooltip = Selectionnez le meilleur cas.
+DC4_dc4_object_declaration_1 = Annexe à l'acte d'engagement
+DC4_dc4_object_declaration_2 = Acte Spécial Initial
+DC4_dc4_object_declaration_3 = Acte Spécial Modificatif
+
+DC4_dc4_date_initiale = Date de la DC4 Initiale (si Acte Modificatif)
+DC4_dc4_date_initiale_Tooltip = Mentionnez la date de l'Acte initiale s'il s'agit d'un Acte Modificatif
+
+DC4_avance = Avance Demandée ?
+DC4_avance_Tooltip = Le sous-traitant a-t&apos;il demandé un avance ?
+
+DC4_dc4_documents_fournis = Documents fournis avec la DC4.
+
+DC4_dc4_documents_fournis_Tooltip = Documents qui peuvent vous être demandé lors de la remise du formulaire DC4.
+
+DC4_dc4_documents_fournis_1 = Exemplaire unique ou certificat de cessibilité du marché public qui lui a été délivré.
+DC4_dc4_documents_fournis_2 = Une attestation ou une mainlevée du bénéficiaire de la cession ou du nantissement de créances.
+DC4_dc4_documents_fournis_3 = Le titulaire demande la modification de l'exemplaire unique ou du certificat de cessibilité.
+DC4_dc4_documents_fournis_4 = Autres possibilités.
+
+DC4_paiement_direct = Droit au paiement direct ?
+DC4_paiement_direct_Tooltip = Le sous-traitant est-il éligible au paiement direct par votre client ?
+
+DC4_libelle_poste_cctp = Libellé du Poste dans le CCTP
+
+DC4_sps_travaux = Travaux soumis à coordination SPS
+DC4_sps_travaux_Tooltip = Les travaux sous-traités sont-il soumis à la coordination du SPS ? Si oui, il faudra très certainement organiser une inspection commune entre eux, et que votre sous-traitant fournisse un PPSPS.
+
+DC4_sps_date_remise = Date de remise du PPSPS.
+DC4_sps_date_remise_Tooltip = Le PPSPS est obligatoire, il doit être remis au contrôleur SPS au moment de l'inspection commune.
+
+DC4_cissct = CISSCT
+DC4_cissct_Tooltip = Y a un CISSCT sur le chantier.
+
+DC4_DIUO = Remise d'un DIUO
+DC4_DIUO_Tooltip = Le dossier d'intervention ultérieure sur l'ouvrage (DIUO) est un document primordial. Établi dès la phase de conception de l’ouvrage, il a pour objectif de faire prendre en compte par le maître d'ouvrage et le maître d'oeuvre les éventuels équipements nécessaires à l’exécution en sécurité des interventions ultérieures pour la maintenance (accès en toiture, aux ascenseurs, nettoyage des vitres…). Le DIUO se doit d’être un outil pratique. Il prend la forme d’un dossier qui rassemble les informations techniques, les plans, les notices…
+
+DC4_responsabilite = Responsabilité des Ouvrages
+DC4_responsabilite_Tooltip = Le sous-traitant est-il responsable de ses ouvrages après leur réception et jusqu'à la fin du chantier ?
+
+DC4_dc4_hypothese_01 = Document fournit avec la DC4
+DC4_dc4_hypothese_02 = Objet de la demande.
+DC4_dc4_hypothese_Tooltip_01 = La présente déclaration de sous-traitance constitue un acte spécial.
+Le titulaire établit qu'aucune cession ni aucun nantissement de créances résultant du marché public ne font obstacle au paiement direct du soustraitant, dans les conditions prévues à l'article 137 du décret n° 2016-360 ou à l’article 126 du décret n° 2016-361. (l'un ou l'autre)
+DC4_dc4_hypothese_Tooltip_02 = La présente déclaration de sous-traitance constitue un acte spécial modificatif.
+DC4_dc4_hypothese_1 = L'exemplaire unique ou le certificat de cessibilité du marché public qui lui a été délivré.
+DC4_dc4_hypothese_2 = Une attestation ou une mainlevée du bénéficiaire de la cession ou du nantissement de créances.
+DC4_dc4_hypothese_3 = Le titulaire demande la modification de l'exemplaire unique ou du certificat de cessibilité qui est joint au présent DC4.
+DC4_dc4_hypothese_4 = L’exemplaire unique ou le certificat de cessibilité ayant été remis en vue d'une cession ou d'un nantissement de créances et ne pouvant être restitué.
+
+dc4_acte_modificatif = Acte Modificatif
+
+
+Module104400Name = Historique
+
+lmdb_poste_category = Catégorie
+lmdb_poste_category_help = Catégorie Budgétaire de laquelle sera décomptée cette commande.
+
+

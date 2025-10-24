@@ -1,0 +1,14 @@
+CustomerRating =Valutazione del cliente
+SupplierRating=Valutazione del fornitore
+CommandeRating=Ordine di valutazione
+ProductRating=Valutazione
+SupplierOrderRating=Ordine di valutazione
+AddRating =Vota
+AddRatingclient =Valuta questo cliente
+AddRatingfournisseur =Valuta questo fornitore
+AddRatingcommande =Valuta questo ordine
+AddRatingproduct =Vota questo prodotto / servizio
+AddRatingcommandefournisseur =Valuta questo fornitore order
+SubmitRating =Vota
+PlaceholderComment =Lascia un commento per giustificare la tua valutazione
+ByOn= %s %s su %s
