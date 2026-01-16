@@ -1,1 +1,26 @@
-test
+{
+    "name": "dolibarr/delegation",
+    "description": "Delegation module for Dolibarr ERP & CRM.",
+    "type": "dolibarr-module",
+    "license": "GPL-3.0-or-later",
+    "keywords": [
+        "dolibarr",
+        "module",
+        "delegation",
+        "dc4",
+        "contrat",
+        "sous-traitance",
+    ],
+    "homepage": "https://www.dolibarr.org",
+    "support": {
+        "docs": "https://wiki.dolibarr.org/"
+    },
+    "require": {
+        "php": ">=7.0"
+    },
+    "extra": {
+        "dolibarr": {
+            "module-name": "delegation"
+        }
+    }
+}
