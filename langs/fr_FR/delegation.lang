@@ -24,6 +24,7 @@ DelegationSupplierInvoiceNotFound=Facture fournisseur introuvable.
 DelegationSupplierInvoiceNotAllowed=La facture fournisseur n'est pas éligible à la délégation.
 DelegationSupplierInvoiceAlreadyLinked=Cette facture fournisseur est déjà liée à la délégation.
 DelegationAmountExceeded=Le total des montants délégués dépasse le montant de la facture.
+DelegationClearingAccountMissingCountry=Veuillez renseigner le pays de la société avant de créer le compte de passage.
 
 lmdb_for = pour
 

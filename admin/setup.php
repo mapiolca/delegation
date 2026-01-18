@@ -32,6 +32,8 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formbank.class.php';
 if(!$user->admin or empty($conf->delegation->enabled))
 	accessforbidden();
 
+global $mysoc;
+
 $langs->load("admin");
 $langs->load("delegation@delegation");
 
@@ -87,8 +89,21 @@ if ($user->admin && $action == 'create_clearing_account') {
 	$account->label = $langs->trans('DelegationClearingAccountLabel');
 	$account->currency_code = $conf->currency;
 	$account->clos = 0;
+	// EN: Set default country to satisfy mandatory field.
+	// FR: Définir le pays par défaut pour satisfaire le champ obligatoire.
+	$defaultCountryId = 0;
+	if (! empty($mysoc->country_id)) {
+		$defaultCountryId = (int) $mysoc->country_id;
+	} elseif (! empty($conf->global->MAIN_INFO_SOCIETE_COUNTRY)) {
+		$defaultCountryId = (int) $conf->global->MAIN_INFO_SOCIETE_COUNTRY;
+	}
+	$account->country_id = $defaultCountryId;
 
-	$accountId = $account->create($user);
+	if (empty($account->country_id)) {
+		setEventMessages($langs->trans('DelegationClearingAccountMissingCountry'), null, 'errors');
+	} else {
+		$accountId = $account->create($user);
+	}
 	if ($accountId > 0) {
 		dolibarr_set_const($db, 'DELEGATION_CLEARING_BANKACCOUNT_ID', $accountId, 'int', 0, '', $conf->entity);
 		setEventMessages($langs->trans('DelegationClearingAccountCreated'), null, 'mesgs');
