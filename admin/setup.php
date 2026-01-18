@@ -87,7 +87,9 @@ if ($user->admin && $action == 'set_clearing_account') {
 if ($user->admin && $action == 'create_clearing_account') {
 	$account = new Account($db);
 	$account->ref = 'DELPASS';
-	$account->label = $langs->trans('DelegationClearingAccountLabel');
+	// EN: Limit label length to database column size.
+	// FR: Limiter la longueur du libellé à la taille de la colonne SQL.
+	$account->label = dol_trunc($langs->trans('DelegationClearingAccountLabel'), 50, 'right', 'UTF-8', 1);
 	$account->currency_code = $conf->currency;
 	$account->clos = 0;
 	// EN: Provide mandatory initial balance date and amount.
