@@ -90,6 +90,10 @@ if ($user->admin && $action == 'create_clearing_account') {
 	$account->label = $langs->trans('DelegationClearingAccountLabel');
 	$account->currency_code = $conf->currency;
 	$account->clos = 0;
+	// EN: Provide mandatory initial balance date and amount.
+	// FR: Renseigner la date et le montant du solde initial obligatoires.
+	$account->date_solde = dol_now();
+	$account->solde = 0;
 	// EN: Set default country to satisfy mandatory field.
 	// FR: Définir le pays par défaut pour satisfaire le champ obligatoire.
 	$defaultCountryId = 0;

@@ -110,7 +110,7 @@ class Delegation extends CommonObject
 		
 		
 		
-		if ($result > 0)
+		if ($result)
 		{
             $num = $this->db->num_rows($result);
             $i = 0;
