@@ -25,6 +25,23 @@ DelegationSupplierInvoiceNotAllowed=La facture fournisseur n'est pas éligible �
 DelegationSupplierInvoiceAlreadyLinked=Cette facture fournisseur est déjà liée à la délégation.
 DelegationAmountExceeded=Le total des montants délégués dépasse le montant de la facture.
 DelegationClearingAccountMissingCountry=Veuillez renseigner le pays de la société avant de créer le compte de passage.
+DelegationTabsSection=Onglets
+DelegationTabDelegationLabel=Onglet Délégation (facture client)
+DelegationTabDelegationHelp=Activer l'onglet Délégation sur les factures clients.
+DelegationTabDetailsLabel=Onglet Détails (projet)
+DelegationTabDetailsHelp=Activer l'onglet Détails sur les projets.
+DelegationTabDc4SupplierLabel=Onglet DC4 (commande fournisseur)
+DelegationTabDc4SupplierHelp=Activer l'onglet DC4 sur les commandes fournisseurs.
+DelegationTabDc4CustomerLabel=Onglet DC4 (commande client)
+DelegationTabDc4CustomerHelp=Activer l'onglet DC4 sur les commandes clients.
+DelegationRightTabDelegationRead=Voir l'onglet Délégation
+DelegationRightTabDelegationWrite=Éditer l'onglet Délégation
+DelegationRightTabDetailsRead=Voir l'onglet Détails
+DelegationRightTabDetailsWrite=Éditer l'onglet Détails
+DelegationRightTabDc4SupplierRead=Voir l'onglet DC4 (commande fournisseur)
+DelegationRightTabDc4SupplierWrite=Éditer l'onglet DC4 (commande fournisseur)
+DelegationRightTabDc4CustomerRead=Voir l'onglet DC4 (commande client)
+DelegationRightTabDc4CustomerWrite=Éditer l'onglet DC4 (commande client)
 
 lmdb_for = pour
 

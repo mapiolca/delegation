@@ -25,6 +25,23 @@ DelegationSupplierInvoiceNotAllowed=Die Lieferantenrechnung ist für die Delegat
 DelegationSupplierInvoiceAlreadyLinked=Diese Lieferantenrechnung ist bereits mit der Delegation verknüpft.
 DelegationAmountExceeded=Die Summe der delegierten Beträge übersteigt den Rechnungsbetrag.
 DelegationClearingAccountMissingCountry=Bitte das Land des Unternehmens festlegen, bevor das Durchlaufkonto erstellt wird.
+DelegationTabsSection=Registerkarten
+DelegationTabDelegationLabel=Registerkarte Delegation (Kundenrechnung)
+DelegationTabDelegationHelp=Aktiviert die Registerkarte Delegation auf Kundenrechnungen.
+DelegationTabDetailsLabel=Registerkarte Details (Projekt)
+DelegationTabDetailsHelp=Aktiviert die Registerkarte Details auf Projekten.
+DelegationTabDc4SupplierLabel=Registerkarte DC4 (Lieferantenbestellung)
+DelegationTabDc4SupplierHelp=Aktiviert die Registerkarte DC4 auf Lieferantenbestellungen.
+DelegationTabDc4CustomerLabel=Registerkarte DC4 (Kundenauftrag)
+DelegationTabDc4CustomerHelp=Aktiviert die Registerkarte DC4 auf Kundenaufträgen.
+DelegationRightTabDelegationRead=Registerkarte Delegation anzeigen
+DelegationRightTabDelegationWrite=Registerkarte Delegation bearbeiten
+DelegationRightTabDetailsRead=Registerkarte Details anzeigen
+DelegationRightTabDetailsWrite=Registerkarte Details bearbeiten
+DelegationRightTabDc4SupplierRead=Registerkarte DC4 anzeigen (Lieferantenbestellung)
+DelegationRightTabDc4SupplierWrite=Registerkarte DC4 bearbeiten (Lieferantenbestellung)
+DelegationRightTabDc4CustomerRead=Registerkarte DC4 anzeigen (Kundenauftrag)
+DelegationRightTabDc4CustomerWrite=Registerkarte DC4 bearbeiten (Kundenauftrag)
 
 lmdb_for=für
 

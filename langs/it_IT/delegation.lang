@@ -25,6 +25,23 @@ DelegationSupplierInvoiceNotAllowed=La fattura fornitore non è idonea alla dele
 DelegationSupplierInvoiceAlreadyLinked=Questa fattura fornitore è già collegata alla delega.
 DelegationAmountExceeded=Il totale degli importi delegati supera l'importo della fattura.
 DelegationClearingAccountMissingCountry=Imposta il paese dell'azienda prima di creare il conto di transito.
+DelegationTabsSection=Schede
+DelegationTabDelegationLabel=Scheda Delega (fattura cliente)
+DelegationTabDelegationHelp=Abilita la scheda Delega sulle fatture clienti.
+DelegationTabDetailsLabel=Scheda Dettagli (progetto)
+DelegationTabDetailsHelp=Abilita la scheda Dettagli sui progetti.
+DelegationTabDc4SupplierLabel=Scheda DC4 (ordine fornitore)
+DelegationTabDc4SupplierHelp=Abilita la scheda DC4 sugli ordini fornitori.
+DelegationTabDc4CustomerLabel=Scheda DC4 (ordine cliente)
+DelegationTabDc4CustomerHelp=Abilita la scheda DC4 sugli ordini clienti.
+DelegationRightTabDelegationRead=Vedere la scheda Delega
+DelegationRightTabDelegationWrite=Modificare la scheda Delega
+DelegationRightTabDetailsRead=Vedere la scheda Dettagli
+DelegationRightTabDetailsWrite=Modificare la scheda Dettagli
+DelegationRightTabDc4SupplierRead=Vedere la scheda DC4 (ordine fornitore)
+DelegationRightTabDc4SupplierWrite=Modificare la scheda DC4 (ordine fornitore)
+DelegationRightTabDc4CustomerRead=Vedere la scheda DC4 (ordine cliente)
+DelegationRightTabDc4CustomerWrite=Modificare la scheda DC4 (ordine cliente)
 
 lmdb_for=per
 

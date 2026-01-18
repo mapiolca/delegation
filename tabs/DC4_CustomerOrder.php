@@ -76,6 +76,17 @@ $form = new Form($db);
 $object = new Commande($db);
 $dc4 = new DC4($db);
 
+// EN: Check module tab toggle and permissions.
+// FR: Vérifier l'activation de l'onglet et les permissions.
+if (empty($conf->global->DELEGATION_ENABLE_TAB_DC4_CUSTOMER)) {
+	accessforbidden();
+}
+
+$canReadTab = $user->admin || $user->rights->delegation->tab_dc4_customer_read;
+$canWriteTab = $user->admin || $user->rights->delegation->tab_dc4_customer_write;
+$canAddLines = $canWriteTab;
+$canDeleteLines = $canWriteTab;
+
 // Load object
 if ($id > 0 || ! empty($ref))
 {
@@ -109,8 +120,12 @@ $permissiondellink = $usercancreate; 	// Used by the include of actions_dellink.
 $permissiontoadd = $usercancreate; 		// Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
 
 
-if (!$usercanread)
+if (!$usercanread || ! $canReadTab)
 {
+	accessforbidden();
+}
+
+if (! empty($action) && ! $canWriteTab) {
 	accessforbidden();
 }
 
@@ -165,6 +180,7 @@ if (! empty($conf->projet->enabled))
 }
 
 $numLines = sizeof($dc4->lines);
+$current_head = 'dc4_customer';
 
 include '../tpl/dc4.default.tpl.php';
 

@@ -202,6 +202,46 @@ function showParameters()
 			print '</form>';
 		print '</td>';
 	print '</tr>';
+
+	$var = ! $var;
+	print '<tr class="liste_titre">';
+		print '<td colspan="2">'.$langs->trans("DelegationTabsSection").'</td>';
+	print '</tr>';
+
+	$tabs = array(
+		'DELEGATION_ENABLE_TAB_DELEGATION' => array(
+			'label' => 'DelegationTabDelegationLabel',
+			'help' => 'DelegationTabDelegationHelp',
+		),
+		'DELEGATION_ENABLE_TAB_DETAILS' => array(
+			'label' => 'DelegationTabDetailsLabel',
+			'help' => 'DelegationTabDetailsHelp',
+		),
+		'DELEGATION_ENABLE_TAB_DC4_SUPPLIER' => array(
+			'label' => 'DelegationTabDc4SupplierLabel',
+			'help' => 'DelegationTabDc4SupplierHelp',
+		),
+		'DELEGATION_ENABLE_TAB_DC4_CUSTOMER' => array(
+			'label' => 'DelegationTabDc4CustomerLabel',
+			'help' => 'DelegationTabDc4CustomerHelp',
+		),
+	);
+
+	foreach ($tabs as $constName => $tabInfo) {
+		$var = ! $var;
+		print '<tr '.$bc[$var].'>';
+			print '<td align="left" class="">';
+				print $form->textwithtooltip($langs->trans($tabInfo['label']), $langs->trans($tabInfo['help']), 2, 1, img_info());
+			print '</td>';
+			print '<td align="center" width="300">';
+				if (function_exists('ajax_constantonoff')) {
+					print ajax_constantonoff($constName);
+				} else {
+					print $form->selectyesno($constName, (int) getDolGlobalInt($constName), 1);
+				}
+			print '</td>';
+		print '</tr>';
+	}
 }
 print '</tbody>';
 print '</table>';

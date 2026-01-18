@@ -62,12 +62,23 @@ $object = new Project($db);
 $details = new Details($db);
 $soc = new Societe($db);
 
-$canAddLines = $user->admin || $user->rights->delegation->myactions->create;
-$canReadLines = $user->admin || $user->rights->delegation->myactions->read;
-$canDeleteLines = $user->admin || $user->rights->delegation->myactions->delete;
+// EN: Check module tab toggle and permissions.
+// FR: Vérifier l'activation de l'onglet et les permissions.
+if (empty($conf->global->DELEGATION_ENABLE_TAB_DETAILS)) {
+	accessforbidden();
+}
 
-if (!$canReadLines)
+$canReadTab = $user->admin || $user->rights->delegation->tab_details_read;
+$canWriteTab = $user->admin || $user->rights->delegation->tab_details_write;
+$canAddLines = $canWriteTab;
+$canDeleteLines = $canWriteTab;
+
+if (!$canReadTab)
 {
+	accessforbidden();
+}
+
+if (! empty($action) && ! $canWriteTab) {
 	accessforbidden();
 }
 
@@ -135,8 +146,10 @@ llxHeader("", $langs->trans("ProjectDetails").' - '.$object->ref);
 $userAccess = $object->restrictedProjectArea($user);
 
 $head=project_prepare_head($object);
-
 $current_head = 'details';
+if (function_exists('complete_head_from_modules')) {
+	complete_head_from_modules($conf, $langs, $object, $head, $current_head, 'project');
+}
 
 include '../tpl/projet_fiche.default.tpl.php';	    	
 
