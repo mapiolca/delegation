@@ -142,10 +142,6 @@ if (!$error && !$cancel)
 
 $head = facture_prepare_head($object);
 $current_head = 'delegation';
-if (function_exists('complete_head_from_modules')) {
-	$h = 0;
-	complete_head_from_modules($conf, $langs, $object, $head, $h, 'invoice');
-}
 
 $soc = $object->thirdparty;
 
