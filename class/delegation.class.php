@@ -110,7 +110,7 @@ class Delegation extends CommonObject
 		
 		
 		
-		if ($result > 0)
+		if ($result)
 		{
             $num = $this->db->num_rows($result);
             $i = 0;
@@ -212,27 +212,43 @@ class Delegation extends CommonObject
 			return -2;
 		}
 
-		// EN: Load supplier invoice and validate eligibility.
-		// FR: Charger la facture fournisseur et valider l'éligibilité.
-		$invoice = new FactureFournisseur($this->db);
-		$result = $invoice->fetch($fkFactureFourn);
-		if ($result <= 0) {
+		// EN: Load supplier invoice data and validate eligibility.
+		// FR: Charger les données de facture fournisseur et valider l'éligibilité.
+		$sql = "SELECT rowid, ref, total_ttc, fk_mode_reglement, fk_projet";
+		$sql.= " FROM ".MAIN_DB_PREFIX."facture_fourn";
+		$sql.= " WHERE rowid = ".(int) $fkFactureFourn;
+		$sql.= " AND entity = ".(int) $conf->entity;
+
+		$resql = $this->db->query($sql);
+		if (! $resql || $this->db->num_rows($resql) === 0) {
 			$this->error = $langs->trans('DelegationSupplierInvoiceNotFound');
 			return -2;
 		}
+		$invoiceData = $this->db->fetch_object($resql);
 
-		if (! empty($conf->global->DELEGATION_PAYMENT_MODE_ID) && (int) $invoice->fk_mode_reglement !== (int) $conf->global->DELEGATION_PAYMENT_MODE_ID) {
+		if (! empty($conf->global->DELEGATION_PAYMENT_MODE_ID) && (int) $invoiceData->fk_mode_reglement !== (int) $conf->global->DELEGATION_PAYMENT_MODE_ID) {
 			$this->error = $langs->trans('DelegationSupplierInvoiceNotAllowed');
 			return -2;
 		}
 
-		if (! empty($object->fk_project) && (int) $invoice->fk_projet !== (int) $object->fk_project) {
+		if (! empty($object->fk_project) && (int) $invoiceData->fk_projet !== (int) $object->fk_project) {
 			$this->error = $langs->trans('DelegationSupplierInvoiceNotAllowed');
 			return -2;
 		}
 
-		$alreadyPaid = $invoice->getSommePaiement();
-		$remaining = price2num($invoice->total_ttc - $alreadyPaid, 'MT');
+		$sql = "SELECT COALESCE(SUM(pf.amount), 0) as paid";
+		$sql.= " FROM ".MAIN_DB_PREFIX."paiementfourn_facturefourn as pf";
+		$sql.= " WHERE pf.fk_facturefourn = ".(int) $fkFactureFourn;
+		$resql = $this->db->query($sql);
+		$alreadyPaid = 0;
+		if ($resql) {
+			$obj = $this->db->fetch_object($resql);
+			if ($obj) {
+				$alreadyPaid = (float) $obj->paid;
+			}
+		}
+
+		$remaining = price2num($invoiceData->total_ttc - $alreadyPaid, 'MT');
 		if ($remaining <= 0) {
 			$this->error = $langs->trans('DelegationSupplierInvoiceNotAllowed');
 			return -2;
@@ -256,7 +272,7 @@ class Delegation extends CommonObject
 		$this->line->fk_object = $object->id;
 		$this->line->fk_element = $object->element;
 		$this->line->fk_facture_fourn = $fkFactureFourn;
-		$this->line->label = $invoice->ref;
+		$this->line->label = $invoiceData->ref;
 		$this->line->amount = $remaining;
 
 		$result = $this->line->insert();

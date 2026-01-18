@@ -65,12 +65,27 @@ $form = new Form($db);
 $object = new Facture($db);
 $delegation = new Delegation($db);
 
-$canAddLines = $user->admin || $user->rights->delegation->myactions->create;
-$canReadLines = $user->admin || $user->rights->delegation->myactions->read;
-$canDeleteLines = $user->admin || $user->rights->delegation->myactions->delete;
+// EN: Check module tab toggle and permissions.
+// FR: Vérifier l'activation de l'onglet et les permissions.
+if (! getDolGlobalInt('DELEGATION_ENABLE_TAB_DELEGATION', 1)) {
+	accessforbidden();
+}
 
-if (!$canReadLines)
+$canReadTab = $user->admin
+	|| (! empty($user->rights->delegation->tab_delegation_read))
+	|| (! empty($user->rights->delegation->myactions) && ! empty($user->rights->delegation->myactions->read));
+$canWriteTab = $user->admin
+	|| (! empty($user->rights->delegation->tab_delegation_write))
+	|| (! empty($user->rights->delegation->myactions) && ! empty($user->rights->delegation->myactions->create));
+$canAddLines = $canWriteTab;
+$canDeleteLines = $canWriteTab;
+
+if (!$canReadTab)
 {
+	accessforbidden();
+}
+
+if (! empty($action) && ! $canWriteTab) {
 	accessforbidden();
 }
 
@@ -118,6 +133,10 @@ if (!$error && !$cancel)
 
 $head = facture_prepare_head($object);
 $current_head = 'delegation';
+if (function_exists('complete_head_from_modules')) {
+	$h = 0;
+	complete_head_from_modules($conf, $langs, $object, $head, $h, 'invoice');
+}
  
 $soc = new Societe($db);
 $soc->fetch($object->socid);
@@ -147,43 +166,76 @@ $supplierInvoiceOptions = array();
 $paymentModeId = ! empty($conf->global->DELEGATION_PAYMENT_MODE_ID) ? (int) $conf->global->DELEGATION_PAYMENT_MODE_ID : 0;
 
 if (! empty($project->id) && $paymentModeId > 0) {
-	$sql = "SELECT f.rowid";
+	$sql = "SELECT f.rowid, f.ref, f.total_ttc, f.datef, s.rowid as socid, s.nom as thirdparty_name,";
+	$sql.= " COALESCE(SUM(pf.amount), 0) as paid";
 	$sql.= " FROM ".MAIN_DB_PREFIX."facture_fourn as f";
+	$sql.= " JOIN ".MAIN_DB_PREFIX."societe as s ON s.rowid = f.fk_soc";
+	$sql.= " LEFT JOIN ".MAIN_DB_PREFIX."paiementfourn_facturefourn as pf ON pf.fk_facturefourn = f.rowid";
 	$sql.= " WHERE f.entity = ".(int) $conf->entity;
 	$sql.= " AND f.fk_projet = ".(int) $project->id;
 	$sql.= " AND f.fk_mode_reglement = ".(int) $paymentModeId;
 	$sql.= " AND f.paye = 0";
+	$sql.= " GROUP BY f.rowid, f.ref, f.total_ttc, f.datef, s.rowid, s.nom";
 	$sql.= " ORDER BY f.datef DESC";
 
 	$resql = $db->query($sql);
 	if ($resql) {
 		while ($obj = $db->fetch_object($resql)) {
-			$invoice = new FactureFournisseur($db);
-			if ($invoice->fetch($obj->rowid) > 0) {
-				$invoice->fetch_thirdparty();
-				$paid = $invoice->getSommePaiement();
-				$remaining = price2num($invoice->total_ttc - $paid, 'MT');
-				if ($remaining > 0) {
-					$supplierInvoiceOptions[$invoice->id] = $invoice->ref.' - '.$invoice->thirdparty->name.' - '.$langs->trans('RemainToPay').' '.price($remaining);
-				}
+			$remaining = price2num($obj->total_ttc - $obj->paid, 'MT');
+			if ($remaining > 0) {
+				$supplierInvoiceOptions[$obj->rowid] = $obj->ref.' - '.$obj->thirdparty_name.' - '.$langs->trans('RemainToPay').' '.price($remaining);
 			}
+		}
+	}
+}
+
+$supplierInvoiceMap = array();
+$supplierInvoiceIds = array();
+foreach ($delegation->lines as $line) {
+	if (! empty($line->fk_facture_fourn)) {
+		$supplierInvoiceIds[] = (int) $line->fk_facture_fourn;
+	}
+}
+$supplierInvoiceIds = array_unique($supplierInvoiceIds);
+
+if (! empty($supplierInvoiceIds)) {
+	$sql = "SELECT f.rowid, f.ref, f.total_ttc, f.datef, s.rowid as socid, s.nom as thirdparty_name,";
+	$sql.= " COALESCE(SUM(pf.amount), 0) as paid";
+	$sql.= " FROM ".MAIN_DB_PREFIX."facture_fourn as f";
+	$sql.= " JOIN ".MAIN_DB_PREFIX."societe as s ON s.rowid = f.fk_soc";
+	$sql.= " LEFT JOIN ".MAIN_DB_PREFIX."paiementfourn_facturefourn as pf ON pf.fk_facturefourn = f.rowid";
+	$sql.= " WHERE f.rowid IN (".implode(',', $supplierInvoiceIds).")";
+	$sql.= " GROUP BY f.rowid, f.ref, f.total_ttc, f.datef, s.rowid, s.nom";
+
+	$resql = $db->query($sql);
+	if ($resql) {
+		while ($obj = $db->fetch_object($resql)) {
+			$invoice = new FactureFournisseur($db);
+			$invoice->id = (int) $obj->rowid;
+			$invoice->ref = $obj->ref;
+			$invoice->total_ttc = (float) $obj->total_ttc;
+			$invoice->datef = $obj->datef;
+			$invoice->thirdparty = new Societe($db);
+			$invoice->thirdparty->id = (int) $obj->socid;
+			$invoice->thirdparty->name = $obj->thirdparty_name;
+
+			$supplierInvoiceMap[$invoice->id] = array(
+				'invoice' => $invoice,
+				'paid' => (float) $obj->paid,
+			);
 		}
 	}
 }
 
 foreach ($delegation->lines as $line) {
 	$line->supplier_invoice = null;
-	if (! empty($line->fk_facture_fourn)) {
-		$invoice = new FactureFournisseur($db);
-		if ($invoice->fetch($line->fk_facture_fourn) > 0) {
-			$invoice->fetch_thirdparty();
-			$line->supplier_invoice = $invoice;
-			$line->supplier_invoice_paid = $invoice->getSommePaiement();
-			$line->supplier_invoice_remaining = price2num($invoice->total_ttc - $line->supplier_invoice_paid, 'MT');
-		}
+	if (! empty($line->fk_facture_fourn) && ! empty($supplierInvoiceMap[$line->fk_facture_fourn])) {
+		$line->supplier_invoice = $supplierInvoiceMap[$line->fk_facture_fourn]['invoice'];
+		$line->supplier_invoice_paid = $supplierInvoiceMap[$line->fk_facture_fourn]['paid'];
+		$line->supplier_invoice_remaining = price2num($line->supplier_invoice->total_ttc - $line->supplier_invoice_paid, 'MT');
 	}
 }
-	    	
+
 include '../tpl/delegation.default.tpl.php';
 
 $db->close();
