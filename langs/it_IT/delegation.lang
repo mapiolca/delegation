@@ -1,0 +1,208 @@
+# Dolibarr language file - it_IT - tos
+# Admin form
+CHARSET=UTF-8
+Module440300Desc=Modulo per gestire la delega di pagamento, i contratti di subappalto e i moduli DC4 (richiede il modulo BTP dal Dolistore)
+Module440300Name=Delega
+Delegation=Delega
+
+SetupG=Generale
+
+LMDB_USE_IDPROF3_DICTIONARY=Usa il dizionario Identificativo Professionale 3 (NAF/APE)
+LMDBSetup=Impostazioni LMDB - Generale
+
+lmdb_for=per
+
+lmdb_envoi_auto=Invio automatico
+
+lmdb_envoi_auto_help=Seleziona la casella se l'email deve essere inviata automaticamente dopo la generazione.
+
+lmdb_template=Modello email automatico
+
+lmdb_template_help=Scegli il modello email che verrà inviato automaticamente alla convalida della fattura.
+
+lmdb_commande_account=Conto bancario
+
+lmdb_commande_account_help=Utile per DC4 e moduli correlati.
+
+lmdb_error_empty_line=La riga è vuota, inserisci un'etichetta e un importo per la delega da detrarre dalla fattura.
+
+lmdb_error_empty_label=L'etichetta è vuota, inserisci un'etichetta per la delega da detrarre dalla fattura.
+
+lmdb_error_amount_null=L'importo è vuoto, inserisci un importo per la delega da detrarre dalla fattura.
+
+NotAProgressInvoice=La fattura selezionata non è una fattura di avanzamento
+NotAnInvoice=L'oggetto selezionato non è una fattura
+ObjectNotFound=La fattura non è stata trovata
+DelegationLineUpdated=La riga è stata aggiornata
+DelegationLineDeleted=La riga è stata eliminata
+DelegationLineAdded=La riga è stata aggiunta
+DelegationLineDoesNotExist=La riga non esiste
+HTAmount=Importo IVA esclusa
+AmountToPay=Importo da pagare (IVA inclusa)
+PDFCrabeDelegationTitle=Stato di avanzamento n. %d
+DelegationTotalHTRestant=Importo residuo IVA esclusa sul SAL
+DelegationTotalTVARestant=IVA residua sul SAL
+DelegationTotalTTCRestant=Importo residuo IVA inclusa sul SAL
+CompteProrataTTCDeduit=Conto pro-rata IVA inclusa da detrarre dal SAL
+RetenueGarantieTTCDeduit=Ritenuta di garanzia IVA inclusa da detrarre dal SAL
+Deleg=Delega di pagamento
+RefChantierClient=Riferimento cantiere cliente
+Total_HT_Marche=Totale IVA esclusa del contratto
+Total_HT=Totale IVA esclusa
+Situ_encours=Stato in corso
+Total_HT_Cumul=Totale cumulato IVA esclusa
+DocumentModellmdbproduitsPDF=Modello scheda prodotto di Les Métiers du Bâtiment.
+PDFBTPLMDBDescription=Modello fattura per stati di avanzamento lavori di Les Métiers du Bâtiment.
+PDFLMDBDescription=Modello fattura di Les Métiers du Bâtiment.
+PDFdevisLMDBDescription=Modello proposta commerciale di Les Métiers du Bâtiment.
+
+idprof3=Codice NAF/APE
+country_code=Codice paese
+
+SuppliersDeliveryModelLMDB=Modello bolla di consegna fornitore di Les Métiers du Bâtiment.
+SuppliersCommandModelLMBD=Modello ordine fornitore di Les Métiers du Bâtiment.
+SuppliersCommandModelINPOSE=Modello ordine fornitore con visualizzazione forzata della descrizione prodotto.
+SuppliersDelegationModelLMBDv2=Modello delega di pagamento v2 di Les Métiers du Bâtiment.
+SuppliersDC4ModelLMDB=Modello formulario DC4 di Les Métiers du Bâtiment.
+SuppliersDelegationModelLMDB=Modello delega di pagamento di Les Métiers du Bâtiment.
+
+SuppliersDelegationModelLMBD_SPIEBATSO_Title=Delega SPIE BATIGNOLLES S-O
+SuppliersDelegationModelLMBD_SPIEBATSO_Desc=Modello delega di pagamento SPIE BATIGNOLLES SUD-OUEST di Les Métiers du Bâtiment.
+
+CSTBTP2014ModelLMBD=Contratto di subappalto semplificato 2014 di Les Métiers du Bâtiment.
+SuppliersDelegationModelEIFFAGE2017=Modello delega di pagamento di EIFFAGE (2017).
+DocumentModelPaymentPDFLMDB=Modello lettera di pagamento fornitori di Les Métiers du Bâtiment.
+SuppliersInvoiceModelLMDB=Modello fattura fornitore di Les Métiers du Bâtiment.
+RetenueGarantieTTCDeduitFacture=Ritenuta di garanzia IVA inclusa detratta
+CompteProrataTTCDeduitFacture=Conto pro-rata IVA inclusa detratto
+LMDBAmounttopay=Importo da pagare
+LMDBtotaldelegationdeduit=Totale deleghe da detrarre
+LMDBTotalHTRestantFacture=Importo residuo IVA esclusa
+LMDBotalTVARestantFacture=IVA residua
+LMDBTotalTTCRestantFacture=Importo residuo IVA inclusa
+Invoice=Fattura
+linkfiles=Link ai file
+
+lmdb_link=Link ai file
+
+lmdb_representant=Rappresentante
+lmdb_representant_help=Idealmente nel formato: Sig. COGNOME Nome.
+lmdb_compte_tiers=N. conto presso questo terzo
+
+lmdb_qualite_representant=Qualifica del rappresentante
+lmdb_qualite_representant_help=Direttore, amministratore, presidente, ecc.
+
+lmdb_retenue_garantie=Ritenuta di garanzia
+lmdb_retenue_garantie_help=Espressa in percentuale (senza simbolo) con un punto (.) al posto della virgola (,).
+
+lmdb_compte_prorata=Conto pro-rata
+lmdb_compte_prorata_help=Espressa in percentuale (senza simbolo) con un punto (.) al posto della virgola (,).
+
+lmdb_project_amount=Importo del progetto (IVA esclusa)
+
+lmdb_n_devis_fourn=N. preventivo fornitore
+
+lmdb_date_devis_fourn=Data preventivo fornitore
+
+lmdb_marque=Marca/Fabbricante
+
+lmdb_date_lcr=Data di scadenza LCR
+
+lmdb_poste_info=Etichetta della voce
+
+Details=Dettagli
+
+private=Privato
+public=Pubblico
+
+ProjectDetails=Dettagli del progetto
+project_details=Dettagli del progetto
+
+PROJECTDETAILS_type_mou=Tipo di committente.
+PROJECTDETAILS_type_mou_Tooltip=Seleziona "Pubblico" se il committente è un'amministrazione o un'azienda pubblica, oppure "Privato" se è un cliente privato.
+
+PROJECTDETAILS_refchantier=Riferimento cantiere.
+PROJECTDETAILS_refchantier_tooltip=Inserisci il riferimento fornito dal cliente durante la consultazione o alla firma del contratto.
+
+PROJECTDETAILS_adresse_chantier=Indirizzo del cantiere.
+
+PROJECTDETAILS_nature_travaux=Natura dei lavori.
+PROJECTDETAILS_nature_travaux_tooltip=Descrivi la natura dei lavori iniziando con un articolo determinativo.
+
+PROJECTDETAILS_fk_moe=Direzione lavori.
+PROJECTDETAILS_fk_moe_Tooltip=Indica il terzo; se non è presente, crealo nella sezione Terzi.
+
+PROJECTDETAILS_n_lot=Numero del lotto.
+
+PROJECTDETAILS_libelle_lot=Etichetta del lotto.
+
+PROJECTDETAILS_marche_defense=Appalti pubblici di difesa o sicurezza?
+PROJECTDETAILS_marche_defense_Tooltip=Se il committente è pubblico, questo contratto riguarda la Difesa o la Sicurezza?
+
+PROJECTDETAILS_rg_sstt=Aliquota di ritenuta di garanzia applicata ai subappaltatori?
+PROJECTDETAILS_rg_sstt_Tooltip=Espressa in percentuale; se non si applica alcuna ritenuta, inserisci "0".
+
+none=Nessuno
+
+DC4form=DC4 | Contratto di subappalto
+
+DC4=DC4 | Delega di pagamento | Contratti di subappalto
+dc4=Informazioni necessarie per preparare una dichiarazione DC4, un contratto di subappalto o una delega di pagamento.
+
+dc4_only=Informazioni necessarie per preparare una dichiarazione DC4.
+dc4_errordatemessage=Questo ordine non è allo stato "Ordinato" o successivo, quindi la data iniziale predefinita sarà quella dello stato corrente.
+
+DC4_dc4_object_declaration=Oggetto della dichiarazione del subappaltatore (DC4)
+DC4_dc4_object_declaration_Tooltip=Seleziona il caso migliore.
+DC4_dc4_object_declaration_1=Allegato all'atto di impegno
+DC4_dc4_object_declaration_2=Atto speciale iniziale
+DC4_dc4_object_declaration_3=Atto speciale modificativo
+
+DC4_dc4_date_initiale=Data iniziale del DC4 (se atto modificativo)
+DC4_dc4_date_initiale_Tooltip=Indica la data dell'atto iniziale se si tratta di un atto modificativo
+
+DC4_avance=Anticipo richiesto?
+DC4_avance_Tooltip=Il subappaltatore ha richiesto un anticipo?
+
+DC4_dc4_documents_fournis=Documenti forniti con il DC4.
+
+DC4_dc4_documents_fournis_Tooltip=Documenti che possono essere richiesti al momento della consegna del DC4.
+
+DC4_dc4_documents_fournis_1=Esemplare unico o certificato di cedibilità del contratto pubblico.
+DC4_dc4_documents_fournis_2=Attestazione o liberatoria del beneficiario della cessione o del pegno dei crediti.
+DC4_dc4_documents_fournis_3=Il titolare richiede la modifica dell'esemplare unico o del certificato di cedibilità.
+DC4_dc4_documents_fournis_4=Altre possibilità.
+
+DC4_paiement_direct=Diritto al pagamento diretto?
+DC4_paiement_direct_Tooltip=Il subappaltatore è idoneo al pagamento diretto da parte del cliente?
+
+DC4_libelle_poste_cctp=Etichetta della voce nel CCTP
+
+DC4_sps_travaux=Lavori soggetti a coordinamento SPS
+DC4_sps_travaux_Tooltip=I lavori subappaltati sono soggetti a coordinamento SPS? In tal caso, è richiesta un'ispezione congiunta e il subappaltatore deve fornire un PPSPS.
+
+DC4_sps_date_remise=Data di consegna del PPSPS.
+DC4_sps_date_remise_Tooltip=Il PPSPS è obbligatorio e deve essere consegnato al coordinatore SPS durante l'ispezione congiunta.
+
+DC4_cissct=CISSCT
+DC4_cissct_Tooltip=È presente un CISSCT in cantiere.
+
+DC4_DIUO=Consegna del DIUO
+DC4_DIUO_Tooltip=Il fascicolo per gli interventi successivi sull'opera (DIUO) è essenziale. Preparato in fase di progettazione, riunisce informazioni tecniche, planimetrie e note per la manutenzione in sicurezza.
+
+DC4_responsabilite=Responsabilità delle opere
+DC4_responsabilite_Tooltip=Il subappaltatore è responsabile delle opere dopo la ricezione e fino alla fine del cantiere?
+
+DC4_dc4_hypothese_01=Documento fornito con il DC4
+DC4_dc4_hypothese_02=Oggetto della richiesta.
+DC4_dc4_hypothese_Tooltip_01=La presente dichiarazione di subappalto costituisce un atto speciale.
+Il titolare attesta che nessuna cessione o pegno di crediti derivanti dal contratto pubblico ostacola il pagamento diretto al subappaltatore, ai sensi dell'articolo 137 del decreto n. 2016-360 o dell'articolo 126 del decreto n. 2016-361.
+DC4_dc4_hypothese_Tooltip_02=La presente dichiarazione di subappalto costituisce un atto speciale modificativo.
+DC4_dc4_hypothese_1=L'esemplare unico o il certificato di cedibilità rilasciato per il contratto pubblico.
+DC4_dc4_hypothese_2=Attestazione o liberatoria del beneficiario della cessione o del pegno dei crediti.
+DC4_dc4_hypothese_3=Il titolare richiede la modifica dell'esemplare unico o del certificato di cedibilità allegato a questo DC4.
+DC4_dc4_hypothese_4=L'esemplare unico o il certificato di cedibilità è stato consegnato per una cessione o un pegno di crediti e non può essere restituito.
+
+dc4_acte_modificatif=Atto modificativo
+
+Module104400Name=Storico

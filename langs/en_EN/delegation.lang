@@ -1,0 +1,208 @@
+# Dolibarr language file - en_US - tos
+# Admin form
+CHARSET=UTF-8
+Module440300Desc=Module to manage payment delegation, subcontracting contracts, and DC4 forms (requires the BTP module from Dolistore)
+Module440300Name=Delegation
+Delegation=Delegation
+
+SetupG=General
+
+LMDB_USE_IDPROF3_DICTIONARY=Use the Professional Identifier 3 dictionary (NAF/APE)
+LMDBSetup=LMDB settings - General
+
+lmdb_for=for
+
+lmdb_envoi_auto=Automatic sending
+
+lmdb_envoi_auto_help=Check the box if the email must be sent automatically after generation.
+
+lmdb_template=Automatic email template
+
+lmdb_template_help=Choose the email template sent automatically when the invoice is validated.
+
+lmdb_commande_account=Bank account
+
+lmdb_commande_account_help=Useful for DC4 and related forms.
+
+lmdb_error_empty_line=The line is empty, please enter a label and an amount for the delegation to deduct from your invoice.
+
+lmdb_error_empty_label=The label is empty, please enter a label for the delegation to deduct from your invoice.
+
+lmdb_error_amount_null=The amount is empty, please enter an amount for the delegation to deduct from your invoice.
+
+NotAProgressInvoice=The selected invoice is not a progress invoice
+NotAnInvoice=The selected object is not an invoice
+ObjectNotFound=The invoice was not found
+DelegationLineUpdated=The line has been updated
+DelegationLineDeleted=The line has been deleted
+DelegationLineAdded=The line has been added
+DelegationLineDoesNotExist=The line does not exist
+HTAmount=Amount excl. tax
+AmountToPay=Amount to pay (incl. tax)
+PDFCrabeDelegationTitle=Progress report no. %d
+DelegationTotalHTRestant=Remaining amount excl. tax on the progress report
+DelegationTotalTVARestant=Remaining VAT on the progress report
+DelegationTotalTTCRestant=Remaining amount incl. tax on the progress report
+CompteProrataTTCDeduit=Prorated account incl. tax to deduct from the progress report
+RetenueGarantieTTCDeduit=Retention guarantee incl. tax to deduct from the progress report
+Deleg=Payment Delegation
+RefChantierClient=Customer site reference
+Total_HT_Marche=Total amount excl. tax for the contract
+Total_HT=Total amount excl. tax
+Situ_encours=Current progress
+Total_HT_Cumul=Cumulative total excl. tax
+DocumentModellmdbproduitsPDF=Product sheet template by Les Métiers du Bâtiment.
+PDFBTPLMDBDescription=Invoice template for work progress by Les Métiers du Bâtiment.
+PDFLMDBDescription=Invoice template by Les Métiers du Bâtiment.
+PDFdevisLMDBDescription=Commercial proposal template by Les Métiers du Bâtiment.
+
+idprof3=NAF/APE code
+country_code=Country code
+
+SuppliersDeliveryModelLMDB=Supplier delivery note template by Les Métiers du Bâtiment.
+SuppliersCommandModelLMBD=Supplier order template by Les Métiers du Bâtiment.
+SuppliersCommandModelINPOSE=Supplier order template by Les Métiers du Bâtiment with forced display of product descriptions.
+SuppliersDelegationModelLMBDv2=Payment delegation template v2 by Les Métiers du Bâtiment.
+SuppliersDC4ModelLMDB=DC4 form template by Les Métiers du Bâtiment.
+SuppliersDelegationModelLMDB=Payment delegation template by Les Métiers du Bâtiment.
+
+SuppliersDelegationModelLMBD_SPIEBATSO_Title=SPIE BATIGNOLLES S-O delegation
+SuppliersDelegationModelLMBD_SPIEBATSO_Desc=SPIE BATIGNOLLES SUD-OUEST payment delegation template by Les Métiers du Bâtiment.
+
+CSTBTP2014ModelLMBD=Simplified subcontracting contract 2014 by Les Métiers du Bâtiment.
+SuppliersDelegationModelEIFFAGE2017=Payment delegation template by EIFFAGE (2017).
+DocumentModelPaymentPDFLMDB=Supplier payment letter template by Les Métiers du Bâtiment.
+SuppliersInvoiceModelLMDB=Supplier invoice template by Les Métiers du Bâtiment.
+RetenueGarantieTTCDeduitFacture=Retention guarantee incl. tax deducted
+CompteProrataTTCDeduitFacture=Prorated account incl. tax deducted
+LMDBAmounttopay=Amount to pay
+LMDBtotaldelegationdeduit=Total delegations to deduct
+LMDBTotalHTRestantFacture=Remaining amount excl. tax
+LMDBotalTVARestantFacture=Remaining VAT
+LMDBTotalTTCRestantFacture=Remaining amount incl. tax
+Invoice=Invoice
+linkfiles=Link to files
+
+lmdb_link=Link to files
+
+lmdb_representant=Representative
+lmdb_representant_help=Ideally in the format: Mr LASTNAME Firstname.
+lmdb_compte_tiers=Account number with this third party
+
+lmdb_qualite_representant=Representative role
+lmdb_qualite_representant_help=Director, Manager, President, etc.
+
+lmdb_retenue_garantie=Retention guarantee
+lmdb_retenue_garantie_help=Expressed as a percentage (do not include the symbol) with a dot (.) instead of a comma (,).
+
+lmdb_compte_prorata=Prorated account
+lmdb_compte_prorata_help=Expressed as a percentage (do not include the symbol) with a dot (.) instead of a comma (,).
+
+lmdb_project_amount=Project amount (excl. tax)
+
+lmdb_n_devis_fourn=Supplier quote number
+
+lmdb_date_devis_fourn=Supplier quote date
+
+lmdb_marque=Brand/Manufacturer
+
+lmdb_date_lcr=Due date for the LCR
+
+lmdb_poste_info=Work item label
+
+Details=Details
+
+private=Private
+public=Public
+
+ProjectDetails=Project details
+project_details=Project details
+
+PROJECTDETAILS_type_mou=Project owner type.
+PROJECTDETAILS_type_mou_Tooltip=Select "Public" if the project owner is a public administration or public company (e.g., social landlord), or "Private" if it is a private client.
+
+PROJECTDETAILS_refchantier=Site reference.
+PROJECTDETAILS_refchantier_tooltip=Enter the site reference provided by the client during consultation or upon contract signing.
+
+PROJECTDETAILS_adresse_chantier=Site address.
+
+PROJECTDETAILS_nature_travaux=Nature of works.
+PROJECTDETAILS_nature_travaux_tooltip=Describe the nature of the works, starting with a definite pronoun ("the").
+
+PROJECTDETAILS_fk_moe=Project manager.
+PROJECTDETAILS_fk_moe_Tooltip=Enter the third party name; if it is not in the list, create it in the Third Parties section.
+
+PROJECTDETAILS_n_lot=Lot number.
+
+PROJECTDETAILS_libelle_lot=Lot label.
+
+PROJECTDETAILS_marche_defense=Public defense or security contracts?
+PROJECTDETAILS_marche_defense_Tooltip=If the project owner is a public company, does this contract concern Defense or Security?
+
+PROJECTDETAILS_rg_sstt=Retention guarantee rate passed to subcontractors?
+PROJECTDETAILS_rg_sstt_Tooltip=Expressed as a percentage; if no retention guarantee is applied to subcontractors, enter "0".
+
+none=None
+
+DC4form=DC4 | Subcontracting contract
+
+DC4=DC4 | Payment Delegation | Subcontracting Contracts
+dc4=Information required to prepare a DC4 declaration, a subcontracting contract, or a payment delegation.
+
+dc4_only=Information required to prepare a DC4 declaration.
+dc4_errordatemessage=This order is not at status "Ordered" or later, so the default initial date will be the current status date.
+
+DC4_dc4_object_declaration=Purpose of the subcontractor declaration (DC4)
+DC4_dc4_object_declaration_Tooltip=Select the best case.
+DC4_dc4_object_declaration_1=Appendix to the deed of commitment
+DC4_dc4_object_declaration_2=Initial special act
+DC4_dc4_object_declaration_3=Amending special act
+
+DC4_dc4_date_initiale=Initial DC4 date (if amending act)
+DC4_dc4_date_initiale_Tooltip=Enter the date of the initial act if this is an amending act
+
+DC4_avance=Requested advance?
+DC4_avance_Tooltip=Has the subcontractor requested an advance?
+
+DC4_dc4_documents_fournis=Documents provided with the DC4.
+
+DC4_dc4_documents_fournis_Tooltip=Documents that may be requested when submitting the DC4 form.
+
+DC4_dc4_documents_fournis_1=Single copy or negotiability certificate issued for the public contract.
+DC4_dc4_documents_fournis_2=Certificate or release from the beneficiary of the assignment or pledge of receivables.
+DC4_dc4_documents_fournis_3=The holder requests a modification of the single copy or negotiability certificate.
+DC4_dc4_documents_fournis_4=Other possibilities.
+
+DC4_paiement_direct=Right to direct payment?
+DC4_paiement_direct_Tooltip=Is the subcontractor eligible for direct payment by your customer?
+
+DC4_libelle_poste_cctp=Work item label in the CCTP
+
+DC4_sps_travaux=Works subject to SPS coordination
+DC4_sps_travaux_Tooltip=Are the subcontracted works subject to SPS coordination? If yes, an inspection is likely required and the subcontractor must provide a PPSPS.
+
+DC4_sps_date_remise=PPSPS submission date.
+DC4_sps_date_remise_Tooltip=The PPSPS is mandatory and must be submitted to the SPS controller at the time of the joint inspection.
+
+DC4_cissct=CISSCT
+DC4_cissct_Tooltip=Is there a CISSCT on the site.
+
+DC4_DIUO=DIUO handover
+DC4_DIUO_Tooltip=The file for later interventions on the work (DIUO) is essential. Prepared during the design phase, it ensures the project owner and project manager take into account equipment needed for safe future maintenance. It is a practical dossier with technical information, plans, and notices.
+
+DC4_responsabilite=Works liability
+DC4_responsabilite_Tooltip=Is the subcontractor responsible for its works after reception and until the end of the project?
+
+DC4_dc4_hypothese_01=Document provided with the DC4
+DC4_dc4_hypothese_02=Purpose of the request.
+DC4_dc4_hypothese_Tooltip_01=This subcontracting declaration constitutes a special act.
+The holder establishes that no assignment or pledge of receivables arising from the public contract prevents direct payment to the subcontractor, under the conditions provided in Article 137 of Decree No. 2016-360 or Article 126 of Decree No. 2016-361.
+DC4_dc4_hypothese_Tooltip_02=This subcontracting declaration constitutes an amending special act.
+DC4_dc4_hypothese_1=The single copy or negotiability certificate issued for the public contract.
+DC4_dc4_hypothese_2=Certificate or release from the beneficiary of the assignment or pledge of receivables.
+DC4_dc4_hypothese_3=The holder requests the modification of the single copy or negotiability certificate attached to this DC4.
+DC4_dc4_hypothese_4=The single copy or negotiability certificate has been provided for an assignment or pledge of receivables and cannot be returned.
+
+dc4_acte_modificatif=Amending act
+
+Module104400Name=History

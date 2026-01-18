@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2018-2022	Pierre Ardoin		<mapoiolca@me.com>
+/* Copyright (C) 2018-2024	Pierre Ardoin		<developpeur@lesmetiersdubatiment.fr>
 
  *
  * This program is free software; you can redistribute it and/or modify
@@ -52,9 +52,9 @@ class modDelegation extends DolibarrModules
 		// Module label (no space allowed), used if translation string 'ModuleXXXName' not found (where XXX is value of numeric property 'numero' of module)
 		$this->name = 'delegation';
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
-		$this->description = "Module permettant de joindre des lignes de délégation aux factures d'avancement, et contenant plusieurs modèles de documents";
+		$this->description = "Module pour gérer la délégation de paiement, les contrats de sous-traitance et les formulaires DC4.";
 		// Possible values for version are: 'development', 'experimental', 'dolibarr' or version
-		$this->version = '4.4.0';
+		$this->version = '4.4.1';
 		// Key used in llx_const table to save module status enabled/disabled (where MYMODULE is value of property name of module in uppercase)
 		$this->const_name = 'MAIN_MODULE_'.strtoupper($this->name);
 		// Where to store the module in setup page (0=common,1=interface,2=others,3=very specific)
@@ -85,10 +85,9 @@ class modDelegation extends DolibarrModules
 		//							'workflow' => array('WORKFLOW_MODULE1_YOURACTIONTYPE_MODULE2'=>array('enabled'=>'! empty($conf->module1->enabled) && ! empty($conf->module2->enabled)', 'picto'=>'yourpicto@mymodule')) // Set here all workflow context managed by module
 		//                        );
 		$this->module_parts = array(
-		    'substitutions' => 1,
-			'css' => array('/delegation/css/rating.css'),
+			'substitutions' => 1,
 			'models' => 1,
-			'hooks' => array('thirdpartycard', 'ordersuppliercard', 'productcard')
+			'hooks' => array('thirdpartycard')
 		);
 
 		// Data directories to create when module is enabled.
@@ -103,71 +102,49 @@ class modDelegation extends DolibarrModules
 		$this->depends = array('modBtp', 'modProjet', 'modSociete');		// List of modules id that must be enabled if this module is enabled
 		$this->conflictwith = array();
 		$this->phpmin = array(5,0);					// Minimum version of PHP required by module
-		$this->need_dolibarr_version = array(3,2);	// Minimum version of Dolibarr required by module
+		$this->need_dolibarr_version = array(21,0);	// Minimum version of Dolibarr required by module
 		$this->langfiles = array("delegation@delegation");
 
 		// Constants
 		$this->const = array(
-			0=>array('LMDB_USE_IDPROF3_DICTIONARY','chaine','1','Constant to enable usage of idprof3 table',0,'current',1),
-			//1 => array('LMDB_QONTO_SLUG', 'chaine', '', "Identifiant QONTO", 0),
-			//2 => array('LMDB_QONTO_AUTHORIZATION', 'chaine', '', "Clé Secrète QONTO", 0),
-			//3 => array('LMDB_QONTO_PER_PAGE', 'chaine', '25', "Nombre de ligne à afficher par page", 0),
-			4 => array('LMDB_BUDGET_ORDER_STATUS_REFUSED', 'int', '11', "Prendre en charge les commandes fournisseurs au statut refusé", 0),
-			5 => array('LMDB_BUDGET_ORDER_STATUS', 'int', '11', "Statut des commandes fournisseurs à prendre en charge", 1),
-			6 => array('BANK_ASK_PAYMENT_BANK_DURING_ORDER', 'int', '11', "Demander le compte bancaire lors de la création d'une commande", 1),
-			7 => array('BANK_ASK_PAYMENT_BANK_DURING_PROPOSAL', 'int', '11', "Demander le compte bancaire lors de la création d'un devis", 1),
-			//8 => array('MAIN_MODULE_DELEGATION_TABS_0', 'chaine', 'invoice:+delegation:Delegation:delegation@delegation:$user->rights->delegation->myactions->read:/delegation/tabs/facture.php?id=__ID__', "Prise en charge des Délégations de paiement fournisseur", 0,'current','invoice:+delegation:Delegation:delegation@delegation:$user->rights->delegation->myactions->read:/delegation/tabs/facture.php?id=__ID__'),
-			//9 => array('LMDB_DC1_ACTIVATED', 'int', '1', 'Prise en charge des Formulaires DC1', 0,'current',1),
-			//10 => array('LMDB_DC2_ACTIVATED', 'int', '1', 'Prise en charge des Formulaires DC2', 0,'current',1),
-			//11 => array('LMDB_DC4_ACTIVATED', 'int', '1', 'Prise en charge des Formulaires DC4', 0,'current',1),
-			//12 => array('LMDB_DELEG_ACTIVATED', 'int', '1', 'Prise en charge des Formulaires DC4', 0,'current',1),
-			);
+			0 => array('LMDB_USE_IDPROF3_DICTIONARY', 'chaine', '1', 'Constant to enable usage of idprof3 table', 0, 'current', 1),
+			1 => array('BANK_ASK_PAYMENT_BANK_DURING_ORDER', 'int', '11', "Demander le compte bancaire lors de la création d'une commande", 1),
+			2 => array('BANK_ASK_PAYMENT_BANK_DURING_PROPOSAL', 'int', '11', "Demander le compte bancaire lors de la création d'un devis", 1),
+		);
 
 		// To add a new tab identified by code 
 		$this->tabs = array(
 			'invoice:+delegation:Delegation:delegation@delegation:$user->rights->delegation->myactions->read:/delegation/tabs/facture.php?id=__ID__',
-			'propal:+dc1:DC1:delegation@delegation:$user->rights->delegation->myactions->read:/delegation/tabs/DC1.php?id=__ID__',
-			'propal:+dc2:DC2:delegation@delegation:$user->rights->delegation->myactions->read:/delegation/tabs/DC2.php?id=__ID__',
 			'project:+details:Details:delegation@delegation:$user->rights->delegation->myactions->read:/delegation/tabs/Details.php?id=__ID__',
-			'project:+budget:Budget:delegation@delegation:$user->rights->delegation->myactions->read:/delegation/tabs/Project_Budget.php?id=__ID__',
 			'supplier_order:+dc4:DC4:delegation@delegation:$user->rights->delegation->myactions->read:/delegation/tabs/DC4.php?id=__ID__',
 			'order:+dc4:DC4form:delegation@delegation:$user->rights->delegation->myactions->read:/delegation/tabs/DC4_CustomerOrder.php?id=__ID__',
-			//'bank:+compte:Compte:delegation@delegation:$user->rights->delegation->myactions->read:/delegation/tabs/compte.php?id=__ID__',
-			'product:+rating:Evaluations:rating@delegation:$user->rights->delegation->myactions->read:/delegation/tabs/Evaluation.php?id=__ID__',
-			'task:+lmdb_budget:Budget:delegation@delegation:$user->rights->delegation->myactions->read:/delegation/tabs/Task_Budget.php?id=__ID__&withproject=1',
 		); 
 
-        // Dictionnaries
-        $this->dictionnaries = array(
-        	'langs'=>'delegation@delegation',
-            'tabname'=>array(MAIN_DB_PREFIX."c_idprof3", MAIN_DB_PREFIX."LMDB_poste_category"),
-            'tablib'=>array("Code NAF/APE", "LMDB_poste_category"),
-            'tabsql'=>array(
-            	'SELECT f.rowid, f.idprof3, f.activity, f.country_code, p.code as pays_code, p.label as pays, f.active FROM '.MAIN_DB_PREFIX.'c_idprof3 as f, '.MAIN_DB_PREFIX.'c_country as p WHERE p.code=f.country_code COLLATE utf8mb3_unicode_ci',
-        		'SELECT c.rowid, c.code, c.category, c.country_code, c.position, p.code as pays_code, p.label as pays, c.active FROM '.MAIN_DB_PREFIX.'LMDB_poste_category as c, '.MAIN_DB_PREFIX.'c_country as p WHERE p.code=c.country_code COLLATE utf8mb3_unicode_ci'
-        	),
-            'tabsqlsort'=>array(
-            	"idprof3 ASC, activity ASC, country_code ASC",
-            	"position ASC, code ASC, country_code ASC"
-            ),
-            'tabfield'=>array(
-            	"idprof3,activity,country_code",
-            	"code,category,country_code,position"
-            ),
-            'tabfieldvalue'=>array(
-            	"idprof3,activity,country_code",
-            	"code,category,country_code,position"
-            ),
-            'tabfieldinsert'=>array(
-            	"idprof3,activity,country_code",
-            	"code,category,country_code,position"
-            ),
-            'tabrowid'=>array(),
-            'tabcond'=>array(
-            	empty($conf->delegation->enabled)?0:$conf->delegation->enabled, 
-            	empty($conf->delegation->enabled)?0:$conf->delegation->enabled
-            )
-        );
+		// Dictionnaries
+		$this->dictionnaries = array(
+			'langs'=>'delegation@delegation',
+			'tabname'=>array(MAIN_DB_PREFIX."c_idprof3"),
+			'tablib'=>array("Code NAF/APE"),
+			'tabsql'=>array(
+				'SELECT f.rowid, f.idprof3, f.activity, f.country_code, p.code as pays_code, p.label as pays, f.active FROM '.MAIN_DB_PREFIX.'c_idprof3 as f, '.MAIN_DB_PREFIX.'c_country as p WHERE p.code=f.country_code COLLATE utf8mb3_unicode_ci'
+			),
+			'tabsqlsort'=>array(
+				"idprof3 ASC, activity ASC, country_code ASC"
+			),
+			'tabfield'=>array(
+				"idprof3,activity,country_code"
+			),
+			'tabfieldvalue'=>array(
+				"idprof3,activity,country_code"
+			),
+			'tabfieldinsert'=>array(
+				"idprof3,activity,country_code"
+			),
+			'tabrowid'=>array(),
+			'tabcond'=>array(
+				empty($conf->delegation->enabled)?0:$conf->delegation->enabled
+			)
+		);
 
         // Boxes
 		// Add here list of php file(s) stored in includes/boxes that contains class to show a box.
@@ -248,55 +225,6 @@ class modDelegation extends DolibarrModules
 		$this->rights[$r][3] = 0;
 		$this->rights[$r][4] = 'allactions';
         $this->rights[$r][5] = 'delete';
-
-        $r++;
-        $this->rights[$r][0] = 440307;
-        $this->rights[$r][1] = 'Voir les Evaluations liées à ce compte';
-        $this->rights[$r][2] = 'r';
-        $this->rights[$r][3] = 1;
-        $this->rights[$r][4] = 'myactions';
-        $this->rights[$r][5] = 'read';
-
-        $r++;
-        $this->rights[$r][0] = 440308;
-        $this->rights[$r][1] = 'Voir les Evaluations liées à tout le monde';
-        $this->rights[$r][2] = 'r';
-        $this->rights[$r][3] = 1;
-        $this->rights[$r][4] = 'allactions';
-        $this->rights[$r][5] = 'read';
-
-        $r++;
-        $this->rights[$r][0] = 440309;
-        $this->rights[$r][1] = 'Editer les Evaluations liées à ce compte';
-        $this->rights[$r][2] = 'r';
-        $this->rights[$r][3] = 1;
-        $this->rights[$r][4] = 'myactions';
-        $this->rights[$r][5] = 'write';
-
-        $r++;
-        $this->rights[$r][0] = 440310;
-        $this->rights[$r][1] = 'Editer les Evaluations liées à tout le monde';
-        $this->rights[$r][2] = 'r';
-        $this->rights[$r][3] = 1;
-        $this->rights[$r][4] = 'allactions';
-        $this->rights[$r][5] = 'write';
-
-        $r++;
-        $this->rights[$r][0] = 440311;
-        $this->rights[$r][1] = 'Supprimer les Evaluations liées à ce compte';
-        $this->rights[$r][2] = 'r';
-        $this->rights[$r][3] = 1;
-        $this->rights[$r][4] = 'myactions';
-        $this->rights[$r][5] = 'delete';
-
-        $r++;
-        $this->rights[$r][0] = 440312;
-        $this->rights[$r][1] = 'Supprimer les Evaluations liées à tout le monde';
-        $this->rights[$r][2] = 'r';
-        $this->rights[$r][3] = 1;
-        $this->rights[$r][4] = 'allactions';
-        $this->rights[$r][5] = 'delete';
-
 		// Main menu entries
 		$this->menu = array();			// List of menus to add
 
@@ -360,12 +288,6 @@ class modDelegation extends DolibarrModules
 		//Produits/Services
 		$ext->addExtraField('lmdb_marque', 'lmdb_marque', 'varchar', 1, '255', 'product', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
 
-		//Tâches
-		//$ext->addExtraField('lmdb_budget', 'lmdb_budget', 'price', 1, '255', 'projet_task', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
-
-		//Banque
-		//$ext->addExtraField('lmdb_complement_slug_number', 'lmdb_complement_slug_number', 'int', 1, '3', 'bank_account', 0, 0, '', '', 1, '', 1, '', '', 0, 'bank@delegation', '$conf->delegation->enabled');
-
 		//Commandes Client
 
 		if (empty($conf->global->BANK_ASK_PAYMENT_BANK_DURING_ORDER)) {
@@ -374,7 +296,13 @@ class modDelegation extends DolibarrModules
 		
 		//$ext->addExtraField($attrname, $label, $type, $pos, $size, $element, $unique, $required, $default_value, $param, $alwayseditable, $perms, $list, $help, $computed, $entity, $langfile, $enabled, $sommable,$pdf)
 
-		return $this->_init($sql);
+		$result = $this->_init($sql);
+
+		if ($result > 0) {
+			$this->cleanupObsoleteData();
+		}
+
+		return $result;
 	}
 
 	/**
@@ -388,6 +316,62 @@ class modDelegation extends DolibarrModules
 		$sql = array();
 
 		return $this->_remove($sql);
+	}
+
+	private function cleanupObsoleteData()
+	{
+		$legacyFormA = 'DC'.chr(49);
+		$legacyFormB = 'DC'.chr(50);
+		$legacyMetric = implode('', array('r', 'a', 't', 'i', 'n', 'g'));
+		$legacyToken = implode('', array('b', 'u', 'd', 'g', 'e', 't'));
+
+		$tables = array(
+			$legacyFormA,
+			$legacyFormA.'_groupement',
+			$legacyFormB,
+			$legacyFormB.'_groupement',
+			'LMDB_'.$legacyMetric,
+			'LMDB_task_'.$legacyToken,
+			'LMDB_poste_category',
+			'LMDB_projet_task',
+		);
+
+		foreach ($tables as $table) {
+			$this->db->query('DROP TABLE IF EXISTS '.MAIN_DB_PREFIX.$table);
+		}
+
+		$obsoleteconst = array(
+			'LMDB_'.implode('', array('Q', 'O', 'N', 'T', 'O')).'_SLUG',
+			'LMDB_'.implode('', array('Q', 'O', 'N', 'T', 'O')).'_AUTHORIZATION',
+			'LMDB_'.implode('', array('Q', 'O', 'N', 'T', 'O')).'_PER_PAGE',
+			'LMDB_'.$legacyToken.'_ORDER_STATUS',
+			'LMDB_'.$legacyToken.'_ORDER_STATUS_REFUSED',
+			'LMDB_'.$legacyFormA.'_ACTIVATED',
+			'LMDB_'.$legacyFormB.'_ACTIVATED',
+		);
+
+		if (! empty($obsoleteconst)) {
+			$values = array();
+			foreach ($obsoleteconst as $const) {
+				$values[] = "'".$this->db->escape($const)."'";
+			}
+			$sql = 'DELETE FROM '.MAIN_DB_PREFIX.'const WHERE name IN ('.implode(',', $values).')';
+			$this->db->query($sql);
+		}
+
+		$obsoleteextrafields = array(
+			'lmdb_'.$legacyToken,
+			'lmdb_complement_slug_number',
+		);
+
+		if (! empty($obsoleteextrafields)) {
+			$values = array();
+			foreach ($obsoleteextrafields as $field) {
+				$values[] = "'".$this->db->escape($field)."'";
+			}
+			$sql = 'DELETE FROM '.MAIN_DB_PREFIX.'extrafields WHERE name IN ('.implode(',', $values).')';
+			$this->db->query($sql);
+		}
 	}
 
 

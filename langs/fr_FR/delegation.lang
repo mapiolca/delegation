@@ -1,7 +1,7 @@
 # Dolibarr language file - fr_FR - tos
 # Admin form
 CHARSET=iso-8859-1
-Module440300Desc=Module permettant de joindre des lignes de délégation aux factures d'avancement, et contenant divers modèles avancés(Nécessite le module BTP disponible sur le Dolistore)
+Module440300Desc=Module pour gérer la délégation de paiement, les contrats de sous-traitance et les formulaires DC4 (nécessite le module BTP disponible sur le Dolistore)
 Module440300Name=Délégation
 Delegation=Délégation
 
@@ -58,8 +58,6 @@ PDFdevisLMDBDescription = Modèle de Proposition Commerciale par Les Métiers du
 
 idprof3 = Code NAF/APE
 country_code = Code Pays
-
-lmdb_budget = Budget
 
 SuppliersDeliveryModelLMDB = Modèle de Bon de Livraison par Les Métiers du Bâtiment.
 SuppliersCommandModelLMBD = Modèle de Bon de Commande par Les Métiers de Bâtiment.
@@ -209,8 +207,4 @@ dc4_acte_modificatif = Acte Modificatif
 
 
 Module104400Name = Historique
-
-lmdb_poste_category = Catégorie
-lmdb_poste_category_help = Catégorie Budgétaire de laquelle sera décomptée cette commande.
-
 
