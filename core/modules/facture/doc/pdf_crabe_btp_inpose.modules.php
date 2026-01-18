@@ -1652,10 +1652,11 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 
 
-				$retenue_de_garantie = $total_ttc * $object->array_options['options_lmdb_retenue_garantie'] / 100 ;
+				$retained_warranty_rate = (! empty($object->retained_warranty) ? $object->retained_warranty : 0);
+				$retenue_de_garantie = $total_ttc * $retained_warranty_rate / 100 ;
 				$compte_prorata = $total_ttc * $object->array_options['options_lmdb_compte_prorata'] / 100 ;
 
-				$retenue_de_garantie_ht = $total_ht * $object->array_options['options_lmdb_retenue_garantie'] / 100 ;
+				$retenue_de_garantie_ht = $total_ht * $retained_warranty_rate / 100 ;
 				$compte_prorata_ht = $total_ht * $object->array_options['options_lmdb_compte_prorata'] / 100 ;
 
 				$total_ht_restant = $total_ht - $retenue_de_garantie_ht - $compte_prorata_ht ;
@@ -2242,10 +2243,11 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			foreach ($TPreviousIncoice as &$fac) $total_a_payer += $fac->total_ht;
 			$total_a_payer += $object->total_ht;
 
-			$retenue_de_garantie = $total_ttc * $object->array_options['options_lmdb_retenue_garantie'] / 100 ;
+			$retained_warranty_rate = (! empty($object->retained_warranty) ? $object->retained_warranty : 0);
+			$retenue_de_garantie = $total_ttc * $retained_warranty_rate / 100 ;
 			$compte_prorata = $total_ttc * $object->array_options['options_lmdb_compte_prorata'] / 100 ;
 
-			$retenue_de_garantie_ht = $total_ht * $object->array_options['options_lmdb_retenue_garantie'] / 100 ;
+			$retenue_de_garantie_ht = $total_ht * $retained_warranty_rate / 100 ;
 			$compte_prorata_ht = $total_ht * $object->array_options['options_lmdb_compte_prorata'] / 100 ;
 
 			$total_ht_restant = $total_ht - $retenue_de_garantie_ht - $compte_prorata_ht ;
@@ -3077,7 +3079,8 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			foreach($TPreviousIncoice as $fac) {
 				$cumul_anterieur_ht += $fac->total_ht;
 				$cumul_anterieur_tva += $fac->total_tva;
-				$retenue_garantie_anterieure += $fac->total_ttc * $fac->array_options['options_lmdb_retenue_garantie'] / 100;
+				$retained_warranty_rate = (! empty($fac->retained_warranty) ? $fac->retained_warranty : 0);
+				$retenue_garantie_anterieure += $fac->total_ttc * $retained_warranty_rate / 100;
 				$compte_prorata_anterieur += $fac->total_ttc * $fac->array_options['options_lmdb_compte_prorata'] / 100;
 			}
 		}
@@ -3086,7 +3089,8 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 		$nouveau_cumul = $cumul_anterieur_ht + $object->total_ht;
 		$nouveau_cumul_tva = $cumul_anterieur_tva + $object->total_tva;
-		$retenue_garantie = $retenue_garantie_anterieure + ($object->total_ttc * $object->array_options['options_lmdb_retenue_garantie'] / 100);
+		$retained_warranty_rate = (! empty($object->retained_warranty) ? $object->retained_warranty : 0);
+		$retenue_garantie = $retenue_garantie_anterieure + ($object->total_ttc * $retained_warranty_rate / 100);
 		$compte_prorata = $compte_prorata_anterieur + ($object->total_ttc * $object->array_options['options_lmdb_compte_prorata'] / 100);
 		
 		$TDataSituation['cumul_anterieur'] = $cumul_anterieur_ht;

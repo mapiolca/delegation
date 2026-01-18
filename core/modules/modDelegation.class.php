@@ -112,14 +112,18 @@ class modDelegation extends DolibarrModules
 			2 => array('BANK_ASK_PAYMENT_BANK_DURING_PROPOSAL', 'int', '11', "Demander le compte bancaire lors de la création d'un devis", 1),
 			3 => array('DELEGATION_PAYMENT_MODE_ID', 'int', '0', 'Payment mode id for delegation', 0, 'current', 1),
 			4 => array('DELEGATION_CLEARING_BANKACCOUNT_ID', 'int', '0', 'Clearing bank account id for delegation', 0, 'current', 1),
+			5 => array('DELEGATION_ENABLE_TAB_DELEGATION', 'int', '1', 'Enable delegation tab', 0, 'current', 1),
+			6 => array('DELEGATION_ENABLE_TAB_DETAILS', 'int', '1', 'Enable project details tab', 0, 'current', 1),
+			7 => array('DELEGATION_ENABLE_TAB_DC4_SUPPLIER', 'int', '1', 'Enable supplier order DC4 tab', 0, 'current', 1),
+			8 => array('DELEGATION_ENABLE_TAB_DC4_CUSTOMER', 'int', '1', 'Enable customer order DC4 tab', 0, 'current', 1),
 		);
 
 		// To add a new tab identified by code 
 		$this->tabs = array(
-			'invoice:+delegation:Delegation:delegation@delegation:$user->rights->delegation->myactions->read:/delegation/tabs/facture.php?id=__ID__',
-			'project:+details:Details:delegation@delegation:$user->rights->delegation->myactions->read:/delegation/tabs/Details.php?id=__ID__',
-			'supplier_order:+dc4:DC4:delegation@delegation:$user->rights->delegation->myactions->read:/delegation/tabs/DC4.php?id=__ID__',
-			'order:+dc4:DC4form:delegation@delegation:$user->rights->delegation->myactions->read:/delegation/tabs/DC4_CustomerOrder.php?id=__ID__',
+			'invoice:+delegation:Delegation:delegation@delegation:(getDolGlobalInt(\'DELEGATION_ENABLE_TAB_DELEGATION\', 1) && ! empty($user->rights->delegation) && (! empty($user->rights->delegation->tab_delegation_read) || (! empty($user->rights->delegation->myactions) && ! empty($user->rights->delegation->myactions->read)))):/delegation/tabs/facture.php?id=__ID__',
+			'project:+details:Details:delegation@delegation:(getDolGlobalInt(\'DELEGATION_ENABLE_TAB_DETAILS\', 1) && ! empty($user->rights->delegation) && (! empty($user->rights->delegation->tab_details_read) || (! empty($user->rights->delegation->myactions) && ! empty($user->rights->delegation->myactions->read)))):/delegation/tabs/Details.php?id=__ID__',
+			'supplier_order:+dc4_supplier:DC4:delegation@delegation:(getDolGlobalInt(\'DELEGATION_ENABLE_TAB_DC4_SUPPLIER\', 1) && ! empty($user->rights->delegation) && (! empty($user->rights->delegation->tab_dc4_supplier_read) || (! empty($user->rights->delegation->myactions) && ! empty($user->rights->delegation->myactions->read)))):/delegation/tabs/DC4.php?id=__ID__',
+			'order:+dc4_customer:DC4form:delegation@delegation:(getDolGlobalInt(\'DELEGATION_ENABLE_TAB_DC4_CUSTOMER\', 1) && ! empty($user->rights->delegation) && (! empty($user->rights->delegation->tab_dc4_customer_read) || (! empty($user->rights->delegation->myactions) && ! empty($user->rights->delegation->myactions->read)))):/delegation/tabs/DC4_CustomerOrder.php?id=__ID__',
 		); 
 
 		// Dictionnaries
@@ -128,7 +132,7 @@ class modDelegation extends DolibarrModules
 			'tabname'=>array(MAIN_DB_PREFIX."c_idprof3"),
 			'tablib'=>array("Code NAF/APE"),
 			'tabsql'=>array(
-				'SELECT f.rowid, f.idprof3, f.activity, f.country_code, p.code as pays_code, p.label as pays, f.active FROM '.MAIN_DB_PREFIX.'c_idprof3 as f, '.MAIN_DB_PREFIX.'c_country as p WHERE p.code=f.country_code COLLATE utf8mb3_unicode_ci'
+				'SELECT f.rowid, f.idprof3, f.activity, f.country_code, p.code as pays_code, p.label as pays, f.active FROM '.MAIN_DB_PREFIX.'c_idprof3 as f, '.MAIN_DB_PREFIX.'c_country as p WHERE p.code COLLATE utf8mb3_unicode_ci = f.country_code COLLATE utf8mb3_unicode_ci'
 			),
 			'tabsqlsort'=>array(
 				"idprof3 ASC, activity ASC, country_code ASC"
@@ -227,6 +231,70 @@ class modDelegation extends DolibarrModules
 		$this->rights[$r][3] = 0;
 		$this->rights[$r][4] = 'allactions';
         $this->rights[$r][5] = 'delete';
+		
+		$r++;
+		$this->rights[$r][0] = 440310;
+		$this->rights[$r][1] = $langs->trans('DelegationRightTabDelegationRead');
+		$this->rights[$r][2] = 'r';
+		$this->rights[$r][3] = 0;
+		$this->rights[$r][4] = 'tab_delegation';
+		$this->rights[$r][5] = 'read';
+
+		$r++;
+		$this->rights[$r][0] = 440311;
+		$this->rights[$r][1] = $langs->trans('DelegationRightTabDelegationWrite');
+		$this->rights[$r][2] = 'r';
+		$this->rights[$r][3] = 0;
+		$this->rights[$r][4] = 'tab_delegation';
+		$this->rights[$r][5] = 'write';
+
+		$r++;
+		$this->rights[$r][0] = 440312;
+		$this->rights[$r][1] = $langs->trans('DelegationRightTabDetailsRead');
+		$this->rights[$r][2] = 'r';
+		$this->rights[$r][3] = 0;
+		$this->rights[$r][4] = 'tab_details';
+		$this->rights[$r][5] = 'read';
+
+		$r++;
+		$this->rights[$r][0] = 440313;
+		$this->rights[$r][1] = $langs->trans('DelegationRightTabDetailsWrite');
+		$this->rights[$r][2] = 'r';
+		$this->rights[$r][3] = 0;
+		$this->rights[$r][4] = 'tab_details';
+		$this->rights[$r][5] = 'write';
+
+		$r++;
+		$this->rights[$r][0] = 440314;
+		$this->rights[$r][1] = $langs->trans('DelegationRightTabDc4SupplierRead');
+		$this->rights[$r][2] = 'r';
+		$this->rights[$r][3] = 0;
+		$this->rights[$r][4] = 'tab_dc4_supplier';
+		$this->rights[$r][5] = 'read';
+
+		$r++;
+		$this->rights[$r][0] = 440315;
+		$this->rights[$r][1] = $langs->trans('DelegationRightTabDc4SupplierWrite');
+		$this->rights[$r][2] = 'r';
+		$this->rights[$r][3] = 0;
+		$this->rights[$r][4] = 'tab_dc4_supplier';
+		$this->rights[$r][5] = 'write';
+
+		$r++;
+		$this->rights[$r][0] = 440316;
+		$this->rights[$r][1] = $langs->trans('DelegationRightTabDc4CustomerRead');
+		$this->rights[$r][2] = 'r';
+		$this->rights[$r][3] = 0;
+		$this->rights[$r][4] = 'tab_dc4_customer';
+		$this->rights[$r][5] = 'read';
+
+		$r++;
+		$this->rights[$r][0] = 440317;
+		$this->rights[$r][1] = $langs->trans('DelegationRightTabDc4CustomerWrite');
+		$this->rights[$r][2] = 'r';
+		$this->rights[$r][3] = 0;
+		$this->rights[$r][4] = 'tab_dc4_customer';
+		$this->rights[$r][5] = 'write';
 		// Main menu entries
 		$this->menu = array();			// List of menus to add
 
@@ -258,7 +326,6 @@ class modDelegation extends DolibarrModules
 		$ext->addExtraField('lmdb_qualite_representant', 'lmdb_qualite_representant', 'varchar', 0, 255, 'societe', 0, 1, '', '', 1, '', 1, 'lmdb_qualite_representant_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
 
 		//Factures
-		$ext->addExtraField('lmdb_retenue_garantie', 'lmdb_retenue_garantie', 'varchar', 1, 255, 'facture', 0, 0, '', '', 1, '', 1, 'lmdb_retenue_garantie_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
 		$ext->addExtraField('lmdb_compte_prorata', 'lmdb_compte_prorata', 'varchar', 2, 255, 'facture', 0, 0, '', '', 1, '', 1, 'lmdb_compte_prorata_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
 
 		$ext->addExtraField('lmdb_envoi_auto', 'lmdb_envoi_auto', 'boolean', 3, '', 'facture', 0, 0, 0, '', 0, '', 0, 'lmdb_envoi_auto_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled', );
