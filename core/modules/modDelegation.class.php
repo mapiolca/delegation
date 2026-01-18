@@ -388,16 +388,42 @@ class modDelegation extends DolibarrModules
 	 */
 	private function ensureDelegationSchema()
 	{
+		// EN: Check for column existence (compatibility with Dolibarr v21).
+		// FR: Vérifier l'existence de la colonne (compatibilité Dolibarr v21).
+		$hasField = false;
+		if (method_exists($this->db, 'DDLTableFieldExists')) {
+			$hasField = $this->db->DDLTableFieldExists(MAIN_DB_PREFIX.'delegation_det', 'fk_facture_fourn');
+		} else {
+			$sql = "SHOW COLUMNS FROM ".MAIN_DB_PREFIX."delegation_det LIKE 'fk_facture_fourn'";
+			$resql = $this->db->query($sql);
+			if ($resql) {
+				$hasField = ($this->db->num_rows($resql) > 0);
+			}
+		}
+
 		// EN: Add supplier invoice link if missing.
 		// FR: Ajouter le lien facture fournisseur si absent.
-		if (! $this->db->DDLTableFieldExists(MAIN_DB_PREFIX.'delegation_det', 'fk_facture_fourn')) {
+		if (! $hasField) {
 			$sql = "ALTER TABLE ".MAIN_DB_PREFIX."delegation_det ADD COLUMN fk_facture_fourn int(11) DEFAULT NULL";
 			$this->db->query($sql);
 		}
 
+		// EN: Check for unique index existence (compatibility with Dolibarr v21).
+		// FR: Vérifier l'existence de l'index unique (compatibilité Dolibarr v21).
+		$hasIndex = false;
+		if (method_exists($this->db, 'DDLIndexExists')) {
+			$hasIndex = $this->db->DDLIndexExists(MAIN_DB_PREFIX.'delegation_det', 'uk_delegation_facture_fourn');
+		} else {
+			$sql = "SHOW INDEX FROM ".MAIN_DB_PREFIX."delegation_det WHERE Key_name = 'uk_delegation_facture_fourn'";
+			$resql = $this->db->query($sql);
+			if ($resql) {
+				$hasIndex = ($this->db->num_rows($resql) > 0);
+			}
+		}
+
 		// EN: Add unique index to prevent duplicate supplier invoice links.
 		// FR: Ajouter un index unique pour éviter les doublons de factures fournisseurs.
-		if (! $this->db->DDLIndexExists(MAIN_DB_PREFIX.'delegation_det', 'uk_delegation_facture_fourn')) {
+		if (! $hasIndex) {
 			$sql = "ALTER TABLE ".MAIN_DB_PREFIX."delegation_det ADD UNIQUE KEY uk_delegation_facture_fourn (fk_object, fk_element, fk_facture_fourn)";
 			$this->db->query($sql);
 		}
