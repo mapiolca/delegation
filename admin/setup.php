@@ -86,6 +86,7 @@ if ($user->admin && $action == 'set_clearing_account') {
 
 if ($user->admin && $action == 'create_clearing_account') {
 	$account = new Account($db);
+	$account->ref = 'DELPASS';
 	$account->label = $langs->trans('DelegationClearingAccountLabel');
 	$account->currency_code = $conf->currency;
 	$account->clos = 0;
