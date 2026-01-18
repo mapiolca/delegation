@@ -126,6 +126,7 @@ function showParameters()
 	global $conf, $langs, $bc, $db;
 
 	$formbank = new FormBank($db);
+	$form = new Form($db);
 
 	$var = ! $var;
 	print '<tr '.$bc[$var].'>';
@@ -142,7 +143,25 @@ function showParameters()
 			print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 				print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
 				print '<input type="hidden" name="action" value="set_clearing_account">';
-				print $formbank->select_comptes($conf->global->DELEGATION_CLEARING_BANKACCOUNT_ID, 'delegation_clearing_bank_account', 0, '', 1);
+				// EN: Use FormBank selector when available, fallback to generic list otherwise.
+				// FR: Utiliser le sélecteur FormBank si disponible, sinon une liste générique.
+				if (method_exists($formbank, 'select_comptes')) {
+					print $formbank->select_comptes($conf->global->DELEGATION_CLEARING_BANKACCOUNT_ID, 'delegation_clearing_bank_account', 0, '', 1);
+				} elseif (method_exists($formbank, 'selectAccount')) {
+					print $formbank->selectAccount($conf->global->DELEGATION_CLEARING_BANKACCOUNT_ID, 'delegation_clearing_bank_account', 0, '', 1);
+				} else {
+					$options = array();
+					$sql = "SELECT rowid, label FROM ".MAIN_DB_PREFIX."bank_account";
+					$sql.= " WHERE entity = ".(int) $conf->entity;
+					$sql.= " ORDER BY label";
+					$resql = $db->query($sql);
+					if ($resql) {
+						while ($obj = $db->fetch_object($resql)) {
+							$options[$obj->rowid] = $obj->label;
+						}
+					}
+					print $form->selectarray('delegation_clearing_bank_account', $options, $conf->global->DELEGATION_CLEARING_BANKACCOUNT_ID, 1);
+				}
 				print ' <input type="submit" class="button" value="'.$langs->trans("Save").'">';
 			print '</form>';
 		print '</td>';
