@@ -62,8 +62,8 @@ if (empty($conf->global->DELEGATION_PAYMENT_MODE_ID)) {
 	}
 
 	if ($paymentId <= 0) {
-		$sql = "INSERT INTO ".MAIN_DB_PREFIX."c_paiement (code, libelle, active)";
-		$sql.= " VALUES ('".$db->escape($paymentCode)."', '".$db->escape($paymentLabel)."', 1)";
+		$sql = "INSERT INTO ".MAIN_DB_PREFIX."c_paiement (code, libelle, type, active)";
+		$sql.= " VALUES ('".$db->escape($paymentCode)."', '".$db->escape($paymentLabel)."', 2, 1)";
 		if ($db->query($sql)) {
 			$paymentId = (int) $db->last_insert_id(MAIN_DB_PREFIX."c_paiement");
 		}

@@ -463,8 +463,8 @@ class modDelegation extends DolibarrModules
 		// EN: Create payment mode if missing.
 		// FR: Créer le mode de règlement s'il manque.
 		if ($paymentId <= 0) {
-			$sql = "INSERT INTO ".MAIN_DB_PREFIX."c_paiement (code, libelle, active)";
-			$sql.= " VALUES ('".$this->db->escape($paymentCode)."', '".$this->db->escape($paymentLabel)."', 1)";
+			$sql = "INSERT INTO ".MAIN_DB_PREFIX."c_paiement (code, libelle, type, active)";
+			$sql.= " VALUES ('".$this->db->escape($paymentCode)."', '".$this->db->escape($paymentLabel)."', 2, 1)";
 			if ($this->db->query($sql)) {
 				$paymentId = (int) $this->db->last_insert_id(MAIN_DB_PREFIX."c_paiement");
 			}
