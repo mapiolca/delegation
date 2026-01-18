@@ -326,7 +326,6 @@ class modDelegation extends DolibarrModules
 		$ext->addExtraField('lmdb_qualite_representant', 'lmdb_qualite_representant', 'varchar', 0, 255, 'societe', 0, 1, '', '', 1, '', 1, 'lmdb_qualite_representant_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
 
 		//Factures
-		$ext->addExtraField('lmdb_retenue_garantie', 'lmdb_retenue_garantie', 'varchar', 1, 255, 'facture', 0, 0, '', '', 1, '', 1, 'lmdb_retenue_garantie_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
 		$ext->addExtraField('lmdb_compte_prorata', 'lmdb_compte_prorata', 'varchar', 2, 255, 'facture', 0, 0, '', '', 1, '', 1, 'lmdb_compte_prorata_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
 
 		$ext->addExtraField('lmdb_envoi_auto', 'lmdb_envoi_auto', 'boolean', 3, '', 'facture', 0, 0, 0, '', 0, '', 0, 'lmdb_envoi_auto_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled', );
