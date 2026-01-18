@@ -62,14 +62,17 @@ $object = new Project($db);
 $details = new Details($db);
 $soc = new Societe($db);
 
-// EN: Check module tab toggle and permissions.
-// FR: Vérifier l'activation de l'onglet et les permissions.
-if (empty($conf->global->DELEGATION_ENABLE_TAB_DETAILS)) {
+// Check module tab toggle and permissions.
+if (! getDolGlobalInt('DELEGATION_ENABLE_TAB_DETAILS', 1)) {
 	accessforbidden();
 }
 
-$canReadTab = $user->admin || $user->rights->delegation->tab_details_read;
-$canWriteTab = $user->admin || $user->rights->delegation->tab_details_write;
+$canReadTab = $user->admin
+	|| (! empty($user->rights->delegation->tab_details_read))
+	|| (! empty($user->rights->delegation->myactions) && ! empty($user->rights->delegation->myactions->read));
+$canWriteTab = $user->admin
+	|| (! empty($user->rights->delegation->tab_details_write))
+	|| (! empty($user->rights->delegation->myactions) && ! empty($user->rights->delegation->myactions->create));
 $canAddLines = $canWriteTab;
 $canDeleteLines = $canWriteTab;
 

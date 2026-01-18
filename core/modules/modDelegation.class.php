@@ -120,10 +120,10 @@ class modDelegation extends DolibarrModules
 
 		// To add a new tab identified by code 
 		$this->tabs = array(
-			'invoice:+delegation:Delegation:delegation@delegation:(! empty($conf->global->DELEGATION_ENABLE_TAB_DELEGATION) && ! empty($user->rights->delegation) && ! empty($user->rights->delegation->tab_delegation_read)):/delegation/tabs/facture.php?id=__ID__',
-			'project:+details:Details:delegation@delegation:(! empty($conf->global->DELEGATION_ENABLE_TAB_DETAILS) && ! empty($user->rights->delegation) && ! empty($user->rights->delegation->tab_details_read)):/delegation/tabs/Details.php?id=__ID__',
-			'supplier_order:+dc4_supplier:DC4:delegation@delegation:(! empty($conf->global->DELEGATION_ENABLE_TAB_DC4_SUPPLIER) && ! empty($user->rights->delegation) && ! empty($user->rights->delegation->tab_dc4_supplier_read)):/delegation/tabs/DC4.php?id=__ID__',
-			'order:+dc4_customer:DC4form:delegation@delegation:(! empty($conf->global->DELEGATION_ENABLE_TAB_DC4_CUSTOMER) && ! empty($user->rights->delegation) && ! empty($user->rights->delegation->tab_dc4_customer_read)):/delegation/tabs/DC4_CustomerOrder.php?id=__ID__',
+			'invoice:+delegation:Delegation:delegation@delegation:(getDolGlobalInt(\'DELEGATION_ENABLE_TAB_DELEGATION\', 1) && ! empty($user->rights->delegation) && (! empty($user->rights->delegation->tab_delegation_read) || (! empty($user->rights->delegation->myactions) && ! empty($user->rights->delegation->myactions->read)))):/delegation/tabs/facture.php?id=__ID__',
+			'project:+details:Details:delegation@delegation:(getDolGlobalInt(\'DELEGATION_ENABLE_TAB_DETAILS\', 1) && ! empty($user->rights->delegation) && (! empty($user->rights->delegation->tab_details_read) || (! empty($user->rights->delegation->myactions) && ! empty($user->rights->delegation->myactions->read)))):/delegation/tabs/Details.php?id=__ID__',
+			'supplier_order:+dc4_supplier:DC4:delegation@delegation:(getDolGlobalInt(\'DELEGATION_ENABLE_TAB_DC4_SUPPLIER\', 1) && ! empty($user->rights->delegation) && (! empty($user->rights->delegation->tab_dc4_supplier_read) || (! empty($user->rights->delegation->myactions) && ! empty($user->rights->delegation->myactions->read)))):/delegation/tabs/DC4.php?id=__ID__',
+			'order:+dc4_customer:DC4form:delegation@delegation:(getDolGlobalInt(\'DELEGATION_ENABLE_TAB_DC4_CUSTOMER\', 1) && ! empty($user->rights->delegation) && (! empty($user->rights->delegation->tab_dc4_customer_read) || (! empty($user->rights->delegation->myactions) && ! empty($user->rights->delegation->myactions->read)))):/delegation/tabs/DC4_CustomerOrder.php?id=__ID__',
 		); 
 
 		// Dictionnaries

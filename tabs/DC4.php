@@ -86,14 +86,17 @@ $form = new Form($db);
 $object = new CommandeFournisseur($db);
 $dc4 = new DC4($db);
 
-// EN: Check module tab toggle and permissions.
-// FR: Vérifier l'activation de l'onglet et les permissions.
-if (empty($conf->global->DELEGATION_ENABLE_TAB_DC4_SUPPLIER)) {
+// Check module tab toggle and permissions.
+if (! getDolGlobalInt('DELEGATION_ENABLE_TAB_DC4_SUPPLIER', 1)) {
 	accessforbidden();
 }
 
-$canReadTab = $user->admin || $user->rights->delegation->tab_dc4_supplier_read;
-$canWriteTab = $user->admin || $user->rights->delegation->tab_dc4_supplier_write;
+$canReadTab = $user->admin
+	|| (! empty($user->rights->delegation->tab_dc4_supplier_read))
+	|| (! empty($user->rights->delegation->myactions) && ! empty($user->rights->delegation->myactions->read));
+$canWriteTab = $user->admin
+	|| (! empty($user->rights->delegation->tab_dc4_supplier_write))
+	|| (! empty($user->rights->delegation->myactions) && ! empty($user->rights->delegation->myactions->create));
 $canAddLines = $canWriteTab;
 $canDeleteLines = $canWriteTab;
 
