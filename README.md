@@ -7,3 +7,5 @@ Ce module gère :
 - le formulaire DC4 (saisie, génération et données associées).
 
 Compatibilité : Dolibarr v21+.
+
+Le module ajoute un mode de règlement dédié « Délégation de paiement » et nécessite la configuration d’un compte de passage pour enregistrer les mouvements liés aux délégations.

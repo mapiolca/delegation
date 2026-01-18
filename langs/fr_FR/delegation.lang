@@ -10,6 +10,22 @@ SetupG=Général
 LMDB_USE_IDPROF3_DICTIONARY=Utiliser le Dictionnaire Identifiant Professionel 3 (NAF/APE)
 LMDBSetup=Réglages LMDB - Général
 
+DelegationPaymentMode=Délégation de paiement
+DelegationClearingBankAccount=Compte de passage (Délégation de paiement)
+DelegationCreateClearingAccount=Créer un compte de passage
+DelegationClearingAccountLabel=Compte de passage – Délégation de paiement
+DelegationClearingAccountSaved=Compte de passage enregistré.
+DelegationClearingAccountCreated=Compte de passage créé.
+DelegationSelectSupplierInvoice=Ajouter une facture fournisseur
+DelegationSupplierInvoices=Aucune facture fournisseur éligible
+DelegationConfigMissingClearingAccount=Veuillez configurer un compte de passage pour la délégation de paiement.
+DelegationSupplierInvoiceMissing=Veuillez sélectionner une facture fournisseur.
+DelegationSupplierInvoiceNotFound=Facture fournisseur introuvable.
+DelegationSupplierInvoiceNotAllowed=La facture fournisseur n'est pas éligible à la délégation.
+DelegationSupplierInvoiceAlreadyLinked=Cette facture fournisseur est déjà liée à la délégation.
+DelegationAmountExceeded=Le total des montants délégués dépasse le montant de la facture.
+DelegationClearingAccountMissingCountry=Veuillez renseigner le pays de la société avant de créer le compte de passage.
+
 lmdb_for = pour
 
 lmdb_envoi_auto = Envoi automatique
@@ -207,4 +223,3 @@ dc4_acte_modificatif = Acte Modificatif
 
 
 Module104400Name = Historique
-

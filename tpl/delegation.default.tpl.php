@@ -91,64 +91,93 @@ dol_fiche_head($head, $current_head, $langs->trans('Delegation'));
 
 <table id="tablelines" class="noborder" width="100%">
 <?php if ($numLines > 0){ ?>
-    <tr class="liste_titre nodrag nodrop">
-        <td><?php echo $langs->trans('Label'); ?></td>
-		<td><?php echo $langs->trans('HTAmount'); ?> (<?php echo $langs->trans('Currency'.$conf->currency); ?>)</td>
+	<tr class="liste_titre nodrag nodrop">
+		<td><?php echo $langs->trans('Supplier'); ?></td>
+		<td><?php echo $langs->trans('Ref'); ?></td>
+		<td><?php echo $langs->trans('Date'); ?></td>
+		<td><?php echo $langs->trans('AmountTTC'); ?></td>
+		<td><?php echo $langs->trans('AlreadyPaid'); ?></td>
+		<td><?php echo $langs->trans('RemainToPay'); ?></td>
+		<td><?php echo $langs->trans('Amount'); ?></td>
 		<td width="50">&nbsp;</td>
 	</tr>
 
 <?php
 
-for($i = 0; $i < $numLines; $i++){
-    $line = $delegation->lines[$i];
+for ($i = 0; $i < $numLines; $i++) {
+	$line = $delegation->lines[$i];
 
-    if ($action == 'editline' && $lineid == $line->rowid){ ?>
+	if ($action == 'editline' && $lineid == $line->rowid){ ?>
 
-    <form action="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id; ?>" method="POST">
-    <input type="hidden" name="token" value="<?php  echo $_SESSION['newtoken']; ?>" />
-    <input type="hidden" name="action" value="updateline" />
-    <input type="hidden" name="id" value="<?php echo $object->id; ?>" />
-    <input type="hidden" name="lineid" value="<?php echo $line->rowid; ?>" />
+	<form action="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id; ?>" method="POST">
+	<input type="hidden" name="token" value="<?php  echo $_SESSION['newtoken']; ?>" />
+	<input type="hidden" name="action" value="updateline" />
+	<input type="hidden" name="id" value="<?php echo $object->id; ?>" />
+	<input type="hidden" name="lineid" value="<?php echo $line->rowid; ?>" />
 
-    <?php } ?>
+	<?php } ?>
 
-    <tr class="<?php echo ($i%2==0 ? 'impair' : 'pair'); ?>">
-    	<td> 
-		<?php if ($action == 'editline' && $lineid == $line->rowid){ ?>	          
-                <input type="text" size="65" id="label" name="label" value="<?php echo $line->label; ?>" />
-         <?php }else{ 
-         	echo $line->label; 
-         } ?>       
+	<tr class="<?php echo ($i%2==0 ? 'impair' : 'pair'); ?>">
+		<td>
+			<?php
+			if (! empty($line->supplier_invoice)) {
+				echo $line->supplier_invoice->thirdparty->getNomUrl(1);
+			} else {
+				echo '&nbsp;';
+			}
+			?>
+		</td>
+		<td>
+			<?php
+			if (! empty($line->supplier_invoice)) {
+				echo $line->supplier_invoice->getNomUrl(1);
+			} else {
+				echo $line->label;
+			}
+			?>
+		</td>
+		<td>
+			<?php
+			if (! empty($line->supplier_invoice)) {
+				$dateInvoice = ! empty($line->supplier_invoice->datef) ? $line->supplier_invoice->datef : $line->supplier_invoice->date;
+				echo dol_print_date($dateInvoice, 'daytext');
+			} else {
+				echo '&nbsp;';
+			}
+			?>
+		</td>
+		<td><?php echo ! empty($line->supplier_invoice) ? price($line->supplier_invoice->total_ttc) : '&nbsp;'; ?></td>
+		<td><?php echo ! empty($line->supplier_invoice) ? price($line->supplier_invoice_paid) : '&nbsp;'; ?></td>
+		<td><?php echo ! empty($line->supplier_invoice) ? price($line->supplier_invoice_remaining) : '&nbsp;'; ?></td>
+		<td>
+			<?php if ($action == 'editline' && $lineid == $line->rowid){ ?>
+				<input type="text" size="8" id="amount" name="amount" value="<?php echo price($line->amount); ?>" />
+				<input type="hidden" id="label" name="label" value="<?php echo dol_escape_htmltag($line->label); ?>" />
+			<?php }else{
+				echo price($line->amount);
+			} ?>
 		</td>
 
-        <td>
-            <?php if ($action == 'editline' && $lineid == $line->rowid){ ?>
-                <input type="text" size="8" id="amount" name="amount" value="<?php echo price($line->amount); ?>" />
-            <?php }else{ 
-            echo price($line->amount); 
-            } ?>
-        </td>
+		<?php if ($action == 'editline' && $lineid == $line->rowid){ ?>
+		<td align="right">
+			<input type="submit" class="button" name="save" value="<?php echo $langs->trans("Save"); ?>" />&nbsp;<input type="submit" class="button" name="cancel" value="<?php echo $langs->trans("Cancel"); ?>" />
+		</td>
 
-        <?php if ($action == 'editline' && $lineid == $line->rowid){ ?>
-        <td align="right">
-            <input type="submit" class="button" name="save" value="<?php echo $langs->trans("Save"); ?>" />&nbsp;<input type="submit" class="button" name="cancel" value="<?php echo $langs->trans("Cancel"); ?>" />
-        </td>
-
-        <?php }else{ ?>
-        	<td align="right">
-        	<?php if ($canAddLines) { ?>       
-                <a href="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=editline&amp;lineid='.$line->rowid; ?>">
-                    <?php echo img_edit(); ?>
-                </a>
-            <?php } ?>
-            <?php if ($canDeleteLines) { ?>  
-                <a href="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=deleteline&amp;lineid='.$line->rowid; ?>">
-                    <?php echo img_delete(); ?>
-                </a>
-            <?php } ?>
-            </td>
-        <?php } ?>
-    </tr> 
+		<?php }else{ ?>
+			<td align="right">
+			<?php if ($canAddLines) { ?>
+				<a href="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=editline&amp;lineid='.$line->rowid; ?>">
+					<?php echo img_edit(); ?>
+				</a>
+			<?php } ?>
+			<?php if ($canDeleteLines) { ?>
+				<a href="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=deleteline&amp;lineid='.$line->rowid; ?>">
+					<?php echo img_delete(); ?>
+				</a>
+			<?php } ?>
+			</td>
+		<?php } ?>
+	</tr>
 	</form>
 <?php } ?>
 
@@ -159,24 +188,27 @@ for($i = 0; $i < $numLines; $i++){
 <?php if ($canAddLines){ ?>
 
 <tr class="liste_titre nodrag nodrop">
-	<td><?php echo $langs->trans("Label"); ?></td>
-	<td><?php echo $langs->trans('HTAmount'); ?> (<?php echo $langs->trans('Currency'.$conf->currency); ?>)</td>
-	<td>&nbsp;</td>
+	<td colspan="8"><?php echo $langs->trans("DelegationSelectSupplierInvoice"); ?></td>
 </tr>
 
 <form action="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id; ?>" method="POST">
 <input type="hidden" name="token" value="<?php echo $_SESSION['newtoken']; ?>" />
-<input type="hidden" name="action" value="addline" />
+<input type="hidden" name="action" value="addsupplierinvoice" />
 <input type="hidden" name="id" value="<?php echo $object->id; ?>" />
 
 <tr class="pair">
-	<td>
-        <input type="text" size="65" id="label" name="label" value="" />
-    </td>
-    <td><input type="text" size="8" id="amount" name="amount" value="0,00" /></td>
+	<td colspan="7">
+		<?php
+		if (! empty($supplierInvoiceOptions)) {
+			echo $form->selectarray('fk_facture_fourn', $supplierInvoiceOptions, '', 1);
+		} else {
+			echo $langs->trans('DelegationSupplierInvoices');
+		}
+		?>
+	</td>
 	<td align="right">
-        <input type="submit" class="button" value="<?php echo $langs->trans("Add"); ?>" name="addline" />
-    </td>
+		<input type="submit" class="button" value="<?php echo $langs->trans("Add"); ?>" name="addline" />
+	</td>
 </tr>
 
 </form>
@@ -190,4 +222,3 @@ for($i = 0; $i < $numLines; $i++){
 <?php dol_fiche_end(); ?>
 
 <?php llxFooter(''); ?>
-

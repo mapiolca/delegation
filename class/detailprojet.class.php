@@ -315,10 +315,19 @@ class DetailsLine
 	*  \brief  Constructeur de la classe
 	*  @param  DB          handler acces base de donnees
 	*/
-    function DetailsLine($DB)
-    {
-        $this->db = $DB;
-    }
+	function __construct($DB)
+	{
+		$this->db = $DB;
+	}
+
+   /**
+	*  \brief  Legacy constructor for backward compatibility
+	*  @param  DB          handler acces base de donnees
+	*/
+	function DetailsLine($DB)
+	{
+		$this->__construct($DB);
+	}
 
 
    /**

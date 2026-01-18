@@ -10,6 +10,22 @@ SetupG=General
 LMDB_USE_IDPROF3_DICTIONARY=Use the Professional Identifier 3 dictionary (NAF/APE)
 LMDBSetup=LMDB settings - General
 
+DelegationPaymentMode=Payment delegation
+DelegationClearingBankAccount=Clearing account (payment delegation)
+DelegationCreateClearingAccount=Create a clearing account
+DelegationClearingAccountLabel=Clearing account – Payment delegation
+DelegationClearingAccountSaved=Clearing account saved.
+DelegationClearingAccountCreated=Clearing account created.
+DelegationSelectSupplierInvoice=Add a supplier invoice
+DelegationSupplierInvoices=No eligible supplier invoices
+DelegationConfigMissingClearingAccount=Please configure a clearing account for payment delegation.
+DelegationSupplierInvoiceMissing=Please select a supplier invoice.
+DelegationSupplierInvoiceNotFound=Supplier invoice not found.
+DelegationSupplierInvoiceNotAllowed=The supplier invoice is not eligible for delegation.
+DelegationSupplierInvoiceAlreadyLinked=This supplier invoice is already linked to the delegation.
+DelegationAmountExceeded=The total delegated amounts exceed the invoice amount.
+DelegationClearingAccountMissingCountry=Please set the company country before creating the clearing account.
+
 lmdb_for=for
 
 lmdb_envoi_auto=Automatic sending

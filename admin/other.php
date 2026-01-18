@@ -239,6 +239,15 @@ $value = $orders[$key];
 $tab=explode('_', $value);
 $familyposition=$tab[0]; $familykey=$tab[1]; $module_position=$tab[2]; $numero=$tab[3];
 
+// EN: Stop if module descriptor not found.
+// FR: Arrêter si le descripteur du module est introuvable.
+if (empty($objMod)) {
+	setEventMessages($langs->trans("ErrorModuleNotFound"), null, 'errors');
+	llxFooter();
+	$db->close();
+	exit;
+}
+
 // Check filters
 $modulename=$objMod->getName();
 $moduledesc=$objMod->getDesc();
