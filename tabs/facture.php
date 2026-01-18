@@ -32,6 +32,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/invoice.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/price.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/fourn/class/fournisseur.facture.class.php';
 if (! empty($conf->projet->enabled)) 
 {
 	require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
@@ -127,8 +129,60 @@ if (! empty($conf->projet->enabled))
 	$project = new Project($db);
 	$project->fetch($object->fk_project);
 }
+else
+{
+	$project = new stdClass();
+	$project->id = 0;
+}
 
 $numLines = sizeof($delegation->lines);
+
+if ($delegation->getSumDelegation() > $object->total_ttc) {
+	setEventMessages($langs->trans('DelegationAmountExceeded'), null, 'warnings');
+}
+
+// EN: Prepare supplier invoice options and enrich delegation lines.
+// FR: Préparer la liste des factures fournisseurs et enrichir les lignes de délégation.
+$supplierInvoiceOptions = array();
+$paymentModeId = ! empty($conf->global->DELEGATION_PAYMENT_MODE_ID) ? (int) $conf->global->DELEGATION_PAYMENT_MODE_ID : 0;
+
+if (! empty($project->id) && $paymentModeId > 0) {
+	$sql = "SELECT f.rowid";
+	$sql.= " FROM ".MAIN_DB_PREFIX."facture_fourn as f";
+	$sql.= " WHERE f.entity = ".(int) $conf->entity;
+	$sql.= " AND f.fk_projet = ".(int) $project->id;
+	$sql.= " AND f.fk_mode_reglement = ".(int) $paymentModeId;
+	$sql.= " AND f.paye = 0";
+	$sql.= " ORDER BY f.datef DESC";
+
+	$resql = $db->query($sql);
+	if ($resql) {
+		while ($obj = $db->fetch_object($resql)) {
+			$invoice = new FactureFournisseur($db);
+			if ($invoice->fetch($obj->rowid) > 0) {
+				$invoice->fetch_thirdparty();
+				$paid = $invoice->getSommePaiement();
+				$remaining = price2num($invoice->total_ttc - $paid, 'MT');
+				if ($remaining > 0) {
+					$supplierInvoiceOptions[$invoice->id] = $invoice->ref.' - '.$invoice->thirdparty->name.' - '.$langs->trans('RemainToPay').' '.price($remaining);
+				}
+			}
+		}
+	}
+}
+
+foreach ($delegation->lines as $line) {
+	$line->supplier_invoice = null;
+	if (! empty($line->fk_facture_fourn)) {
+		$invoice = new FactureFournisseur($db);
+		if ($invoice->fetch($line->fk_facture_fourn) > 0) {
+			$invoice->fetch_thirdparty();
+			$line->supplier_invoice = $invoice;
+			$line->supplier_invoice_paid = $invoice->getSommePaiement();
+			$line->supplier_invoice_remaining = price2num($invoice->total_ttc - $line->supplier_invoice_paid, 'MT');
+		}
+	}
+}
 	    	
 include '../tpl/delegation.default.tpl.php';
 

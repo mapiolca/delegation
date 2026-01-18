@@ -10,6 +10,21 @@ SetupG=General
 LMDB_USE_IDPROF3_DICTIONARY=Usar el diccionario de Identificador Profesional 3 (NAF/APE)
 LMDBSetup=Configuración LMDB - General
 
+DelegationPaymentMode=Delegación de pago
+DelegationClearingBankAccount=Cuenta de paso (delegación de pago)
+DelegationCreateClearingAccount=Crear una cuenta de paso
+DelegationClearingAccountLabel=Cuenta de paso – Delegación de pago
+DelegationClearingAccountSaved=Cuenta de paso guardada.
+DelegationClearingAccountCreated=Cuenta de paso creada.
+DelegationSelectSupplierInvoice=Añadir una factura de proveedor
+DelegationSupplierInvoices=No hay facturas de proveedor elegibles
+DelegationConfigMissingClearingAccount=Configure una cuenta de paso para la delegación de pago.
+DelegationSupplierInvoiceMissing=Seleccione una factura de proveedor.
+DelegationSupplierInvoiceNotFound=Factura de proveedor no encontrada.
+DelegationSupplierInvoiceNotAllowed=La factura de proveedor no es elegible para la delegación.
+DelegationSupplierInvoiceAlreadyLinked=Esta factura de proveedor ya está vinculada a la delegación.
+DelegationAmountExceeded=El total de los importes delegados supera el importe de la factura.
+
 lmdb_for=para
 
 lmdb_envoi_auto=Envío automático

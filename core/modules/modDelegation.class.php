@@ -54,7 +54,7 @@ class modDelegation extends DolibarrModules
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Module pour gérer la délégation de paiement, les contrats de sous-traitance et les formulaires DC4.";
 		// Possible values for version are: 'development', 'experimental', 'dolibarr' or version
-		$this->version = '4.4.1';
+		$this->version = '1.0.0';
 		// Key used in llx_const table to save module status enabled/disabled (where MYMODULE is value of property name of module in uppercase)
 		$this->const_name = 'MAIN_MODULE_'.strtoupper($this->name);
 		// Where to store the module in setup page (0=common,1=interface,2=others,3=very specific)
@@ -110,6 +110,8 @@ class modDelegation extends DolibarrModules
 			0 => array('LMDB_USE_IDPROF3_DICTIONARY', 'chaine', '1', 'Constant to enable usage of idprof3 table', 0, 'current', 1),
 			1 => array('BANK_ASK_PAYMENT_BANK_DURING_ORDER', 'int', '11', "Demander le compte bancaire lors de la création d'une commande", 1),
 			2 => array('BANK_ASK_PAYMENT_BANK_DURING_PROPOSAL', 'int', '11', "Demander le compte bancaire lors de la création d'un devis", 1),
+			3 => array('DELEGATION_PAYMENT_MODE_ID', 'int', '0', 'Payment mode id for delegation', 0, 'current', 1),
+			4 => array('DELEGATION_CLEARING_BANKACCOUNT_ID', 'int', '0', 'Clearing bank account id for delegation', 0, 'current', 1),
 		);
 
 		// To add a new tab identified by code 
@@ -299,6 +301,10 @@ class modDelegation extends DolibarrModules
 		$result = $this->_init($sql);
 
 		if ($result > 0) {
+			// EN: Ensure schema and dictionaries are up to date.
+			// FR: Garantir que le schéma et les dictionnaires sont à jour.
+			$this->ensureDelegationSchema();
+			$this->ensurePaymentMode();
 			$this->cleanupObsoleteData();
 		}
 
@@ -372,6 +378,77 @@ class modDelegation extends DolibarrModules
 			$sql = 'DELETE FROM '.MAIN_DB_PREFIX.'extrafields WHERE name IN ('.implode(',', $values).')';
 			$this->db->query($sql);
 		}
+	}
+
+	/**
+	 * EN: Ensure the delegation line table contains new supplier invoice fields.
+	 * FR: S'assurer que la table des lignes de délégation contient les champs facture fournisseur.
+	 *
+	 * @return void
+	 */
+	private function ensureDelegationSchema()
+	{
+		// EN: Add supplier invoice link if missing.
+		// FR: Ajouter le lien facture fournisseur si absent.
+		if (! $this->db->DDLTableFieldExists(MAIN_DB_PREFIX.'delegation_det', 'fk_facture_fourn')) {
+			$sql = "ALTER TABLE ".MAIN_DB_PREFIX."delegation_det ADD COLUMN fk_facture_fourn int(11) DEFAULT NULL";
+			$this->db->query($sql);
+		}
+
+		// EN: Add unique index to prevent duplicate supplier invoice links.
+		// FR: Ajouter un index unique pour éviter les doublons de factures fournisseurs.
+		if (! $this->db->DDLIndexExists(MAIN_DB_PREFIX.'delegation_det', 'uk_delegation_facture_fourn')) {
+			$sql = "ALTER TABLE ".MAIN_DB_PREFIX."delegation_det ADD UNIQUE KEY uk_delegation_facture_fourn (fk_object, fk_element, fk_facture_fourn)";
+			$this->db->query($sql);
+		}
+	}
+
+	/**
+	 * EN: Ensure payment mode "Délégation de paiement" exists and is active.
+	 * FR: S'assurer que le mode de règlement "Délégation de paiement" existe et est actif.
+	 *
+	 * @return int	<0 if KO, >0 if OK
+	 */
+	private function ensurePaymentMode()
+	{
+		global $conf;
+
+		dol_include_once('/core/lib/admin.lib.php');
+
+		$paymentCode = 'DELPAY';
+		$paymentLabel = 'Délégation de paiement';
+		$paymentId = 0;
+
+		// EN: Look for existing payment mode.
+		// FR: Rechercher le mode de règlement existant.
+		$sql = "SELECT rowid, active FROM ".MAIN_DB_PREFIX."c_paiement";
+		$sql.= " WHERE code = '".$this->db->escape($paymentCode)."'";
+		$resql = $this->db->query($sql);
+		if ($resql) {
+			if ($this->db->num_rows($resql) > 0) {
+				$obj = $this->db->fetch_object($resql);
+				$paymentId = (int) $obj->rowid;
+				if ((int) $obj->active !== 1) {
+					$this->db->query("UPDATE ".MAIN_DB_PREFIX."c_paiement SET active = 1 WHERE rowid = ".(int) $paymentId);
+				}
+			}
+		}
+
+		// EN: Create payment mode if missing.
+		// FR: Créer le mode de règlement s'il manque.
+		if ($paymentId <= 0) {
+			$sql = "INSERT INTO ".MAIN_DB_PREFIX."c_paiement (code, libelle, active)";
+			$sql.= " VALUES ('".$this->db->escape($paymentCode)."', '".$this->db->escape($paymentLabel)."', 1)";
+			if ($this->db->query($sql)) {
+				$paymentId = (int) $this->db->last_insert_id(MAIN_DB_PREFIX."c_paiement");
+			}
+		}
+
+		if ($paymentId > 0) {
+			dolibarr_set_const($this->db, 'DELEGATION_PAYMENT_MODE_ID', $paymentId, 'int', 0, '', $conf->entity);
+		}
+
+		return $paymentId > 0 ? 1 : -1;
 	}
 
 

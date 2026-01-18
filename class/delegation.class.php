@@ -30,6 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/propal.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.commande.class.php';
+require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.facture.class.php';
 
 
 /**
@@ -97,7 +98,7 @@ class Delegation extends CommonObject
 			
         $this->lines = array();
 
-		$sql = "SELECT dd.rowid, dd.fk_object, dd.fk_element, dd.label, dd.amount";	
+		$sql = "SELECT dd.rowid, dd.fk_object, dd.fk_element, dd.fk_facture_fourn, dd.label, dd.amount";
 		$sql.= " FROM ".MAIN_DB_PREFIX."delegation_det AS dd";		
 		$sql.= " WHERE dd.fk_object  = ".$object->id." AND dd.fk_element = '".$this->db->escape($object->element)."'";		       
         $sql.= " ORDER BY dd.rowid";
@@ -120,8 +121,9 @@ class Delegation extends CommonObject
 				{
         			$obj = $this->db->fetch_object($result);
 					
-					$this->lines[$i]			= $obj;
-					$this->lines[$i]->label		= trim($obj->label);
+					$this->lines[$i]					= $obj;
+					$this->lines[$i]->fk_facture_fourn	= $obj->fk_facture_fourn ? (int) $obj->fk_facture_fourn : 0;
+					$this->lines[$i]->label				= trim($obj->label);
 					
                     $i++;
                 }
@@ -188,38 +190,86 @@ class Delegation extends CommonObject
      *  @param     user             User who adds
      *  @return    int              <0 if KO, id the line added if OK
      */
-    function addline($user)
-    {
-        global $langs, $conf, $object;
+	function addline($user)
+	{
+		return $this->addsupplierinvoice($user);
+	}
 
-		$label 	= GETPOST('label');		
-		$amount 	= price2num(GETPOST('amount'));		
+	/**
+	 *  \brief Add a supplier invoice line
+	 *
+	 *  @param     user             User who adds
+	 *  @return    int              <0 if KO, id the line added if OK
+	 */
+	function addsupplierinvoice($user)
+	{
+		global $langs, $conf, $object;
 
-		// Insert line
-		$this->line  = new DelegationLine($this->db);
-		
-		$this->line->fk_object = $object->id;
-		$this->line->fk_element = $object->element;	
-		$this->line->label = $label;	
-		$this->line->amount = $amount;
-		
-		$result = $this->line->insert();
-		
-		if ($result > 0)
-		{		
-			$this->fetch();
-			
-			$this->error = $langs->trans('DelegationLineAdded');		
-			return 1;
-		}
-		else
-		{
-			$this->error = $this->line->error;
+		$fkFactureFourn = (int) GETPOST('fk_facture_fourn', 'int');
 
+		if ($fkFactureFourn <= 0) {
+			$this->error = $langs->trans('DelegationSupplierInvoiceMissing');
 			return -2;
 		}
-	        
-    }
+
+		// EN: Load supplier invoice and validate eligibility.
+		// FR: Charger la facture fournisseur et valider l'éligibilité.
+		$invoice = new FactureFournisseur($this->db);
+		$result = $invoice->fetch($fkFactureFourn);
+		if ($result <= 0) {
+			$this->error = $langs->trans('DelegationSupplierInvoiceNotFound');
+			return -2;
+		}
+
+		if (! empty($conf->global->DELEGATION_PAYMENT_MODE_ID) && (int) $invoice->fk_mode_reglement !== (int) $conf->global->DELEGATION_PAYMENT_MODE_ID) {
+			$this->error = $langs->trans('DelegationSupplierInvoiceNotAllowed');
+			return -2;
+		}
+
+		if (! empty($object->fk_project) && (int) $invoice->fk_projet !== (int) $object->fk_project) {
+			$this->error = $langs->trans('DelegationSupplierInvoiceNotAllowed');
+			return -2;
+		}
+
+		$alreadyPaid = $invoice->getSommePaiement();
+		$remaining = price2num($invoice->total_ttc - $alreadyPaid, 'MT');
+		if ($remaining <= 0) {
+			$this->error = $langs->trans('DelegationSupplierInvoiceNotAllowed');
+			return -2;
+		}
+
+		// EN: Prevent duplicate links for the same supplier invoice.
+		// FR: Empêcher les doublons pour la même facture fournisseur.
+		$sql = "SELECT rowid FROM ".MAIN_DB_PREFIX."delegation_det";
+		$sql.= " WHERE fk_object = ".(int) $object->id;
+		$sql.= " AND fk_element = '".$this->db->escape($object->element)."'";
+		$sql.= " AND fk_facture_fourn = ".(int) $fkFactureFourn;
+		$resql = $this->db->query($sql);
+		if ($resql && $this->db->num_rows($resql) > 0) {
+			$this->error = $langs->trans('DelegationSupplierInvoiceAlreadyLinked');
+			return -2;
+		}
+
+		// EN: Insert line with remaining amount as default.
+		// FR: Insérer la ligne avec le reste à payer par défaut.
+		$this->line  = new DelegationLine($this->db);
+		$this->line->fk_object = $object->id;
+		$this->line->fk_element = $object->element;
+		$this->line->fk_facture_fourn = $fkFactureFourn;
+		$this->line->label = $invoice->ref;
+		$this->line->amount = $remaining;
+
+		$result = $this->line->insert();
+
+		if ($result > 0) {
+			$this->fetch();
+			$this->error = $langs->trans('DelegationLineAdded');
+			return 1;
+		}
+
+		$this->error = $this->line->error;
+		return -2;
+	}
 
     /**
      *  \brief Update a line 
@@ -289,6 +339,7 @@ class DelegationLine
 	
 	var $label;
 	var $amount;
+	var $fk_facture_fourn;
 
 	function __construct($db)
     {
@@ -349,7 +400,7 @@ class DelegationLine
         global $langs, $user, $conf;
 
         //
-        $sql = "SELECT `rowid`, `fk_object`, `fk_element`, `label`, `amount`";
+        $sql = "SELECT `rowid`, `fk_object`, `fk_element`, `fk_facture_fourn`, `label`, `amount`";
 		$sql.= " FROM ".MAIN_DB_PREFIX."delegation_det";
         $sql.= " WHERE `rowid` = ".$lineid;
 
@@ -366,12 +417,12 @@ class DelegationLine
             {
                 $obj = $this->db->fetch_object($result);
 
-				$this->rowid		= $obj->rowid ? $obj->rowid : 0;
-				$this->fk_object	= $obj->fk_objectdet ? $obj->fk_objectdet : 0;
-				$this->fk_element	= $obj->fk_element;
-				
-				$this->label		= trim($obj->label);
-				$this->amount		= $obj->amount ? $obj->amount : 0;
+				$this->rowid				= $obj->rowid ? $obj->rowid : 0;
+				$this->fk_object			= $obj->fk_object ? $obj->fk_object : 0;
+				$this->fk_element			= $obj->fk_element;
+				$this->fk_facture_fourn		= $obj->fk_facture_fourn ? (int) $obj->fk_facture_fourn : 0;
+				$this->label				= trim($obj->label);
+				$this->amount				= $obj->amount ? $obj->amount : 0;
 				
                 //$this->db->free($result);
 				
@@ -420,10 +471,11 @@ class DelegationLine
     
 	        //
 	        $sql = "INSERT INTO ".MAIN_DB_PREFIX."delegation_det";
-	        $sql.= " (`fk_object`, `fk_element`, `label`, `amount`)";
+	        $sql.= " (`fk_object`, `fk_element`, `fk_facture_fourn`, `label`, `amount`)";
 	        $sql.= " VALUES (".$this->fk_object.",";
 	        $sql.= " '".$this->fk_element."', ";
-	        $sql.= " '".$this->label."', ";
+	        $sql.= " ".(! empty($this->fk_facture_fourn) ? (int) $this->fk_facture_fourn : "NULL").",";
+	        $sql.= " '".$this->db->escape($this->label)."', ";
 	        $sql.= " ".$this->amount;
 	        $sql.= ')';
 
@@ -481,7 +533,7 @@ class DelegationLine
 	
         //
         $sql = "UPDATE ".MAIN_DB_PREFIX."delegation_det";
-        $sql.= " SET `label` = '".$this->label."'";
+        $sql.= " SET `label` = '".$this->db->escape($this->label)."'";
 		$sql.= ", `amount` = ".$this->amount;
 		$sql.= " WHERE rowid = ".$this->rowid;
 

@@ -10,6 +10,21 @@ SetupG=Generale
 LMDB_USE_IDPROF3_DICTIONARY=Usa il dizionario Identificativo Professionale 3 (NAF/APE)
 LMDBSetup=Impostazioni LMDB - Generale
 
+DelegationPaymentMode=Delega di pagamento
+DelegationClearingBankAccount=Conto di transito (delega di pagamento)
+DelegationCreateClearingAccount=Crea un conto di transito
+DelegationClearingAccountLabel=Conto di transito – Delega di pagamento
+DelegationClearingAccountSaved=Conto di transito salvato.
+DelegationClearingAccountCreated=Conto di transito creato.
+DelegationSelectSupplierInvoice=Aggiungi una fattura fornitore
+DelegationSupplierInvoices=Nessuna fattura fornitore idonea
+DelegationConfigMissingClearingAccount=Configura un conto di transito per la delega di pagamento.
+DelegationSupplierInvoiceMissing=Seleziona una fattura fornitore.
+DelegationSupplierInvoiceNotFound=Fattura fornitore non trovata.
+DelegationSupplierInvoiceNotAllowed=La fattura fornitore non è idonea alla delega.
+DelegationSupplierInvoiceAlreadyLinked=Questa fattura fornitore è già collegata alla delega.
+DelegationAmountExceeded=Il totale degli importi delegati supera l'importo della fattura.
+
 lmdb_for=per
 
 lmdb_envoi_auto=Invio automatico

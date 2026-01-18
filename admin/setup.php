@@ -26,12 +26,76 @@ if (! $res) $res=@include("../../../main.inc.php");	// For "custom" directory
 // Libraries
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/custom/delegation/class/lmdb.class.php';
+require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.formbank.class.php';
 
 if(!$user->admin or empty($conf->delegation->enabled))
 	accessforbidden();
 
 $langs->load("admin");
 $langs->load("delegation@delegation");
+
+if (empty($conf->global->DELEGATION_CLEARING_BANKACCOUNT_ID)) {
+	setEventMessages($langs->trans('DelegationConfigMissingClearingAccount'), null, 'warnings');
+}
+
+// EN: Ensure payment mode exists on admin access (upgrade safety).
+// FR: S'assurer que le mode de règlement existe à l'accès admin (sécurité upgrade).
+if (empty($conf->global->DELEGATION_PAYMENT_MODE_ID)) {
+	$paymentCode = 'DELPAY';
+	$paymentLabel = $langs->trans('DelegationPaymentMode');
+	$paymentId = 0;
+
+	$sql = "SELECT rowid, active FROM ".MAIN_DB_PREFIX."c_paiement";
+	$sql.= " WHERE code = '".$db->escape($paymentCode)."'";
+	$resql = $db->query($sql);
+	if ($resql) {
+		if ($db->num_rows($resql) > 0) {
+			$obj = $db->fetch_object($resql);
+			$paymentId = (int) $obj->rowid;
+			if ((int) $obj->active !== 1) {
+				$db->query("UPDATE ".MAIN_DB_PREFIX."c_paiement SET active = 1 WHERE rowid = ".(int) $paymentId);
+			}
+		}
+	}
+
+	if ($paymentId <= 0) {
+		$sql = "INSERT INTO ".MAIN_DB_PREFIX."c_paiement (code, libelle, active)";
+		$sql.= " VALUES ('".$db->escape($paymentCode)."', '".$db->escape($paymentLabel)."', 1)";
+		if ($db->query($sql)) {
+			$paymentId = (int) $db->last_insert_id(MAIN_DB_PREFIX."c_paiement");
+		}
+	}
+
+	if ($paymentId > 0) {
+		dolibarr_set_const($db, 'DELEGATION_PAYMENT_MODE_ID', $paymentId, 'int', 0, '', $conf->entity);
+	}
+}
+
+// EN: Handle admin actions for clearing account.
+// FR: Gérer les actions d'administration du compte de passage.
+$action = GETPOST('action', 'aZ09');
+
+if ($user->admin && $action == 'set_clearing_account') {
+	$bankAccountId = (int) GETPOST('delegation_clearing_bank_account', 'int');
+	dolibarr_set_const($db, 'DELEGATION_CLEARING_BANKACCOUNT_ID', $bankAccountId, 'int', 0, '', $conf->entity);
+	setEventMessages($langs->trans('DelegationClearingAccountSaved'), null, 'mesgs');
+}
+
+if ($user->admin && $action == 'create_clearing_account') {
+	$account = new Account($db);
+	$account->label = $langs->trans('DelegationClearingAccountLabel');
+	$account->currency_code = $conf->currency;
+	$account->clos = 0;
+
+	$accountId = $account->create($user);
+	if ($accountId > 0) {
+		dolibarr_set_const($db, 'DELEGATION_CLEARING_BANKACCOUNT_ID', $accountId, 'int', 0, '', $conf->entity);
+		setEventMessages($langs->trans('DelegationClearingAccountCreated'), null, 'mesgs');
+	} else {
+		setEventMessages($account->error, $account->errors, 'errors');
+	}
+}
 
 /*
 *	View
@@ -59,13 +123,40 @@ showParameters();
 
 function showParameters()
 {
-	global $conf, $langs, $bc;
+	global $conf, $langs, $bc, $db;
+
+	$formbank = new FormBank($db);
 
 	$var = ! $var;
 	print '<tr '.$bc[$var].'>';
 		print '<td align="left" class="">'.$langs->trans("LMDB_USE_IDPROF3_DICTIONARY").'</td>';
 		print '<td align="center" width="300">';
 			print ajax_constantonoff('LMDB_USE_IDPROF3_DICTIONARY');
+		print '</td>';
+	print '</tr>';
+
+	$var = ! $var;
+	print '<tr '.$bc[$var].'>';
+		print '<td align="left" class="">'.$langs->trans("DelegationClearingBankAccount").'</td>';
+		print '<td align="center" width="300">';
+			print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+				print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+				print '<input type="hidden" name="action" value="set_clearing_account">';
+				print $formbank->select_comptes($conf->global->DELEGATION_CLEARING_BANKACCOUNT_ID, 'delegation_clearing_bank_account', 0, '', 1);
+				print ' <input type="submit" class="button" value="'.$langs->trans("Save").'">';
+			print '</form>';
+		print '</td>';
+	print '</tr>';
+
+	$var = ! $var;
+	print '<tr '.$bc[$var].'>';
+		print '<td align="left" class="">'.$langs->trans("DelegationCreateClearingAccount").'</td>';
+		print '<td align="center" width="300">';
+			print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+				print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+				print '<input type="hidden" name="action" value="create_clearing_account">';
+				print '<input type="submit" class="button" value="'.$langs->trans("DelegationCreateClearingAccount").'">';
+			print '</form>';
 		print '</td>';
 	print '</tr>';
 }

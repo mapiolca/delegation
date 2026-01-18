@@ -10,6 +10,21 @@ SetupG=Allgemein
 LMDB_USE_IDPROF3_DICTIONARY=Verzeichnis für Berufskennung 3 (NAF/APE) verwenden
 LMDBSetup=LMDB Einstellungen - Allgemein
 
+DelegationPaymentMode=Zahlungsdelegation
+DelegationClearingBankAccount=Durchlaufkonto (Zahlungsdelegation)
+DelegationCreateClearingAccount=Durchlaufkonto erstellen
+DelegationClearingAccountLabel=Durchlaufkonto – Zahlungsdelegation
+DelegationClearingAccountSaved=Durchlaufkonto gespeichert.
+DelegationClearingAccountCreated=Durchlaufkonto erstellt.
+DelegationSelectSupplierInvoice=Lieferantenrechnung hinzufügen
+DelegationSupplierInvoices=Keine geeigneten Lieferantenrechnungen
+DelegationConfigMissingClearingAccount=Bitte ein Durchlaufkonto für die Zahlungsdelegation konfigurieren.
+DelegationSupplierInvoiceMissing=Bitte eine Lieferantenrechnung auswählen.
+DelegationSupplierInvoiceNotFound=Lieferantenrechnung nicht gefunden.
+DelegationSupplierInvoiceNotAllowed=Die Lieferantenrechnung ist für die Delegation nicht geeignet.
+DelegationSupplierInvoiceAlreadyLinked=Diese Lieferantenrechnung ist bereits mit der Delegation verknüpft.
+DelegationAmountExceeded=Die Summe der delegierten Beträge übersteigt den Rechnungsbetrag.
+
 lmdb_for=für
 
 lmdb_envoi_auto=Automatischer Versand

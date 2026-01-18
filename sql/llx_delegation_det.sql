@@ -18,10 +18,12 @@
 
 
 CREATE TABLE IF NOT EXISTS `llx_delegation_det`( 
-  	`rowid`				int(11) AUTO_INCREMENT,
-  	`fk_object` 			int(11)  NOT NULL, 
-  	`fk_element` 			VARCHAR(255) NOT NULL,   
-  	`label`		   TEXT  NOT NULL,  
-	`amount`          double(24,8) DEFAULT 0, 
-	PRIMARY KEY (`rowid`) 
+	`rowid`				int(11) AUTO_INCREMENT,
+	`fk_object`			int(11)  NOT NULL, 
+	`fk_element`		VARCHAR(255) NOT NULL,   
+	`fk_facture_fourn`	int(11) DEFAULT NULL,
+	`label`				TEXT  NOT NULL,  
+	`amount`			double(24,8) DEFAULT 0, 
+	PRIMARY KEY (`rowid`),
+	UNIQUE KEY `uk_delegation_facture_fourn` (`fk_object`,`fk_element`,`fk_facture_fourn`)
 )ENGINE=innodb DEFAULT CHARSET=utf8 ;
