@@ -49,7 +49,9 @@ if (empty($conf->global->DELEGATION_PAYMENT_MODE_ID)) {
 	$paymentId = 0;
 
 	$sql = "SELECT id, active FROM ".MAIN_DB_PREFIX."c_paiement";
-	$sql.= " WHERE code = '".$db->escape($paymentCode)."'";
+	// EN: Force binary comparison to avoid collation mix errors.
+	// FR: Forcer une comparaison binaire pour éviter les erreurs de collation.
+	$sql.= " WHERE BINARY code = '".$db->escape($paymentCode)."'";
 	$resql = $db->query($sql);
 	if ($resql) {
 		if ($db->num_rows($resql) > 0) {
