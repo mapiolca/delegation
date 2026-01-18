@@ -65,7 +65,8 @@ $form = new Form($db);
 $object = new Facture($db);
 $delegation = new Delegation($db);
 
-// Check module tab toggle and permissions.
+// EN: Check module tab toggle and permissions.
+// FR: Vérifier l'activation de l'onglet et les permissions.
 if (! getDolGlobalInt('DELEGATION_ENABLE_TAB_DELEGATION', 1)) {
 	accessforbidden();
 }
@@ -133,7 +134,8 @@ if (!$error && !$cancel)
 $head = facture_prepare_head($object);
 $current_head = 'delegation';
 if (function_exists('complete_head_from_modules')) {
-	complete_head_from_modules($conf, $langs, $object, $head, $current_head, 'invoice');
+	$h = 0;
+	complete_head_from_modules($conf, $langs, $object, $head, $h, 'invoice');
 }
  
 $soc = new Societe($db);

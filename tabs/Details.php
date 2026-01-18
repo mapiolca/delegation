@@ -62,7 +62,8 @@ $object = new Project($db);
 $details = new Details($db);
 $soc = new Societe($db);
 
-// Check module tab toggle and permissions.
+// EN: Check module tab toggle and permissions.
+// FR: Vérifier l'activation de l'onglet et les permissions.
 if (! getDolGlobalInt('DELEGATION_ENABLE_TAB_DETAILS', 1)) {
 	accessforbidden();
 }
@@ -151,7 +152,8 @@ $userAccess = $object->restrictedProjectArea($user);
 $head=project_prepare_head($object);
 $current_head = 'details';
 if (function_exists('complete_head_from_modules')) {
-	complete_head_from_modules($conf, $langs, $object, $head, $current_head, 'project');
+	$h = 0;
+	complete_head_from_modules($conf, $langs, $object, $head, $h, 'project');
 }
 
 include '../tpl/projet_fiche.default.tpl.php';	    	

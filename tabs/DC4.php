@@ -86,7 +86,8 @@ $form = new Form($db);
 $object = new CommandeFournisseur($db);
 $dc4 = new DC4($db);
 
-// Check module tab toggle and permissions.
+// EN: Check module tab toggle and permissions.
+// FR: Vérifier l'activation de l'onglet et les permissions.
 if (! getDolGlobalInt('DELEGATION_ENABLE_TAB_DC4_SUPPLIER', 1)) {
 	accessforbidden();
 }

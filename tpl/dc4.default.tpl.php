@@ -27,20 +27,22 @@
  */
 
 if ($object->element == 'commande') {
-    $head = commande_prepare_head($object);
-    $title= $langs->trans("Order");
-    $help_url = 'EN:Customers_Orders|FR:Commandes_Clients|ES:Pedidos de clientes';
-    $linkback = '<a href="'.DOL_URL_ROOT.'/commande/list.php?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+	$head = commande_prepare_head($object);
+	$title= $langs->trans("Order");
+	$help_url = 'EN:Customers_Orders|FR:Commandes_Clients|ES:Pedidos de clientes';
+	$linkback = '<a href="'.DOL_URL_ROOT.'/commande/list.php?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 	if (function_exists('complete_head_from_modules')) {
-		complete_head_from_modules($conf, $langs, $object, $head, $current_head, 'order');
+		$h = 0;
+		complete_head_from_modules($conf, $langs, $object, $head, $h, 'order');
 	}
 }else if ($object->element == 'order_supplier') {
-    $head = ordersupplier_prepare_head($object);
-    $help_url='EN:Module_Suppliers_Orders|FR:CommandeFournisseur|ES:Módulo_Pedidos_a_proveedores';
-    $title= $langs->trans("SupplierOrder");
-    $linkback = '<a href="'.DOL_URL_ROOT.'/fourn/commande/list.php'.(! empty($socid)?'?socid='.$socid:'').'">'.$langs->trans("BackToList").'</a>';
+	$head = ordersupplier_prepare_head($object);
+	$help_url='EN:Module_Suppliers_Orders|FR:CommandeFournisseur|ES:Módulo_Pedidos_a_proveedores';
+	$title= $langs->trans("SupplierOrder");
+	$linkback = '<a href="'.DOL_URL_ROOT.'/fourn/commande/list.php'.(! empty($socid)?'?socid='.$socid:'').'">'.$langs->trans("BackToList").'</a>';
 	if (function_exists('complete_head_from_modules')) {
-		complete_head_from_modules($conf, $langs, $object, $head, $current_head, 'supplierorder');
+		$h = 0;
+		complete_head_from_modules($conf, $langs, $object, $head, $h, 'supplierorder');
 	}
 }
 
