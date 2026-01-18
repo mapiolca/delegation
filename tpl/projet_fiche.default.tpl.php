@@ -1,6 +1,6 @@
 <?php
 
-/* Copyright (C) 2019-2020      Pierre Ardoin        <mapiolca@me.com>
+/* Copyright (C) 2019-2024      Pierre Ardoin        <developpeur@lesmetiersdubatiment.fr>
  *                                             
  *
  * This program is free software; you can redistribute it and/or modify
@@ -84,10 +84,6 @@ print '<div class="fichecenter">';
             if ($object->hasDelay()) print img_warning("Late");
             print '</td></tr>';
 
-// Budget
-            print '<tr><td>'.$langs->trans("Budget").'</td><td>';
-            if (strcmp($object->budget_amount, '')) print price($object->budget_amount, '', $langs, 1, 0, 0, $conf->currency);
-            print '</td></tr>';
         print '</table>';
     print '</div>';
     print '<div class="fichehalfright">';

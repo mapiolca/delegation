@@ -1,0 +1,208 @@
+# Dolibarr language file - de_DE - tos
+# Admin form
+CHARSET=UTF-8
+Module440300Desc=Modul zur Verwaltung von Zahlungsdelegation, Subunternehmerverträgen und DC4-Formularen (benötigt das BTP-Modul aus dem Dolistore)
+Module440300Name=Delegation
+Delegation=Delegation
+
+SetupG=Allgemein
+
+LMDB_USE_IDPROF3_DICTIONARY=Verzeichnis für Berufskennung 3 (NAF/APE) verwenden
+LMDBSetup=LMDB Einstellungen - Allgemein
+
+lmdb_for=für
+
+lmdb_envoi_auto=Automatischer Versand
+
+lmdb_envoi_auto_help=Aktivieren, wenn die E-Mail nach der Erstellung automatisch versendet werden soll.
+
+lmdb_template=Automatische E-Mail-Vorlage
+
+lmdb_template_help=Wählen Sie die E-Mail-Vorlage, die beim Validieren der Rechnung automatisch versendet wird.
+
+lmdb_commande_account=Bankkonto
+
+lmdb_commande_account_help=Nützlich für DC4 und verwandte Formulare.
+
+lmdb_error_empty_line=Die Zeile ist leer. Bitte erfassen Sie eine Bezeichnung und einen Betrag für die Delegation, die von der Rechnung abzuziehen ist.
+
+lmdb_error_empty_label=Die Bezeichnung ist leer. Bitte erfassen Sie eine Bezeichnung für die Delegation, die von der Rechnung abzuziehen ist.
+
+lmdb_error_amount_null=Der Betrag ist leer. Bitte erfassen Sie einen Betrag für die Delegation, die von der Rechnung abzuziehen ist.
+
+NotAProgressInvoice=Die ausgewählte Rechnung ist keine Fortschrittsrechnung
+NotAnInvoice=Das ausgewählte Objekt ist keine Rechnung
+ObjectNotFound=Die Rechnung wurde nicht gefunden
+DelegationLineUpdated=Die Zeile wurde aktualisiert
+DelegationLineDeleted=Die Zeile wurde gelöscht
+DelegationLineAdded=Die Zeile wurde hinzugefügt
+DelegationLineDoesNotExist=Die Zeile existiert nicht
+HTAmount=Betrag ohne MwSt.
+AmountToPay=Zu zahlender Betrag (inkl. MwSt.)
+PDFCrabeDelegationTitle=Fortschrittsbericht Nr. %d
+DelegationTotalHTRestant=Restbetrag ohne MwSt. im Fortschrittsbericht
+DelegationTotalTVARestant=Restliche MwSt. im Fortschrittsbericht
+DelegationTotalTTCRestant=Restbetrag inkl. MwSt. im Fortschrittsbericht
+CompteProrataTTCDeduit=Pro-rata-Konto inkl. MwSt., das abzuziehen ist
+RetenueGarantieTTCDeduit=Sicherheitseinbehalt inkl. MwSt., der abzuziehen ist
+Deleg=Zahlungsdelegation
+RefChantierClient=Kunden-Baustellenreferenz
+Total_HT_Marche=Gesamtbetrag ohne MwSt. des Vertrags
+Total_HT=Gesamtbetrag ohne MwSt.
+Situ_encours=Aktueller Stand
+Total_HT_Cumul=Kumulierte Summe ohne MwSt.
+DocumentModellmdbproduitsPDF=Produktblatt-Vorlage von Les Métiers du Bâtiment.
+PDFBTPLMDBDescription=Rechnungsvorlage für Baufortschritt von Les Métiers du Bâtiment.
+PDFLMDBDescription=Rechnungsvorlage von Les Métiers du Bâtiment.
+PDFdevisLMDBDescription=Angebotsvorlage von Les Métiers du Bâtiment.
+
+idprof3=NAF/APE-Code
+country_code=Ländercode
+
+SuppliersDeliveryModelLMDB=Liefernotenvorlage für Lieferanten von Les Métiers du Bâtiment.
+SuppliersCommandModelLMBD=Bestellvorlage für Lieferanten von Les Métiers du Bâtiment.
+SuppliersCommandModelINPOSE=Bestellvorlage mit erzwungener Anzeige der Produktbeschreibung.
+SuppliersDelegationModelLMBDv2=Zahlungsdelegationsvorlage v2 von Les Métiers du Bâtiment.
+SuppliersDC4ModelLMDB=DC4-Formularvorlage von Les Métiers du Bâtiment.
+SuppliersDelegationModelLMDB=Zahlungsdelegationsvorlage von Les Métiers du Bâtiment.
+
+SuppliersDelegationModelLMBD_SPIEBATSO_Title=SPIE BATIGNOLLES S-O Delegation
+SuppliersDelegationModelLMBD_SPIEBATSO_Desc=Zahlungsdelegationsvorlage SPIE BATIGNOLLES SUD-OUEST von Les Métiers du Bâtiment.
+
+CSTBTP2014ModelLMBD=Vereinfachter Subunternehmervertrag 2014 von Les Métiers du Bâtiment.
+SuppliersDelegationModelEIFFAGE2017=Zahlungsdelegationsvorlage von EIFFAGE (2017).
+DocumentModelPaymentPDFLMDB=Zahlungsanschreiben an Lieferanten von Les Métiers du Bâtiment.
+SuppliersInvoiceModelLMDB=Lieferantenrechnungs-Vorlage von Les Métiers du Bâtiment.
+RetenueGarantieTTCDeduitFacture=Einbehalt inkl. MwSt. abgezogen
+CompteProrataTTCDeduitFacture=Pro-rata-Konto inkl. MwSt. abgezogen
+LMDBAmounttopay=Zu zahlender Betrag
+LMDBtotaldelegationdeduit=Gesamte Delegationen zum Abzug
+LMDBTotalHTRestantFacture=Restbetrag ohne MwSt.
+LMDBotalTVARestantFacture=Restliche MwSt.
+LMDBTotalTTCRestantFacture=Restbetrag inkl. MwSt.
+Invoice=Rechnung
+linkfiles=Link zu Dateien
+
+lmdb_link=Link zu Dateien
+
+lmdb_representant=Vertreter
+lmdb_representant_help=Idealerweise im Format: Hr. NACHNAME Vorname.
+lmdb_compte_tiers=Kontonummer bei diesem Drittanbieter
+
+lmdb_qualite_representant=Funktion des Vertreters
+lmdb_qualite_representant_help=Direktor, Geschäftsführer, Präsident usw.
+
+lmdb_retenue_garantie=Sicherheitseinbehalt
+lmdb_retenue_garantie_help=Als Prozentsatz (ohne Symbol) mit Punkt (.) statt Komma (,).
+
+lmdb_compte_prorata=Pro-rata-Konto
+lmdb_compte_prorata_help=Als Prozentsatz (ohne Symbol) mit Punkt (.) statt Komma (,).
+
+lmdb_project_amount=Projektbetrag (ohne MwSt.)
+
+lmdb_n_devis_fourn=Angebotsnummer des Lieferanten
+
+lmdb_date_devis_fourn=Angebotsdatum des Lieferanten
+
+lmdb_marque=Marke/Hersteller
+
+lmdb_date_lcr=Fälligkeitsdatum der LCR
+
+lmdb_poste_info=Positionstitel
+
+Details=Details
+
+private=Privat
+public=Öffentlich
+
+ProjectDetails=Projektdetails
+project_details=Projektdetails
+
+PROJECTDETAILS_type_mou=Art des Auftraggebers.
+PROJECTDETAILS_type_mou_Tooltip=Wählen Sie "Öffentlich", wenn der Auftraggeber eine öffentliche Verwaltung oder ein öffentliches Unternehmen ist, oder "Privat" für einen privaten Kunden.
+
+PROJECTDETAILS_refchantier=Baustellenreferenz.
+PROJECTDETAILS_refchantier_tooltip=Geben Sie die Referenz an, die der Kunde während der Ausschreibung oder Vertragsunterzeichnung angegeben hat.
+
+PROJECTDETAILS_adresse_chantier=Baustellenadresse.
+
+PROJECTDETAILS_nature_travaux=Art der Arbeiten.
+PROJECTDETAILS_nature_travaux_tooltip=Beschreiben Sie die Arbeiten beginnend mit einem bestimmten Artikel.
+
+PROJECTDETAILS_fk_moe=Bauleitung.
+PROJECTDETAILS_fk_moe_Tooltip=Geben Sie den Drittanbieter an; falls nicht vorhanden, legen Sie ihn in den Drittanbieter-Abschnitt an.
+
+PROJECTDETAILS_n_lot=Losnummer.
+
+PROJECTDETAILS_libelle_lot=Losbezeichnung.
+
+PROJECTDETAILS_marche_defense=Öffentliche Verteidigungs- oder Sicherheitsaufträge?
+PROJECTDETAILS_marche_defense_Tooltip=Wenn der Auftraggeber öffentlich ist, betrifft dieser Vertrag Verteidigung oder Sicherheit?
+
+PROJECTDETAILS_rg_sstt=Sicherheitseinbehalt auf Subunternehmer übertragen?
+PROJECTDETAILS_rg_sstt_Tooltip=Als Prozentsatz; wenn kein Einbehalt gilt, "0" eingeben.
+
+none=Keine
+
+DC4form=DC4 | Subunternehmervertrag
+
+DC4=DC4 | Zahlungsdelegation | Subunternehmerverträge
+dc4=Informationen zur Erstellung einer DC4-Erklärung, eines Subunternehmervertrags oder einer Zahlungsdelegation.
+
+dc4_only=Informationen zur Erstellung einer DC4-Erklärung.
+dc4_errordatemessage=Dieser Auftrag hat nicht den Status "Bestellt" oder höher, daher ist das Standarddatum das aktuelle Statusdatum.
+
+DC4_dc4_object_declaration=Zweck der Subunternehmererklärung (DC4)
+DC4_dc4_object_declaration_Tooltip=Wählen Sie den passenden Fall.
+DC4_dc4_object_declaration_1=Anlage zum Verpflichtungsakt
+DC4_dc4_object_declaration_2=Erstmaliger besonderer Akt
+DC4_dc4_object_declaration_3=Änderungsakt
+
+DC4_dc4_date_initiale=Datum des ursprünglichen DC4 (bei Änderungsakt)
+DC4_dc4_date_initiale_Tooltip=Geben Sie das Datum des ursprünglichen Akts an, wenn es sich um einen Änderungsakt handelt
+
+DC4_avance=Vorschuss angefordert?
+DC4_avance_Tooltip=Hat der Subunternehmer einen Vorschuss beantragt?
+
+DC4_dc4_documents_fournis=Mit dem DC4 bereitgestellte Dokumente.
+
+DC4_dc4_documents_fournis_Tooltip=Dokumente, die bei der Einreichung des DC4 verlangt werden können.
+
+DC4_dc4_documents_fournis_1=Einzelexemplar oder Abtretbarkeitsbescheinigung des öffentlichen Vertrags.
+DC4_dc4_documents_fournis_2=Bescheinigung oder Freistellung des Begünstigten der Abtretung oder Verpfändung von Forderungen.
+DC4_dc4_documents_fournis_3=Der Inhaber beantragt die Änderung des Einzelexemplars oder der Abtretbarkeitsbescheinigung.
+DC4_dc4_documents_fournis_4=Andere Möglichkeiten.
+
+DC4_paiement_direct=Recht auf Direktzahlung?
+DC4_paiement_direct_Tooltip=Ist der Subunternehmer für eine Direktzahlung durch Ihren Kunden berechtigt?
+
+DC4_libelle_poste_cctp=Positionsbezeichnung im CCTP
+
+DC4_sps_travaux=Arbeiten unter SPS-Koordination
+DC4_sps_travaux_Tooltip=Unterliegen die vergebenen Arbeiten der SPS-Koordination? Dann ist eine gemeinsame Inspektion erforderlich und der Subunternehmer muss ein PPSPS liefern.
+
+DC4_sps_date_remise=Abgabedatum des PPSPS.
+DC4_sps_date_remise_Tooltip=Das PPSPS ist verpflichtend und muss beim SPS-Koordinator zur gemeinsamen Inspektion eingereicht werden.
+
+DC4_cissct=CISSCT
+DC4_cissct_Tooltip=Gibt es eine CISSCT auf der Baustelle?
+
+DC4_DIUO=Übergabe des DIUO
+DC4_DIUO_Tooltip=Die Datei für spätere Eingriffe am Bauwerk (DIUO) ist wesentlich. Sie wird in der Planungsphase erstellt und enthält technische Informationen, Pläne und Hinweise für sichere spätere Arbeiten.
+
+DC4_responsabilite=Haftung für die Arbeiten
+DC4_responsabilite_Tooltip=Ist der Subunternehmer nach der Abnahme bis zum Ende der Baustelle für seine Arbeiten verantwortlich?
+
+DC4_dc4_hypothese_01=Mit dem DC4 bereitgestelltes Dokument
+DC4_dc4_hypothese_02=Zweck der Anfrage.
+DC4_dc4_hypothese_Tooltip_01=Diese Subunternehmererklärung stellt einen besonderen Akt dar.
+Der Inhaber bestätigt, dass keine Abtretung oder Verpfändung von Forderungen aus dem öffentlichen Vertrag der Direktzahlung an den Subunternehmer entgegensteht.
+DC4_dc4_hypothese_Tooltip_02=Diese Subunternehmererklärung stellt einen Änderungsakt dar.
+DC4_dc4_hypothese_1=Das Einzelexemplar oder die Abtretbarkeitsbescheinigung des öffentlichen Vertrags.
+DC4_dc4_hypothese_2=Bescheinigung oder Freistellung des Begünstigten der Abtretung oder Verpfändung von Forderungen.
+DC4_dc4_hypothese_3=Der Inhaber beantragt die Änderung des Einzelexemplars oder der Abtretbarkeitsbescheinigung, die diesem DC4 beigefügt ist.
+DC4_dc4_hypothese_4=Das Einzelexemplar oder die Abtretbarkeitsbescheinigung wurde für eine Abtretung oder Verpfändung bereitgestellt und kann nicht zurückgegeben werden.
+
+dc4_acte_modificatif=Änderungsakt
+
+Module104400Name=Historie

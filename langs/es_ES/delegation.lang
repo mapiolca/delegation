@@ -1,0 +1,208 @@
+# Dolibarr language file - es_ES - tos
+# Admin form
+CHARSET=UTF-8
+Module440300Desc=Módulo para gestionar la delegación de pago, los contratos de subcontratación y los formularios DC4 (requiere el módulo BTP del Dolistore)
+Module440300Name=Delegación
+Delegation=Delegación
+
+SetupG=General
+
+LMDB_USE_IDPROF3_DICTIONARY=Usar el diccionario de Identificador Profesional 3 (NAF/APE)
+LMDBSetup=Configuración LMDB - General
+
+lmdb_for=para
+
+lmdb_envoi_auto=Envío automático
+
+lmdb_envoi_auto_help=Marque la casilla si el correo debe enviarse automáticamente después de la generación.
+
+lmdb_template=Plantilla de correo automático
+
+lmdb_template_help=Elija la plantilla de correo que se enviará automáticamente cuando se valide la factura.
+
+lmdb_commande_account=Cuenta bancaria
+
+lmdb_commande_account_help=Útil para DC4 y formularios relacionados.
+
+lmdb_error_empty_line=La línea está vacía, introduzca una etiqueta y un importe para la delegación que desea deducir de la factura.
+
+lmdb_error_empty_label=La etiqueta está vacía, introduzca una etiqueta para la delegación que desea deducir de la factura.
+
+lmdb_error_amount_null=El importe está vacío, introduzca un importe para la delegación que desea deducir de la factura.
+
+NotAProgressInvoice=La factura seleccionada no es una factura de avance
+NotAnInvoice=El objeto seleccionado no es una factura
+ObjectNotFound=La factura no se encontró
+DelegationLineUpdated=La línea se ha actualizado
+DelegationLineDeleted=La línea se ha eliminado
+DelegationLineAdded=La línea se ha añadido
+DelegationLineDoesNotExist=La línea no existe
+HTAmount=Importe sin IVA
+AmountToPay=Importe a pagar (con IVA)
+PDFCrabeDelegationTitle=Parte de situación nº %d
+DelegationTotalHTRestant=Importe restante sin IVA en la situación
+DelegationTotalTVARestant=IVA restante en la situación
+DelegationTotalTTCRestant=Importe restante con IVA en la situación
+CompteProrataTTCDeduit=Cuenta prorrata con IVA a deducir de la situación
+RetenueGarantieTTCDeduit=Retención de garantía con IVA a deducir de la situación
+Deleg=Delegación de pago
+RefChantierClient=Referencia de obra del cliente
+Total_HT_Marche=Total sin IVA del contrato
+Total_HT=Total sin IVA
+Situ_encours=Situación en curso
+Total_HT_Cumul=Total acumulado sin IVA
+DocumentModellmdbproduitsPDF=Plantilla de ficha de producto por Les Métiers du Bâtiment.
+PDFBTPLMDBDescription=Plantilla de factura para situaciones de obra por Les Métiers du Bâtiment.
+PDFLMDBDescription=Plantilla de factura por Les Métiers du Bâtiment.
+PDFdevisLMDBDescription=Plantilla de propuesta comercial por Les Métiers du Bâtiment.
+
+idprof3=Código NAF/APE
+country_code=Código de país
+
+SuppliersDeliveryModelLMDB=Plantilla de albarán de proveedor por Les Métiers du Bâtiment.
+SuppliersCommandModelLMBD=Plantilla de pedido de proveedor por Les Métiers du Bâtiment.
+SuppliersCommandModelINPOSE=Plantilla de pedido de proveedor con visualización forzada de la descripción del producto.
+SuppliersDelegationModelLMBDv2=Plantilla de delegación de pago v2 por Les Métiers du Bâtiment.
+SuppliersDC4ModelLMDB=Plantilla de formulario DC4 por Les Métiers du Bâtiment.
+SuppliersDelegationModelLMDB=Plantilla de delegación de pago por Les Métiers du Bâtiment.
+
+SuppliersDelegationModelLMBD_SPIEBATSO_Title=Delegación SPIE BATIGNOLLES S-O
+SuppliersDelegationModelLMBD_SPIEBATSO_Desc=Plantilla de delegación de pago SPIE BATIGNOLLES SUD-OUEST por Les Métiers du Bâtiment.
+
+CSTBTP2014ModelLMBD=Contrato de subcontratación simplificado 2014 por Les Métiers du Bâtiment.
+SuppliersDelegationModelEIFFAGE2017=Plantilla de delegación de pago por EIFFAGE (2017).
+DocumentModelPaymentPDFLMDB=Plantilla de carta de pago a proveedores por Les Métiers du Bâtiment.
+SuppliersInvoiceModelLMDB=Plantilla de factura de proveedor por Les Métiers du Bâtiment.
+RetenueGarantieTTCDeduitFacture=Retención de garantía con IVA deducida
+CompteProrataTTCDeduitFacture=Cuenta prorrata con IVA deducida
+LMDBAmounttopay=Importe a pagar
+LMDBtotaldelegationdeduit=Total de delegaciones a deducir
+LMDBTotalHTRestantFacture=Importe restante sin IVA
+LMDBotalTVARestantFacture=IVA restante
+LMDBTotalTTCRestantFacture=Importe restante con IVA
+Invoice=Factura
+linkfiles=Enlace a archivos
+
+lmdb_link=Enlace a archivos
+
+lmdb_representant=Representante
+lmdb_representant_help=Idealmente en el formato: Sr. APELLIDO Nombre.
+lmdb_compte_tiers=Nº de cuenta con este tercero
+
+lmdb_qualite_representant=Cargo del representante
+lmdb_qualite_representant_help=Director, gerente, presidente, etc.
+
+lmdb_retenue_garantie=Retención de garantía
+lmdb_retenue_garantie_help=Expresado en porcentaje (sin símbolo) con un punto (.) en lugar de coma (,).
+
+lmdb_compte_prorata=Cuenta prorrata
+lmdb_compte_prorata_help=Expresado en porcentaje (sin símbolo) con un punto (.) en lugar de coma (,).
+
+lmdb_project_amount=Importe del proyecto (sin IVA)
+
+lmdb_n_devis_fourn=Nº de presupuesto del proveedor
+
+lmdb_date_devis_fourn=Fecha del presupuesto del proveedor
+
+lmdb_marque=Marca/Fabricante
+
+lmdb_date_lcr=Fecha de vencimiento de la LCR
+
+lmdb_poste_info=Etiqueta de partida
+
+Details=Detalles
+
+private=Privado
+public=Público
+
+ProjectDetails=Detalles del proyecto
+project_details=Detalles del proyecto
+
+PROJECTDETAILS_type_mou=Tipo de propietario del proyecto.
+PROJECTDETAILS_type_mou_Tooltip=Seleccione "Público" si el propietario es una administración o empresa pública, o "Privado" si es un cliente privado.
+
+PROJECTDETAILS_refchantier=Referencia de obra.
+PROJECTDETAILS_refchantier_tooltip=Indique la referencia facilitada por el cliente durante la consulta o al firmar el contrato.
+
+PROJECTDETAILS_adresse_chantier=Dirección de la obra.
+
+PROJECTDETAILS_nature_travaux=Naturaleza de los trabajos.
+PROJECTDETAILS_nature_travaux_tooltip=Describa la naturaleza de los trabajos comenzando con un artículo definido ("el", "la").
+
+PROJECTDETAILS_fk_moe=Dirección de obra.
+PROJECTDETAILS_fk_moe_Tooltip=Indique el tercero; si no está en la lista, créelo en la sección de terceros.
+
+PROJECTDETAILS_n_lot=Número de lote.
+
+PROJECTDETAILS_libelle_lot=Etiqueta del lote.
+
+PROJECTDETAILS_marche_defense=¿Contratos públicos de defensa o seguridad?
+PROJECTDETAILS_marche_defense_Tooltip=Si el propietario es público, ¿este contrato concierne a Defensa o Seguridad?
+
+PROJECTDETAILS_rg_sstt=¿Tasa de retención de garantía repercutida a subcontratistas?
+PROJECTDETAILS_rg_sstt_Tooltip=Expresado en porcentaje; si no se aplica retención a subcontratistas, indique "0".
+
+none=Ninguno
+
+DC4form=DC4 | Contrato de subcontratación
+
+DC4=DC4 | Delegación de pago | Contratos de subcontratación
+dc4=Información necesaria para preparar una declaración DC4, un contrato de subcontratación o una delegación de pago.
+
+dc4_only=Información necesaria para preparar una declaración DC4.
+dc4_errordatemessage=Esta orden no está en el estado "Pedido" o posterior, por lo que la fecha inicial por defecto será la del estado actual.
+
+DC4_dc4_object_declaration=Objeto de la declaración del subcontratista (DC4)
+DC4_dc4_object_declaration_Tooltip=Seleccione el caso más adecuado.
+DC4_dc4_object_declaration_1=Anexo al acto de compromiso
+DC4_dc4_object_declaration_2=Acto especial inicial
+DC4_dc4_object_declaration_3=Acto especial modificativo
+
+DC4_dc4_date_initiale=Fecha inicial del DC4 (si es acto modificativo)
+DC4_dc4_date_initiale_Tooltip=Indique la fecha del acto inicial si se trata de un acto modificativo
+
+DC4_avance=¿Anticipo solicitado?
+DC4_avance_Tooltip=¿El subcontratista ha solicitado un anticipo?
+
+DC4_dc4_documents_fournis=Documentos proporcionados con el DC4.
+
+DC4_dc4_documents_fournis_Tooltip=Documentos que pueden ser solicitados al presentar el DC4.
+
+DC4_dc4_documents_fournis_1=Ejemplar único o certificado de cesibilidad del contrato público.
+DC4_dc4_documents_fournis_2=Certificado o liberación del beneficiario de la cesión o prenda de créditos.
+DC4_dc4_documents_fournis_3=El titular solicita la modificación del ejemplar único o del certificado de cesibilidad.
+DC4_dc4_documents_fournis_4=Otras posibilidades.
+
+DC4_paiement_direct=¿Derecho al pago directo?
+DC4_paiement_direct_Tooltip=¿El subcontratista es elegible para el pago directo por su cliente?
+
+DC4_libelle_poste_cctp=Etiqueta de la partida en el CCTP
+
+DC4_sps_travaux=Trabajos sujetos a coordinación SPS
+DC4_sps_travaux_Tooltip=¿Los trabajos subcontratados están sujetos a coordinación SPS? En ese caso, se requerirá una inspección y el subcontratista deberá proporcionar un PPSPS.
+
+DC4_sps_date_remise=Fecha de entrega del PPSPS.
+DC4_sps_date_remise_Tooltip=El PPSPS es obligatorio y debe entregarse al coordinador SPS durante la inspección conjunta.
+
+DC4_cissct=CISSCT
+DC4_cissct_Tooltip=¿Existe un CISSCT en la obra?
+
+DC4_DIUO=Entrega del DIUO
+DC4_DIUO_Tooltip=El expediente de intervención ulterior en la obra (DIUO) es esencial. Se elabora en la fase de diseño e incluye información técnica, planos y avisos para futuras intervenciones seguras.
+
+DC4_responsabilite=Responsabilidad de las obras
+DC4_responsabilite_Tooltip=¿El subcontratista es responsable de sus obras después de la recepción y hasta el final del proyecto?
+
+DC4_dc4_hypothese_01=Documento proporcionado con el DC4
+DC4_dc4_hypothese_02=Objeto de la solicitud.
+DC4_dc4_hypothese_Tooltip_01=Esta declaración de subcontratación constituye un acto especial.
+El titular establece que ninguna cesión ni prenda de créditos derivados del contrato público impide el pago directo al subcontratista, según el artículo 137 del Decreto nº 2016-360 o el artículo 126 del Decreto nº 2016-361.
+DC4_dc4_hypothese_Tooltip_02=Esta declaración de subcontratación constituye un acto especial modificativo.
+DC4_dc4_hypothese_1=El ejemplar único o certificado de cesibilidad emitido para el contrato público.
+DC4_dc4_hypothese_2=Certificado o liberación del beneficiario de la cesión o prenda de créditos.
+DC4_dc4_hypothese_3=El titular solicita la modificación del ejemplar único o certificado de cesibilidad adjunto a este DC4.
+DC4_dc4_hypothese_4=El ejemplar único o certificado de cesibilidad se entregó para una cesión o prenda de créditos y no puede ser devuelto.
+
+dc4_acte_modificatif=Acto modificativo
+
+Module104400Name=Historial
