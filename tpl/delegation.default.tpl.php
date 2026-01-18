@@ -78,36 +78,6 @@ print '<div class="underbanner clearboth"></div>';
 		<td><?php echo $soc ? $soc->getNomUrl(1, 'compta') : ''; ?></td>
 	</tr>
 
-	<tr>
-		<td class="titlefield"><?php echo $langs->trans('Type'); ?></td>
-		<td><?php echo $object->getLibType(); ?></td>
-	</tr>
-
-	<tr>
-		<td class="titlefield"><?php echo $langs->trans('Date'); ?></td>
-		<td><?php echo dol_print_date($object->date, 'daytext'); ?></td>
-	</tr>
-
-	<tr>
-		<td class="titlefield"><?php echo $langs->trans('AmountHT'); ?></td>
-		<td><?php echo price($object->total_ht, 1, '', 1, -1, -1, $conf->currency); ?></td>
-	</tr>
-
-	<tr>
-		<td class="titlefield"><?php echo $langs->trans('AmountVAT'); ?></td>
-		<td><?php echo price($object->total_tva, 1, '', 1, -1, -1, $conf->currency); ?></td>
-	</tr>
-
-	<tr>
-		<td class="titlefield"><?php echo $langs->trans('AmountTTC'); ?></td>
-		<td><?php echo price($object->total_ttc, 1, '', 1, -1, -1, $conf->currency); ?></td>
-	</tr>
-
-	<tr>
-		<td class="titlefield"><?php echo $langs->trans('Status'); ?></td>
-		<td><?php echo $object->getLibStatut(4, $totalpaye); ?></td>
-	</tr>
-
 	<?php if (! empty($conf->projet->enabled)) { ?>
 	<tr>
 		<td class="titlefield"><?php echo $langs->trans('Project'); ?></td>
