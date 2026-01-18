@@ -44,6 +44,9 @@ if ($object->element == 'commande') {
 		$h = 0;
 		complete_head_from_modules($conf, $langs, $object, $head, $h, 'supplierorder');
 	}
+	if (empty($object->thirdparty)) {
+		$object->fetch_thirdparty();
+	}
 }
 
 llxHeader('', $langs->trans("DC4form").' - '.$langs->trans("Order"), $help_url);
@@ -66,7 +69,9 @@ if ($object->element == 'commande') {
     $soc->fetch($object->socid);
     $morehtmlref .= '<br>'.$langs->trans('ThirdParty').' : '.$soc->getNomUrl(1);
 }else if ($object->element == 'order_supplier') {
-    $morehtmlref.='<br>'.$langs->trans('ThirdParty').' : '.$object->thirdparty->getNomUrl(1);
+	if (! empty($object->thirdparty)) {
+		$morehtmlref.='<br>'.$langs->trans('ThirdParty').' : '.$object->thirdparty->getNomUrl(1);
+	}
 }
 
 // Project
