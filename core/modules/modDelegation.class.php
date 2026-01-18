@@ -447,15 +447,15 @@ class modDelegation extends DolibarrModules
 
 		// EN: Look for existing payment mode.
 		// FR: Rechercher le mode de règlement existant.
-		$sql = "SELECT rowid, active FROM ".MAIN_DB_PREFIX."c_paiement";
+		$sql = "SELECT id, active FROM ".MAIN_DB_PREFIX."c_paiement";
 		$sql.= " WHERE code = '".$this->db->escape($paymentCode)."'";
 		$resql = $this->db->query($sql);
 		if ($resql) {
 			if ($this->db->num_rows($resql) > 0) {
 				$obj = $this->db->fetch_object($resql);
-				$paymentId = (int) $obj->rowid;
+				$paymentId = (int) $obj->id;
 				if ((int) $obj->active !== 1) {
-					$this->db->query("UPDATE ".MAIN_DB_PREFIX."c_paiement SET active = 1 WHERE rowid = ".(int) $paymentId);
+					$this->db->query("UPDATE ".MAIN_DB_PREFIX."c_paiement SET active = 1 WHERE id = ".(int) $paymentId);
 				}
 			}
 		}

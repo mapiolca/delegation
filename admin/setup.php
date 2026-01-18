@@ -46,15 +46,15 @@ if (empty($conf->global->DELEGATION_PAYMENT_MODE_ID)) {
 	$paymentLabel = $langs->trans('DelegationPaymentMode');
 	$paymentId = 0;
 
-	$sql = "SELECT rowid, active FROM ".MAIN_DB_PREFIX."c_paiement";
+	$sql = "SELECT id, active FROM ".MAIN_DB_PREFIX."c_paiement";
 	$sql.= " WHERE code = '".$db->escape($paymentCode)."'";
 	$resql = $db->query($sql);
 	if ($resql) {
 		if ($db->num_rows($resql) > 0) {
 			$obj = $db->fetch_object($resql);
-			$paymentId = (int) $obj->rowid;
+			$paymentId = (int) $obj->id;
 			if ((int) $obj->active !== 1) {
-				$db->query("UPDATE ".MAIN_DB_PREFIX."c_paiement SET active = 1 WHERE rowid = ".(int) $paymentId);
+				$db->query("UPDATE ".MAIN_DB_PREFIX."c_paiement SET active = 1 WHERE id = ".(int) $paymentId);
 			}
 		}
 	}
