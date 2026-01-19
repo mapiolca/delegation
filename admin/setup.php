@@ -133,8 +133,13 @@ if ($user->admin && $action == 'create_clearing_account') {
 	$account = new Account($db);
 	$accountId = 0;
 	$account->ref = 'DELPASS';
-	// Limit label length to database column size.
-	$account->label = dol_trunc($langs->trans('DelegationClearingAccountLabel'), 30, 'right', 'UTF-8', 1);
+	// EN: Limit label length to database column size (v21 and below).
+	// FR: Limiter la longueur du libellé à la taille de la colonne (v21 et inférieures).
+	$labelMaxLength = 30;
+	if (defined('DOL_VERSION') && version_compare(DOL_VERSION, '22.0', '>=')) {
+		$labelMaxLength = 128;
+	}
+	$account->label = dol_trunc($langs->trans('DelegationClearingAccountLabel'), $labelMaxLength, 'right', 'UTF-8', 1);
 	$account->currency_code = $conf->currency;
 	$account->clos = 0;
 	// Provide mandatory initial balance date and amount.
