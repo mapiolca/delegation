@@ -185,13 +185,13 @@ if ($user->admin && $action == 'set_vat_reverse_charge_legal_text') {
 
 llxHeader('', $langs->trans("DelegationSetup"), '', '', 0, 0, array(), array(), '', $langs->trans("DelegationSetup"));
 
+$linkback='<a href="'.DOL_URL_ROOT.'/admin/modules.php">'.$langs->trans("BackToModuleList").'</a>';
+print_fiche_titre($langs->trans("DelegationSetup"), $linkback);
 // Configuration header
 
 $head = lmdb_prepare_head();
 dol_fiche_head($head, 'SetupG', $langs->trans("DelegationSetup"), 0, "delegation@delegation");
 
-$linkback='<a href="'.DOL_URL_ROOT.'/admin/modules.php">'.$langs->trans("BackToModuleList").'</a>';
-print_fiche_titre($langs->trans("DelegationSetup"), $linkback);
 print '<br>';
 print '<table class="noborder" width="100%">'."\n";
 print '<tr class="liste_titre">';
