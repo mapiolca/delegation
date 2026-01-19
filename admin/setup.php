@@ -245,5 +245,3 @@ function showParameters()
 }
 print '</tbody>';
 print '</table>';
-
-?>
