@@ -31,11 +31,11 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formbank.class.php';
 require_once DOL_DOCUMENT_ROOT.'/custom/delegation/class/lmdb.class.php';
 
 $delegationLibPath = dol_buildpath('/delegation/lib/delegation.lib.php', 0);
-if (dol_is_file($delegationLibPath)) {
+if ((function_exists('dol_is_file') && dol_is_file($delegationLibPath)) || (! function_exists('dol_is_file') && is_file($delegationLibPath))) {
 	require_once $delegationLibPath;
 }
 $delegationAdminLibPath = dol_buildpath('/delegation/lib/admin.lib.php', 0);
-if (dol_is_file($delegationAdminLibPath)) {
+if ((function_exists('dol_is_file') && dol_is_file($delegationAdminLibPath)) || (! function_exists('dol_is_file') && is_file($delegationAdminLibPath))) {
 	require_once $delegationAdminLibPath;
 }
 
