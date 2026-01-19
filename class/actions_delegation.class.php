@@ -378,7 +378,7 @@ class Actionsdelegation
 			$this->pdfNotePublicBackup[$key] = $object->note_public;
 		}
 
-		if (dol_strpos($object->note_public, $legalText) === false) {
+		if (strpos($object->note_public, $legalText) === false) {
 			$separator = empty($object->note_public) ? '' : "\n\n";
 			$object->note_public .= $separator.$legalText;
 		}
