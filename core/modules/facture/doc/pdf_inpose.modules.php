@@ -854,6 +854,7 @@ class pdf_INPOSE extends ModelePDFFactures
 
 		$default_font_size = pdf_getPDFFontSize($outputlangs);
 		$line_height = 6;
+		$table_top_offset = 15;
 		$posx = $this->marge_gauche;
 		$posy = $this->marge_haute;
 
@@ -866,9 +867,9 @@ class pdf_INPOSE extends ModelePDFFactures
 		$pdf->SetFont('', 'B', $default_font_size);
 		$pdf->SetXY($posx, $posy);
 		$pdf->MultiCell(0, 6, $outputlangs->transnoentities('DelegationSupplierInvoicesSummaryTitle'), 0, 'L', 0);
-		$posy = $pdf->GetY() + 2;
+		$posy = $pdf->GetY() + 2 + $table_top_offset;
 
-		$columns = array(
+		$base_columns = array(
 			array('label' => $outputlangs->transnoentities('Ref'), 'width' => 26, 'align' => 'L'),
 			array('label' => $outputlangs->transnoentities('Supplier'), 'width' => 54, 'align' => 'L'),
 			array('label' => $outputlangs->transnoentities('AmountHT'), 'width' => 18, 'align' => 'R'),
@@ -877,6 +878,28 @@ class pdf_INPOSE extends ModelePDFFactures
 			array('label' => $outputlangs->transnoentities('DateInvoice'), 'width' => 28, 'align' => 'C'),
 			array('label' => $outputlangs->transnoentities('DateDue'), 'width' => 28, 'align' => 'C'),
 		);
+		$usable_width = $this->page_largeur - $this->marge_gauche - $this->marge_droite;
+		$base_total = 0;
+		foreach ($base_columns as $base_column)
+		{
+			$base_total += $base_column['width'];
+		}
+		$columns = array();
+		$running_width = 0;
+		foreach ($base_columns as $index => $base_column)
+		{
+			$column = $base_column;
+			if ($index === (count($base_columns) - 1))
+			{
+				$column['width'] = $usable_width - $running_width;
+			}
+			else
+			{
+				$column['width'] = $base_total > 0 ? round($base_column['width'] * $usable_width / $base_total, 2) : $base_column['width'];
+				$running_width += $column['width'];
+			}
+			$columns[] = $column;
+		}
 
 		// EN: Draw table header.
 		// FR: Dessiner l'en-tête du tableau.
@@ -924,7 +947,7 @@ class pdf_INPOSE extends ModelePDFFactures
 				$pdf->SetFont('', 'B', $default_font_size);
 				$pdf->SetXY($posx, $posy);
 				$pdf->MultiCell(0, 6, $outputlangs->transnoentities('DelegationSupplierInvoicesSummaryTitle'), 0, 'L', 0);
-				$posy = $pdf->GetY() + 2;
+				$posy = $pdf->GetY() + 2 + $table_top_offset;
 
 				$pdf->SetFillColor(230, 230, 230);
 				$pdf->SetFont('', 'B', $default_font_size - 1);
@@ -968,7 +991,7 @@ class pdf_INPOSE extends ModelePDFFactures
 			$pdf->SetFont('', 'B', $default_font_size);
 			$pdf->SetXY($posx, $posy);
 			$pdf->MultiCell(0, 6, $outputlangs->transnoentities('DelegationSupplierInvoicesSummaryTitle'), 0, 'L', 0);
-			$posy = $pdf->GetY() + 2;
+			$posy = $pdf->GetY() + 2 + $table_top_offset;
 
 			$pdf->SetFillColor(230, 230, 230);
 			$pdf->SetFont('', 'B', $default_font_size - 1);
