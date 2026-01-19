@@ -28,8 +28,9 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formbank.class.php';
 
-if (dol_is_file(dol_buildpath('/delegation/lib/delegation.lib.php', 0))) {
-	dol_include_once('/delegation/lib/delegation.lib.php');
+$delegationLibPath = dol_buildpath('/delegation/lib/delegation.lib.php', 0);
+if (file_exists($delegationLibPath)) {
+	require_once $delegationLibPath;
 }
 
 if(!$user->admin or empty($conf->delegation->enabled))
