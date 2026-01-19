@@ -139,7 +139,10 @@ if ($user->admin && $action == 'create_clearing_account') {
 	if (defined('DOL_VERSION') && version_compare(DOL_VERSION, '22.0', '>=')) {
 		$labelMaxLength = 128;
 	}
-	$account->label = dol_trunc($langs->trans('DelegationClearingAccountLabel'), $labelMaxLength, 'right', 'UTF-8', 1);
+	// EN: Use non-HTML translation to avoid entity expansion in database.
+	// FR: Utiliser une traduction sans HTML pour éviter l'expansion d'entités en base.
+	$rawLabel = $langs->transnoentities('DelegationClearingAccountLabel');
+	$account->label = dol_trunc($rawLabel, $labelMaxLength, 'right', 'UTF-8', 1);
 	$account->currency_code = $conf->currency;
 	$account->clos = 0;
 	// Provide mandatory initial balance date and amount.
