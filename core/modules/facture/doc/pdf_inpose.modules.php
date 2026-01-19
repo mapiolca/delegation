@@ -854,7 +854,8 @@ class pdf_INPOSE extends ModelePDFFactures
 
 		$default_font_size = pdf_getPDFFontSize($outputlangs);
 		$line_height = 6;
-		$table_top_offset = 15;
+		$title_top_offset = 25;
+		$table_top_offset = 5;
 		$posx = $this->marge_gauche;
 		$posy = $this->marge_haute;
 
@@ -865,7 +866,7 @@ class pdf_INPOSE extends ModelePDFFactures
 		if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
 
 		$pdf->SetFont('', 'B', $default_font_size);
-		$pdf->SetXY($posx, $posy);
+		$pdf->SetXY($posx, $posy + $title_top_offset);
 		$pdf->MultiCell(0, 6, $outputlangs->transnoentities('DelegationSupplierInvoicesSummaryTitle'), 0, 'L', 0);
 		$posy = $pdf->GetY() + 2 + $table_top_offset;
 
@@ -945,7 +946,7 @@ class pdf_INPOSE extends ModelePDFFactures
 				$posy = $this->marge_haute;
 
 				$pdf->SetFont('', 'B', $default_font_size);
-				$pdf->SetXY($posx, $posy);
+				$pdf->SetXY($posx, $posy + $title_top_offset);
 				$pdf->MultiCell(0, 6, $outputlangs->transnoentities('DelegationSupplierInvoicesSummaryTitle'), 0, 'L', 0);
 				$posy = $pdf->GetY() + 2 + $table_top_offset;
 
@@ -989,7 +990,7 @@ class pdf_INPOSE extends ModelePDFFactures
 			$posy = $this->marge_haute;
 
 			$pdf->SetFont('', 'B', $default_font_size);
-			$pdf->SetXY($posx, $posy);
+			$pdf->SetXY($posx, $posy + $title_top_offset);
 			$pdf->MultiCell(0, 6, $outputlangs->transnoentities('DelegationSupplierInvoicesSummaryTitle'), 0, 'L', 0);
 			$posy = $pdf->GetY() + 2 + $table_top_offset;
 
