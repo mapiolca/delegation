@@ -839,6 +839,12 @@ class pdf_INPOSE extends ModelePDFFactures
 			$invoice = new FactureFournisseur($this->db);
 			if ($invoice->fetch((int) $obj->rowid) > 0)
 			{
+				// EN: Ensure invoice dates are loaded.
+				// FR: Vérifier que les dates de facture sont bien chargées.
+				if (! isset($invoice->datef) || ! isset($invoice->date_lim_reglement))
+				{
+					$invoice->fetch((int) $obj->rowid);
+				}
 				$invoice->fetch_thirdparty();
 				$supplierInvoices[] = $invoice;
 				$total_ht += (float) $invoice->total_ht;
@@ -940,6 +946,7 @@ class pdf_INPOSE extends ModelePDFFactures
 
 			if ($posy + $row_height > ($this->page_hauteur - $this->marge_basse))
 			{
+				$this->_pagefoot($pdf, $object, $outputlangs);
 				$pdf->AddPage();
 				if (! empty($tplidx)) $pdf->useTemplate($tplidx);
 				if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
@@ -984,6 +991,7 @@ class pdf_INPOSE extends ModelePDFFactures
 
 		if ($posy + $row_height > ($this->page_hauteur - $this->marge_basse))
 		{
+			$this->_pagefoot($pdf, $object, $outputlangs);
 			$pdf->AddPage();
 			if (! empty($tplidx)) $pdf->useTemplate($tplidx);
 			if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
@@ -1025,6 +1033,8 @@ class pdf_INPOSE extends ModelePDFFactures
 			$pdf->MultiCell($columns[$column_index]['width'], $row_height, $value, 1, $columns[$column_index]['align'], 0);
 			$curx += $columns[$column_index]['width'];
 		}
+
+		$this->_pagefoot($pdf, $object, $outputlangs);
 
 		return 1;
 	}
