@@ -234,14 +234,58 @@ class Actionsdelegation
 				'options_delegation_vat_reverse_charge'
 			);
 
-			if (! $isEditing && $status['active'] && $canWriteVat) {
-				// EN: Provide a quick action to apply VAT 0 on all lines.
-				// FR: Proposer une action rapide pour appliquer TVA 0 sur toutes les lignes.
-				$output .= $this->renderVatReverseChargeActionRow($object);
-			}
 		}
 
 		$this->resprints .= $output;
+
+		return 0;
+	}
+
+	/**
+	 * EN: Add VAT reverse charge action button with other actions.
+	 * FR: Ajouter le bouton d'autoliquidation avec les autres actions.
+	 *
+	 * @param	array			$parameters	Hook parameters
+	 * @param	CommonObject	&$object	Object to process
+	 * @param	string			&$action	Current action
+	 * @param	HookManager		$hookmanager	Hook manager
+	 * @return	int							< 0 on error, 0 on success, 1 to replace standard code
+	 */
+	public function addMoreActionsButtons($parameters, &$object, &$action, $hookmanager)
+	{
+		global $conf, $user, $langs;
+
+		if (empty($conf->delegation->enabled)) {
+			return 0;
+		}
+
+		if (! getDolGlobalInt('DELEGATION_ENABLE_VAT_REVERSE_CHARGE', 0)) {
+			return 0;
+		}
+
+		$currentcontext = explode(':', $parameters['currentcontext']);
+		if (! $this->isCustomerDocumentContext($currentcontext)) {
+			return 0;
+		}
+
+		if (! $this->userCanWriteVatReverseCharge($user)) {
+			return 0;
+		}
+
+		if ($action === 'edit' || $action === 'create') {
+			return 0;
+		}
+
+		$langs->load("delegation@delegation");
+		$status = $this->getVatReverseChargeStatus($object);
+
+		if (! $status['active']) {
+			return 0;
+		}
+
+		// EN: Render action button next to standard actions.
+		// FR: Rendre le bouton d'action à côté des actions standard.
+		$this->resprints .= $this->renderVatReverseChargeActionButton($object);
 
 		return 0;
 	}
@@ -420,14 +464,17 @@ class Actionsdelegation
 	 */
 	private function renderVatReverseChargeRow($value, $inherited, $isEditing, $canWrite, $fieldName)
 	{
-		global $langs, $form;
+		global $langs;
 
 		$output = '<tr>';
 		$output .= '<td class="titlefield">'.$langs->trans('DelegationVatReverseCharge').'</td>';
-		$output .= '<td>';
+		$output .= '<td class="nowraponall">';
 
 		if ($isEditing && $canWrite) {
-			$output .= $form->selectyesno($fieldName, $value, 1);
+			// EN: Use checkbox inline to match Dolibarr UI expectations.
+			// FR: Utiliser une case à cocher inline pour respecter l'UI Dolibarr.
+			$output .= '<input type="hidden" name="'.$fieldName.'" value="0">';
+			$output .= '<input type="checkbox" class="flat" id="'.$fieldName.'" name="'.$fieldName.'" value="1"'.($value ? ' checked="checked"' : '').'>';
 		} else {
 			$output .= $value ? $langs->trans('Yes') : $langs->trans('No');
 		}
@@ -443,22 +490,20 @@ class Actionsdelegation
 	}
 
 	/**
-	 * EN: Render action row for VAT reverse charge.
-	 * FR: Générer la ligne d'action pour l'autoliquidation de TVA.
+	 * EN: Render action button for VAT reverse charge.
+	 * FR: Générer le bouton d'action pour l'autoliquidation de TVA.
 	 *
 	 * @param	CommonObject	$object	Object to process
 	 * @return	string
 	 */
-	private function renderVatReverseChargeActionRow($object)
+	private function renderVatReverseChargeActionButton($object)
 	{
 		global $langs;
 
 		$url = $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=delegation_apply_vat_reverse_charge&token='.newToken();
-		$output = '<tr>';
-		$output .= '<td colspan="2">';
-		$output .= '<a class="butAction" href="'.dol_escape_htmltag($url).'">'.$langs->trans('DelegationApplyVatReverseCharge').'</a>';
-		$output .= '</td>';
-		$output .= '</tr>';
+		$output = '<a class="butAction butActionSmall" href="'.dol_escape_htmltag($url).'">';
+		$output .= $langs->trans('DelegationApplyVatReverseCharge');
+		$output .= '</a>';
 
 		return $output;
 	}
