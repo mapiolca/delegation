@@ -50,6 +50,12 @@ if (empty($conf->global->DELEGATION_CLEARING_BANKACCOUNT_ID)) {
 	setEventMessages($langs->trans('DelegationConfigMissingClearingAccount'), null, 'warnings');
 }
 
+// EN: Enable linked object line imports by default.
+// FR: Activer par défaut l'import des lignes d'objets liés.
+if (! isset($conf->global->MAIN_ENABLE_IMPORT_LINKED_OBJECT_LINES)) {
+	dolibarr_set_const($db, 'MAIN_ENABLE_IMPORT_LINKED_OBJECT_LINES', 1, 'int', 0, '', $conf->entity);
+}
+
 // Ensure payment mode exists on admin access (upgrade safety).
 if (empty($conf->global->DELEGATION_PAYMENT_MODE_ID)) {
 	$paymentCode = 'DELPAY';
@@ -251,6 +257,13 @@ $tabs = array(
 foreach ($tabs as $constName => $tabInfo) {
 	delegation_setup_print_on_off($langs->trans($tabInfo['label']), $constName, $langs->trans($tabInfo['help']));
 }
+
+delegation_setup_print_title($langs->trans("DelegationImportSection"));
+delegation_setup_print_on_off(
+	$langs->trans("DelegationEnableImportLinkedObjectLines"),
+	'MAIN_ENABLE_IMPORT_LINKED_OBJECT_LINES',
+	$langs->trans("DelegationEnableImportLinkedObjectLinesHelp")
+);
 
 delegation_setup_print_title($langs->trans("DelegationVatReverseChargeSection"));
 delegation_setup_print_on_off($langs->trans("DelegationEnableVatReverseCharge"), 'DELEGATION_ENABLE_VAT_REVERSE_CHARGE');
