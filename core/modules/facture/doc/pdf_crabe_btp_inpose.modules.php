@@ -1963,27 +1963,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				    // reste à payer total
 				    
 				    
-				    	// reste à Payer HT
-					$index++;
-				    $pdf->SetFont('','', $default_font_size - 1);
-				    $pdf->SetFillColor(255,255,255);
-				    $pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
-				    $pdf->MultiCell($col1x, $tab2_hl, $outputlangs->transnoentities('DelegationTotalHTRestant'), 0, 'L', 1);
-				    
-				    $pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-				    $pdf->MultiCell($largcol2, $tab2_hl, price($total_ht_restant, 0, $outputlangs), 0, 'R', 1);
-
-				    	// reste à Payer TVA
-				    $index++;
-				    $pdf->SetFont('','', $default_font_size - 1);
-				    $pdf->SetFillColor(248,248,248);
-				    $pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
-				    $pdf->MultiCell($col1x, $tab2_hl, $outputlangs->transnoentities('DelegationTotalTVARestant'), 0, 'L', 1);
-				    
-				    $pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-				    $pdf->MultiCell($largcol2, $tab2_hl, price($tva_restante, 0, $outputlangs), 0, 'R', 1);
-
-				    	// reste à Payer TTC
+					// Remaining total TTC
 				    $index++;
 				    $pdf->SetFont('','', $default_font_size - 1);
 				    $pdf->SetFillColor(224,224,224);
@@ -3142,6 +3122,9 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$this->posx_month = 166;
 		
 		$tab_height -= 15; // Réduction de la hauteur global du tableau
+		$column_width = 35;
+		$header_height = 5;
+		$cell_padding = 1;
 		
 		
 		// Force to disable hidetop and hidebottom
@@ -3169,9 +3152,16 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				$pdf->Rect($this->posx_new_cumul-1, $tab_top, $width, 5, 'F', null, explode(',',$conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR));
 				$pdf->Rect($this->marge_gauche, $tab_top+92.5, $this->page_largeur-$this->marge_gauche-$this->marge_droite, 5, 'F', null, explode(',',$conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR));
 			}
+			else
+			{
+				$pdf->SetFillColor(240, 240, 240);
+				$pdf->Rect($this->posx_new_cumul-1, $tab_top, $this->page_largeur-$this->marge_droite-($this->posx_new_cumul-1), $header_height, 'F');
+				$pdf->SetFillColor(255, 255, 255);
+			}
 		}
 
 		$pdf->SetDrawColor(128,128,128);
+		$pdf->SetLineWidth(0.1);
 		$pdf->SetFont('','', $default_font_size - 1);
 
 		// Output Rect
@@ -3182,22 +3172,24 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$pdf->line($this->posx_new_cumul-1, $tab_top, $this->posx_new_cumul-1, $tab_top + $tab_height);
 		if (empty($hidetop))
 		{
+			$pdf->SetFont('','B', $default_font_size - 1);
 			$pdf->SetXY($this->posx_new_cumul-1, $tab_top+0.5);
-			$pdf->MultiCell(35,2, $outputlangs->transnoentities("BtpNewCumul"),'','C');
+			$pdf->MultiCell($column_width, 2, $outputlangs->transnoentities("BtpNewCumul"), '', 'C');
 		}
 		
 		$pdf->line($this->posx_cumul_anterieur-1, $tab_top, $this->posx_cumul_anterieur-1, $tab_top + $tab_height);
 		if (empty($hidetop))
 		{
 			$pdf->SetXY($this->posx_cumul_anterieur-1, $tab_top+0.5);
-			$pdf->MultiCell(35,2, $outputlangs->transnoentities("BtpAnteCumul"),'','C');
+			$pdf->MultiCell($column_width, 2, $outputlangs->transnoentities("BtpAnteCumul"), '', 'C');
 		}
 		
 		$pdf->line($this->posx_month-1, $tab_top, $this->posx_month-1, $tab_top + $tab_height);
 		if (empty($hidetop))
 		{
 			$pdf->SetXY($this->posx_month-1, $tab_top+0.5);
-			$pdf->MultiCell(35,2, $outputlangs->transnoentities("Month"),'','C');
+			$pdf->MultiCell($column_width, 2, $outputlangs->transnoentities("Month"), '', 'C');
+			$pdf->SetFont('','', $default_font_size - 1);
 		}
 		
 		// ADD HORIZONTALE LINES
@@ -3244,10 +3236,10 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$pdf->MultiCell(80,2, $outputlangs->transnoentities("BtpRetenueGarantie"),'','C');
 
 		$pdf->SetXY($this->marge_gauche+2, $tab_top+94);
-		$pdf->MultiCell(80,2, $outputlangs->transnoentities("Compte Prorata"),'','C');
+		$pdf->MultiCell(80,2, $outputlangs->transnoentities("Compte Prorata"), '', 'C');
 
 		$pdf->SetXY($this->marge_gauche+2, $tab_top+114);
-		$pdf->MultiCell(80,2, $outputlangs->transnoentities("Délégations de Paiement"),'','C');
+		$pdf->MultiCell(80,2, $outputlangs->transnoentities("DelegationPayments"), '', 'C');
 		
 		$pdf->SetFont('','B', $default_font_size - 1);
 		$pdf->SetXY($this->marge_gauche+2, $tab_top+133);
@@ -3269,45 +3261,45 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 										)
 							);
 		
-		$x = $this->marge_gauche+95;
+		$x = $this->posx_new_cumul + $cell_padding;
 		foreach($TToDpisplay as $Tab) {
 			
 			$pdf->SetXY($x, $tab_top+8);
-			$pdf->MultiCell(80,2, price($this->TDataSituation[$Tab[0]]),'','L');
+			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[0]]), '', 'R');
 			
 			$pdf->SetXY($x, $tab_top+26);
-			$pdf->MultiCell(80,2, price($this->TDataSituation[$Tab[1]]),'','L');
+			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[1]]), '', 'R');
 			
 			$pdf->SetXY($x, $tab_top+30);
-			$pdf->MultiCell(80,2, price($this->TDataSituation[$Tab[2]]),'','L');
+			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[2]]), '', 'R');
 			
 			$pdf->SetXY($x, $tab_top+34);
-			$pdf->MultiCell(80,2, price($this->TDataSituation[$Tab[3]]),'','L');
+			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[3]]), '', 'R');
 			$pdf->SetFont('','B', $default_font_size - 1);
 
 			$pdf->SetXY($x, $tab_top+53);
-			$pdf->MultiCell(80,2, price($this->TDataSituation[$Tab[4]]),'','L');
+			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[4]]), '', 'R');
 			$pdf->SetFont('','', $default_font_size - 2);
 		
 		
 			$pdf->SetXY($x, $tab_top+74);
-			$pdf->MultiCell(80,2, price($this->TDataSituation[$Tab[5]]),'','L');
+			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[5]]), '', 'R');
 			$pdf->SetFont('','', $default_font_size - 2);
 	
 			$pdf->SetXY($x, $tab_top+93);
-			$pdf->MultiCell(80,2, price($this->TDataSituation[$Tab[6]]),'','L');
+			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[6]]), '', 'R');
 			$pdf->SetFont('','', $default_font_size - 2);
 
 			$pdf->SetXY($x, $tab_top+113);
-			$pdf->MultiCell(80,2, price($this->TDataSituation[$Tab[7]]),'','L');
+			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[7]]), '', 'R');
 			$pdf->SetFont('','', $default_font_size - 2);
 
 			$pdf->SetXY($x, $tab_top+133);
 			$pdf->SetFont('','B', $default_font_size - 1);
-			$pdf->MultiCell(80,2, price($this->TDataSituation[$Tab[8]]),'','L');
+			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[8]]), '', 'R');
 			
 			
-			$x+=35;
+			$x+=$column_width;
 
 		}
 		/************************************************************/

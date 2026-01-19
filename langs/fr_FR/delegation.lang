@@ -29,6 +29,7 @@ DelegationSupplierInvoicesSummaryTitle=Récapitulatif des factures fournisseurs 
 DelegationTotalsWithCount=Totaux (%s factures)
 DelegationAmountExceeded=Le total des montants délégués dépasse le montant de la facture.
 DelegationClearingAccountMissingCountry=Veuillez renseigner le pays de la société avant de créer le compte de passage.
+DelegationPayments=Délégations de paiement
 non_renseigne=Non renseigné
 BtpAdditionalWork=Avenants 
 BtpAnteCumul=Cumul antérieur

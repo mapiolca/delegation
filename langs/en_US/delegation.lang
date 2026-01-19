@@ -29,6 +29,7 @@ DelegationSupplierInvoicesSummaryTitle=Summary of supplier invoices under paymen
 DelegationTotalsWithCount=Totals (%s invoices)
 DelegationAmountExceeded=The total delegated amounts exceed the invoice amount.
 DelegationClearingAccountMissingCountry=Please set the company country before creating the clearing account.
+DelegationPayments=Payment delegations
 non_renseigne=Not set
 BtpAdditionalWork=Additional work
 BtpAnteCumul=Previous cumulative
