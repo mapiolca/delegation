@@ -21,11 +21,28 @@
  *		\brief      Delegation Facture module tabs view
  */
 
-
-$res=@include("../../main.inc.php");					// For root directory
-if (! $res) $res=@include("../../../main.inc.php");	// For "custom" directory
+// Load Dolibarr environment.
+$res = false;
+$paths = array(
+	__DIR__.'/../../main.inc.php',
+	__DIR__.'/../../../main.inc.php',
+	__DIR__.'/../../../../main.inc.php',
+	__DIR__.'/../../../../../main.inc.php',
+);
+foreach ($paths as $path) {
+	if (file_exists($path)) {
+		$res = include $path;
+		if ($res) {
+			break;
+		}
+	}
+}
+if (! $res) {
+	die('Include of main fails');
+}
 
 require_once DOL_DOCUMENT_ROOT . '/compta/facture/class/facture.class.php';
+require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/modules/facture/modules_facture.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formother.class.php';
@@ -42,20 +59,12 @@ if (! empty($conf->projet->enabled))
 
 dol_include_once("/delegation/class/delegation.class.php");
 
-$langs->load('bills');
-$langs->load('companies');
-$langs->load('compta');
-$langs->load('products');
-$langs->load('banks');
-$langs->load('main');
-$langs->load("delegation@delegation");
-$langs->load('projects');
-
+$langs->loadLangs(array('bills','companies','compta','products','banks','main','delegation@delegation','projects'));
 
 $id = GETPOST('id', 'int');
-$lineid = GETPOST('lineid') ? GETPOST('lineid') : 0;
+$lineid = GETPOST('lineid', 'int');
 
-$action = GETPOST('action', 'alpha');
+$action = GETPOST('action', 'aZ09');
 $cancel = GETPOST('cancel') ? true : false;
 $error = false;
 $message = '';
@@ -65,8 +74,7 @@ $form = new Form($db);
 $object = new Facture($db);
 $delegation = new Delegation($db);
 
-// EN: Check module tab toggle and permissions.
-// FR: Vérifier l'activation de l'onglet et les permissions.
+// Check module tab toggle and permissions.
 if (! getDolGlobalInt('DELEGATION_ENABLE_TAB_DELEGATION', 1)) {
 	accessforbidden();
 }
@@ -95,6 +103,7 @@ if ($id > 0)
 
 	if ($result > 0)
 	{
+		$object->fetch_thirdparty();
 		$delegation->fetch();
 		
 		if ($object->element != 'facture')// || $object->type != 5)
@@ -133,13 +142,8 @@ if (!$error && !$cancel)
 
 $head = facture_prepare_head($object);
 $current_head = 'delegation';
-if (function_exists('complete_head_from_modules')) {
-	$h = 0;
-	complete_head_from_modules($conf, $langs, $object, $head, $h, 'invoice');
-}
- 
-$soc = new Societe($db);
-$soc->fetch($object->socid);
+
+$soc = $object->thirdparty;
 
 $totalpaye  = $object->getSommePaiement();
 
@@ -160,8 +164,7 @@ if ($delegation->getSumDelegation() > $object->total_ttc) {
 	setEventMessages($langs->trans('DelegationAmountExceeded'), null, 'warnings');
 }
 
-// EN: Prepare supplier invoice options and enrich delegation lines.
-// FR: Préparer la liste des factures fournisseurs et enrichir les lignes de délégation.
+// Prepare supplier invoice options and enrich delegation lines.
 $supplierInvoiceOptions = array();
 $paymentModeId = ! empty($conf->global->DELEGATION_PAYMENT_MODE_ID) ? (int) $conf->global->DELEGATION_PAYMENT_MODE_ID : 0;
 
