@@ -66,7 +66,7 @@ class modDelegation extends DolibarrModules
 		// It is used to group modules in module setup page
 		$this->family = "Les Métiers du Bâtiment";
 		// Module label (no space allowed), used if translation string 'ModuleXXXName' not found (where XXX is value of numeric property 'numero' of module)
-		$this->name = 'delegation';
+		$this->name = $langs->trans('Delegation');
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Module pour gérer la délégation de paiement, les contrats de sous-traitance et les formulaires DC4.";
 		// Possible values for version are: 'development', 'experimental', 'dolibarr' or version
