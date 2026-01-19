@@ -29,6 +29,7 @@ DelegationSupplierInvoicesSummaryTitle=Übersicht der Lieferantenrechnungen unte
 DelegationTotalsWithCount=Summen (%s Rechnungen)
 DelegationAmountExceeded=Die Summe der delegierten Beträge übersteigt den Rechnungsbetrag.
 DelegationClearingAccountMissingCountry=Bitte das Land des Unternehmens festlegen, bevor das Durchlaufkonto erstellt wird.
+DelegationPayments=Zahlungsdelegationen
 non_renseigne=Nicht ausgefüllt
 BtpAdditionalWork=Zusätzliche Arbeiten
 BtpAnteCumul=Vorheriger kumulierter Betrag
