@@ -25,6 +25,7 @@ DelegationSupplierInvoiceNotAllowed=The supplier invoice is not eligible for del
 DelegationSupplierInvoiceAlreadyLinked=This supplier invoice is already linked to the delegation.
 DelegationAmountExceeded=The total delegated amounts exceed the invoice amount.
 DelegationClearingAccountMissingCountry=Please set the company country before creating the clearing account.
+non_renseigne=Not set
 BtpAdditionalWork=Additional work
 BtpAnteCumul=Previous cumulative
 BtpMainWork=Main work

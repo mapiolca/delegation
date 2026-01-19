@@ -21,8 +21,25 @@
  *		\brief      DC4 module tabs view
  */
 
-$res=@include("../../main.inc.php");				// For root directory
-if (! $res) $res=@include("../../../main.inc.php");	// For "custom" directory
+// Load Dolibarr environment.
+$res = false;
+$paths = array(
+	__DIR__.'/../../main.inc.php',
+	__DIR__.'/../../../main.inc.php',
+	__DIR__.'/../../../../main.inc.php',
+	__DIR__.'/../../../../../main.inc.php',
+);
+foreach ($paths as $path) {
+	if (file_exists($path)) {
+		$res = include $path;
+		if ($res) {
+			break;
+		}
+	}
+}
+if (! $res) {
+	die('Include of main fails');
+}
 //include 'core/lib/includeMain.lib.php';
 require_once DOL_DOCUMENT_ROOT ."/core/class/commonobject.class.php";
 //require_once DOL_DOCUMENT_ROOT ."/core/lib/generic.lib.php";
@@ -35,6 +52,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/modules/supplier_order/modules_commandefou
 
 require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.commande.class.php';
 require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.product.class.php';
+require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/fourn.lib.php';
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
@@ -58,22 +76,22 @@ if (!empty($conf->variants->enabled)) {
 
 dol_include_once("/delegation/class/dc4.class.php");
 
-$langs->loadLangs(array("suppliers", "orders", "companies", "stocks"));
+$langs->loadLangs(array("suppliers", "orders", "companies", "stocks", "delegation@delegation"));
 
 
-$id 			= GETPOST('id','int');
-$ref 			= GETPOST('ref','alpha');
+$id = GETPOST('id','int');
+$ref = GETPOST('ref','alpha');
 
 $confirm		= GETPOST('confirm','alpha');
 $comclientid 	= GETPOST('comid','int');
 $socid			= GETPOST('socid','int');
 $projectid		= GETPOST('projectid','int');
 
-$action 		= GETPOST('action', 'alpha');
+$action = GETPOST('action', 'aZ09');
 $cancel         = GETPOST('cancel', 'alpha');
 
-$lineid         = GETPOST('lineid', 'int');
-$field          = GETPOST('field', 'alpha');
+$lineid = GETPOST('lineid', 'int');
+$field = GETPOST('field', 'alpha');
 
 // Security check
 if ($user->societe_id) $socid=$user->societe_id;
@@ -86,8 +104,7 @@ $form = new Form($db);
 $object = new CommandeFournisseur($db);
 $dc4 = new DC4($db);
 
-// EN: Check module tab toggle and permissions.
-// FR: Vérifier l'activation de l'onglet et les permissions.
+// Check module tab toggle and permissions.
 if (! getDolGlobalInt('DELEGATION_ENABLE_TAB_DC4_SUPPLIER', 1)) {
 	accessforbidden();
 }
@@ -137,6 +154,7 @@ if ($id > 0)
 
 	if ($result > 0)
 	{
+		$object->fetch_thirdparty();
 		$dc4->fetch();
 		
 		if ($object->element != 'order_supplier')// || $object->type != 5)
@@ -182,7 +200,40 @@ if (! empty($conf->projet->enabled))
 $numLines = sizeof($dc4->lines);
 $current_head = 'dc4_supplier';
 
+$head = ordersupplier_prepare_head($object);
+$linkback = '<a href="'.DOL_URL_ROOT.'/fourn/commande/list.php'.(! empty($socid)?'?socid='.$socid:'').'">'.$langs->trans("BackToList").'</a>';
+$title = $langs->trans('SupplierOrder');
+
+$morehtmlref = '<div class="refidno">';
+$morehtmlref .= $form->editfieldkey("RefSupplier", 'ref_supplier', $object->ref_supplier, $object, 0, 'string', '', 0, 1);
+$morehtmlref .= $form->editfieldval("RefSupplier", 'ref_supplier', $object->ref_supplier, $object, 0, 'string', '', null, null, '', 1);
+if (! empty($object->thirdparty)) {
+	$morehtmlref .= '<br>'.$langs->trans('ThirdParty').' : '.$object->thirdparty->getNomUrl(1);
+}
+if (! empty($conf->projet->enabled)) {
+	$langs->load("projects");
+	$morehtmlref .= '<br>'.$langs->trans('Project').' : ';
+	if (! empty($object->fk_project)) {
+		$proj = new Project($db);
+		$proj->fetch($object->fk_project);
+		$morehtmlref .= $proj->getNomUrl(1);
+	}
+}
+$morehtmlref .= '</div>';
+
+llxHeader('', $langs->trans("DC4form").' - '.$langs->trans("SupplierOrder"), 'EN:Module_Suppliers_Orders|FR:CommandeFournisseur|ES:Módulo_Pedidos_a_proveedores');
+print dol_get_fiche_head($head, $current_head, $title, -1, 'order');
+dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
+print '<div class="fichecenter">';
+print '<div class="underbanner clearboth"></div>';
+
 include '../tpl/dc4.default.tpl.php';
 
+$print_fiche_end = dol_get_fiche_end();
+if ($print_fiche_end) {
+	print $print_fiche_end;
+}
+print '</div>';
+llxFooter();
+
 $db->close();
-?>

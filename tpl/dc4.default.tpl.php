@@ -26,98 +26,9 @@
  *  View
  */
 
-if ($object->element == 'commande') {
-	$head = commande_prepare_head($object);
-	$title= $langs->trans("Order");
-	$help_url = 'EN:Customers_Orders|FR:Commandes_Clients|ES:Pedidos de clientes';
-	$linkback = '<a href="'.DOL_URL_ROOT.'/commande/list.php?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
-	if (function_exists('complete_head_from_modules')) {
-		$h = 0;
-		complete_head_from_modules($conf, $langs, $object, $head, $h, 'order');
-	}
-}else if ($object->element == 'order_supplier') {
-	$head = ordersupplier_prepare_head($object);
-	$help_url='EN:Module_Suppliers_Orders|FR:CommandeFournisseur|ES:Módulo_Pedidos_a_proveedores';
-	$title= $langs->trans("SupplierOrder");
-	$linkback = '<a href="'.DOL_URL_ROOT.'/fourn/commande/list.php'.(! empty($socid)?'?socid='.$socid:'').'">'.$langs->trans("BackToList").'</a>';
-	if (function_exists('complete_head_from_modules')) {
-		$h = 0;
-		complete_head_from_modules($conf, $langs, $object, $head, $h, 'supplierorder');
-	}
-	if (empty($object->thirdparty)) {
-		$object->fetch_thirdparty();
-	}
-}
-
-llxHeader('', $langs->trans("DC4form").' - '.$langs->trans("Order"), $help_url);
-
-dol_fiche_head($head, $current_head, $title, -1, 'order');
-
-// Supplier order card
-
-
-$morehtmlref='<div class="refidno">';
-
-// Ref supplier
-$morehtmlref.=$form->editfieldkey("RefSupplier", 'ref_supplier', $object->ref_supplier, $object, 0, 'string', '', 0, 1);
-$morehtmlref.=$form->editfieldval("RefSupplier", 'ref_supplier', $object->ref_supplier, $object, 0, 'string', '', null, null, '', 1);
-
-// Thirdparty
-
-if ($object->element == 'commande') {
-    $soc = new Societe($db);
-    $soc->fetch($object->socid);
-    $morehtmlref .= '<br>'.$langs->trans('ThirdParty').' : '.$soc->getNomUrl(1);
-}else if ($object->element == 'order_supplier') {
-	if (! empty($object->thirdparty)) {
-		$morehtmlref.='<br>'.$langs->trans('ThirdParty').' : '.$object->thirdparty->getNomUrl(1);
-	}
-}
-
-// Project
-if (! empty($conf->projet->enabled))
-{
-    $langs->load("projects");
-    $morehtmlref.='<br>'.$langs->trans('Project') . ' ';
-    if ($user->rights->fournisseur->commande->creer)
-    {
-        if ($action != 'classify')
-            //$morehtmlref.='<a href="' . $_SERVER['PHP_SELF'] . '?action=classify&amp;id=' . $object->id . '">' . img_edit($langs->transnoentitiesnoconv('SetProject')) . '</a> : ';
-            $morehtmlref.=' : ';
-            if ($action == 'classify') {
-                //$morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'projectid', 0, 0, 1, 1);
-                $morehtmlref.='<form method="post" action="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'">';
-                $morehtmlref.='<input type="hidden" name="action" value="classin">';
-                $morehtmlref.='<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
-                $morehtmlref.=$formproject->select_projects($object->socid, $object->fk_project, 'projectid', $maxlength, 0, 1, 0, 1, 0, 0, '', 1);
-                $morehtmlref.='<input type="submit" class="button valignmiddle" value="'.$langs->trans("Modify").'">';
-                $morehtmlref.='</form>';
-            } else {
-                $morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'none', 0, 0, 0, 1);
-            }
-    } else {
-        if (! empty($object->fk_project)) {
-            $proj = new Project($db);
-            $proj->fetch($object->fk_project);
-            $morehtmlref.='<a href="'.DOL_URL_ROOT.'/projet/card.php?id=' . $object->fk_project . '" title="' . $langs->trans('ShowProject') . '">';
-            $morehtmlref.=$proj->ref;
-            $morehtmlref.='</a>';
-        } else {
-            $morehtmlref.='';
-        }
-    }
-}
-
-$morehtmlref.='</div>';
-
-dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
-
 ?>
 
-<?php dol_fiche_end(); ?>
-
-
-<?php 
+<?php
 
     if ($object->element == 'order_supplier') {
         print load_fiche_titre($langs->trans("dc4"), '', '');
@@ -132,7 +43,8 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
 
 ?>
 
-<table id="tablelines" class="noborder" width="100%">
+<div class="div-table-responsive">
+<table id="tablelines" class="noborder centpercent">
 <?php if ($numLines > 0){ ?>
     <tr class="liste_titre nodrag nodrop">
         <td><?php print $langs->trans('Label'); ?></td>
@@ -146,7 +58,7 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
         if ($action == 'editline' && $lineid == $line_dc4->rowid){ ?>
 
         <form name="dc4" action="<?php print $_SERVER["PHP_SELF"].'?id='.$object->id; ?>" method="POST">
-            <input type="hidden" name="token" value="<?php  print $_SESSION['newtoken']; ?>" />
+            <input type="hidden" name="token" value="<?php  print newToken(); ?>" />
             <input type="hidden" name="action" value="updateline" />
             <input type="hidden" name="id" value="<?php print $object->id; ?>" />
             <input type="hidden" name="lineid" value="<?php print $line_dc4->rowid; ?>"/>
@@ -568,10 +480,5 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
     </form>
 <?php } ?>
 </table>
-
-<?php 
-
-// End of page
-llxFooter();
-
+</div>
 ?>

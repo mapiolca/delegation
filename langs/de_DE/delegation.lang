@@ -25,6 +25,7 @@ DelegationSupplierInvoiceNotAllowed=Die Lieferantenrechnung ist für die Delegat
 DelegationSupplierInvoiceAlreadyLinked=Diese Lieferantenrechnung ist bereits mit der Delegation verknüpft.
 DelegationAmountExceeded=Die Summe der delegierten Beträge übersteigt den Rechnungsbetrag.
 DelegationClearingAccountMissingCountry=Bitte das Land des Unternehmens festlegen, bevor das Durchlaufkonto erstellt wird.
+non_renseigne=Nicht ausgefüllt
 BtpAdditionalWork=Zusätzliche Arbeiten
 BtpAnteCumul=Vorheriger kumulierter Betrag
 BtpMainWork=Hauptarbeiten

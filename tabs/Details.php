@@ -23,8 +23,25 @@
 
 
 
-$res=@include("../../main.inc.php");					// For root directory
-if (! $res) $res=@include("../../../main.inc.php");	// For "custom" directory
+// Load Dolibarr environment.
+$res = false;
+$paths = array(
+	__DIR__.'/../../main.inc.php',
+	__DIR__.'/../../../main.inc.php',
+	__DIR__.'/../../../../main.inc.php',
+	__DIR__.'/../../../../../main.inc.php',
+);
+foreach ($paths as $path) {
+	if (file_exists($path)) {
+		$res = include $path;
+		if ($res) {
+			break;
+		}
+	}
+}
+if (! $res) {
+	die('Include of main fails');
+}
 
 require_once DOL_DOCUMENT_ROOT."/core/class/commonobject.class.php";
 require_once DOL_DOCUMENT_ROOT.'/core/modules/project/modules_project.php';
@@ -35,23 +52,18 @@ require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/project.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 
 dol_include_once("/delegation/class/detailprojet.class.php");
 
-$langs->load('companies');
-$langs->load('compta');
-$langs->load('products');
-$langs->load('banks');
-$langs->load('main');
-$langs->load("delegation@delegation");
-$langs->load('projects');
+$langs->loadLangs(array('companies','compta','products','banks','main','delegation@delegation','projects'));
 
 
 $id = GETPOST('id', 'int');
-$lineid = GETPOST('lineid') ? GETPOST('lineid') : 0;
-$field = GETPOST('field');
+$lineid = GETPOST('lineid', 'int');
+$field = GETPOST('field', 'alpha');
 
-$action = GETPOST('action', 'alpha');
+$action = GETPOST('action', 'aZ09');
 $cancel = GETPOST('cancel') ? true : false;
 $error = false;
 $message = '';
@@ -62,8 +74,7 @@ $object = new Project($db);
 $details = new Details($db);
 $soc = new Societe($db);
 
-// EN: Check module tab toggle and permissions.
-// FR: Vérifier l'activation de l'onglet et les permissions.
+// Check module tab toggle and permissions.
 if (! getDolGlobalInt('DELEGATION_ENABLE_TAB_DETAILS', 1)) {
 	accessforbidden();
 }
@@ -92,6 +103,9 @@ if ($id > 0)
 
 	if ($result > 0)
 	{
+		if (method_exists($object, 'fetch_thirdparty')) {
+			$object->fetch_thirdparty();
+		}
 		$details->fetch();
 		
 		if ($object->element != 'project')// || $object->type != 5)
@@ -137,32 +151,36 @@ $socid=$object->socid;
 //if ($user->socid > 0) $socid = $user->socid;    // For external user, no check is done on company because readability is managed by public status of project and assignement.
 $result = restrictedArea($user, 'projet',  $object->id, 'projet&project');
 	    	
-/*
- *  View
- */
-
-$title=$langs->trans("ProjectDetails").' - '.$object->ref.' '.$object->title;
-if (! empty($conf->global->MAIN_HTML_TITLE) && preg_match('/projectnameonly/', $conf->global->MAIN_HTML_TITLE) && $object->title) $title=$object->ref.' '.$object->title.' - '.$langs->trans("ProjectDetails");
-
-llxHeader("", $langs->trans("ProjectDetails").' - '.$object->ref);
-
-// To verify role of users
 $userAccess = $object->restrictedProjectArea($user);
 
-$head=project_prepare_head($object);
+$head = project_prepare_head($object);
 $current_head = 'details';
 if (function_exists('complete_head_from_modules')) {
 	$h = 0;
 	complete_head_from_modules($conf, $langs, $object, $head, $h, 'project');
 }
 
-include '../tpl/projet_fiche.default.tpl.php';	    	
+llxHeader("", $langs->trans("ProjectDetails").' - '.$object->ref);
+print dol_get_fiche_head($head, $current_head, $langs->trans("Project"), -1, ($object->public?'projectpub':'project'));
+
+$linkback = '<a href="'.DOL_URL_ROOT.'/projet/list.php?restore_lastsearch_values=1">'.$langs->trans("BackToList").'</a>';
+$morehtmlref = '<div class="refidno">';
+$morehtmlref .= $object->title;
+if (! empty($object->thirdparty) && ! empty($object->thirdparty->id)) {
+	$morehtmlref .= '<br>'.$langs->trans('ThirdParty').' : '.$object->thirdparty->getNomUrl(1, 'project');
+}
+$morehtmlref .= '</div>';
+dol_banner_tab($object, 'ref', $linkback, 0, 'ref', 'ref', $morehtmlref);
+print '<div class="fichecenter">';
+print '<div class="underbanner clearboth"></div>';
 
 print load_fiche_titre($langs->trans("project_details"), '', 'project');
 
 include '../tpl/details.default.tpl.php';
 
+print dol_get_fiche_end();
+print '</div>';
+llxFooter();
 $db->close();
-
 
 ?>

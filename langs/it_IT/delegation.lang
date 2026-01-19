@@ -25,6 +25,7 @@ DelegationSupplierInvoiceNotAllowed=La fattura fornitore non è idonea alla dele
 DelegationSupplierInvoiceAlreadyLinked=Questa fattura fornitore è già collegata alla delega.
 DelegationAmountExceeded=Il totale degli importi delegati supera l'importo della fattura.
 DelegationClearingAccountMissingCountry=Imposta il paese dell'azienda prima di creare il conto di transito.
+non_renseigne=Non compilato
 BtpAdditionalWork=Lavori aggiuntivi
 BtpAnteCumul=Cumulato precedente
 BtpMainWork=Lavori principali
