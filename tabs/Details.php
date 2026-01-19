@@ -155,6 +155,10 @@ $userAccess = $object->restrictedProjectArea($user);
 
 $head = project_prepare_head($object);
 $current_head = 'details';
+if (function_exists('complete_head_from_modules')) {
+	$h = 0;
+	complete_head_from_modules($conf, $langs, $object, $head, $h, 'project');
+}
 
 llxHeader("", $langs->trans("ProjectDetails").' - '.$object->ref);
 print dol_get_fiche_head($head, $current_head, $langs->trans("Project"), -1, ($object->public?'projectpub':'project'));
