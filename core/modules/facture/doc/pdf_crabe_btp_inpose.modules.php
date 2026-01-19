@@ -1029,8 +1029,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 		$outputlangs->load("delegation@delegation");
 
-		// EN: Load delegation lines and supplier invoice ids.
-		// FR: Charger les lignes de délégation et les identifiants de factures fournisseurs.
+		// Load delegation lines and supplier invoice ids.
 		dol_include_once("/delegation/class/delegation.class.php");
 		$GLOBALS['object'] = $object;
 		$delegation = new Delegation($this->db);
@@ -1051,8 +1050,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			return 0;
 		}
 
-		// EN: Order supplier invoices with same source as delegation tab.
-		// FR: Ordonner les factures fournisseurs avec la même source que l'onglet délégation.
+		// Order supplier invoices with same source as delegation tab.
 		$sql = "SELECT f.rowid";
 		$sql.= " FROM ".MAIN_DB_PREFIX."facture_fourn as f";
 		$sql.= " WHERE f.rowid IN (".implode(',', $supplierInvoiceIds).")";
@@ -1074,8 +1072,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$invoice = new FactureFournisseur($this->db);
 			if ($invoice->fetch((int) $obj->rowid) > 0)
 			{
-				// EN: Ensure invoice dates are loaded.
-				// FR: Vérifier que les dates de facture sont bien chargées.
+				// Ensure invoice dates are loaded.
 				if (! isset($invoice->datef) || ! isset($invoice->date_lim_reglement))
 				{
 					$invoice->fetch((int) $obj->rowid);
@@ -1100,8 +1097,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$posx = $this->marge_gauche;
 		$posy = $this->marge_haute;
 
-		// EN: Start summary page.
-		// FR: Démarrer la page de récapitulatif.
+		// Start summary page.
 		$pdf->AddPage();
 		if (! empty($tplidx)) $pdf->useTemplate($tplidx);
 		if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
@@ -1143,8 +1139,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$columns[] = $column;
 		}
 
-		// EN: Draw table header.
-		// FR: Dessiner l'en-tête du tableau.
+		// Draw table header.
 		$pdf->SetFillColor(230, 230, 230);
 		$pdf->SetFont('', 'B', $default_font_size - 1);
 		$curx = $posx;
@@ -1160,14 +1155,16 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 		foreach ($supplierInvoices as $invoice)
 		{
+			$invoice_datef = ! empty($invoice->datef) ? dol_print_date($invoice->datef, 'day', false, $outputlangs) : '';
+			$invoice_date_due = ! empty($invoice->date_lim_reglement) ? dol_print_date($invoice->date_lim_reglement, 'day', false, $outputlangs, true) : '';
 			$values = array(
 				$invoice->ref,
 				$invoice->thirdparty->name,
 				price($invoice->total_ht, 0, $outputlangs),
 				price($invoice->total_tva, 0, $outputlangs),
 				price($invoice->total_ttc, 0, $outputlangs),
-				dol_print_date($invoice->datef, 'day', false, $outputlangs),
-				dol_print_date($invoice->date_lim_reglement, 'day', false, $outputlangs, true),
+				$invoice_datef,
+				$invoice_date_due,
 			);
 
 			$row_height = $line_height;
@@ -1215,8 +1212,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$posy += $row_height;
 		}
 
-		// EN: Totals row with invoice count.
-		// FR: Ligne de totaux avec le nombre de factures.
+		// Totals row with invoice count.
 		$total_label = $outputlangs->transnoentities('DelegationTotalsWithCount', count($supplierInvoices));
 		$row_height = $line_height;
 		if (method_exists($pdf, 'getStringHeight'))
