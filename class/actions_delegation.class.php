@@ -170,74 +170,6 @@ class Actionsdelegation
 	 */
 	public function formObjectOptions($parameters, &$object, &$action, $hookmanager)
 	{
-		global $conf, $user, $langs, $form;
-
-		if (empty($conf->delegation->enabled)) {
-			return 0;
-		}
-
-		if (! getDolGlobalInt('DELEGATION_ENABLE_VAT_REVERSE_CHARGE', 0)) {
-			return 0;
-		}
-
-		$currentcontext = explode(':', $parameters['currentcontext']);
-		$isContractCard = in_array('contractcard', $currentcontext, true);
-		$isPropalCard = in_array('propalcard', $currentcontext, true);
-		$isOrderCard = in_array('ordercard', $currentcontext, true);
-		$isInvoiceCard = in_array('invoicecard', $currentcontext, true);
-
-		if (! $isContractCard && ! $isPropalCard && ! $isOrderCard && ! $isInvoiceCard) {
-			return 0;
-		}
-
-		$langs->load("delegation@delegation");
-
-		$canReadVat = $this->userCanReadVatReverseCharge($user);
-		$canWriteVat = $this->userCanWriteVatReverseCharge($user);
-		$canReadContract = $this->userCanReadSubcontractContract($user);
-		$canWriteContract = $this->userCanWriteSubcontractContract($user);
-
-		if ($isContractCard && ! $canReadContract && ! $canWriteContract) {
-			return 0;
-		}
-
-		if (! $isContractCard && ! $canReadVat && ! $canWriteVat) {
-			return 0;
-		}
-
-		// EN: Ensure optional fields are loaded.
-		// FR: S'assurer que les champs optionnels sont chargés.
-		if (method_exists($object, 'fetch_optionals')) {
-			$object->fetch_optionals();
-		}
-
-		$isEditing = in_array($action, array('edit', 'create'), true);
-		$output = '';
-
-		if ($isContractCard) {
-			$contractValue = ! empty($object->array_options['options_delegation_subcontract_vat_reverse_charge']) ? 1 : 0;
-			$output .= $this->renderVatReverseChargeRow(
-				$contractValue,
-				false,
-				$isEditing,
-				$canWriteContract,
-				'options_delegation_subcontract_vat_reverse_charge'
-			);
-		} else {
-			$status = $this->getVatReverseChargeStatus($object);
-			$effectiveValue = $status['active'] ? 1 : 0;
-			$output .= $this->renderVatReverseChargeRow(
-				$effectiveValue,
-				$status['inherited'],
-				$isEditing,
-				$canWriteVat,
-				'options_delegation_vat_reverse_charge'
-			);
-
-		}
-
-		$this->resprints .= $output;
-
 		return 0;
 	}
 
@@ -449,44 +381,6 @@ class Actionsdelegation
 		}
 
 		return 0;
-	}
-
-	/**
-	 * EN: Render the VAT reverse charge row.
-	 * FR: Générer la ligne d'autoliquidation de TVA.
-	 *
-	 * @param	int		$value			Current value
-	 * @param	bool	$inherited		Whether value is inherited
-	 * @param	bool	$isEditing		Whether editing mode is active
-	 * @param	bool	$canWrite		Whether the user can write
-	 * @param	string	$fieldName		Field name
-	 * @return	string
-	 */
-	private function renderVatReverseChargeRow($value, $inherited, $isEditing, $canWrite, $fieldName)
-	{
-		global $langs;
-
-		$output = '<tr>';
-		$output .= '<td class="titlefield">'.$langs->trans('DelegationVatReverseCharge').'</td>';
-		$output .= '<td class="nowraponall">';
-
-		if ($isEditing && $canWrite) {
-			// EN: Use checkbox inline to match Dolibarr UI expectations.
-			// FR: Utiliser une case à cocher inline pour respecter l'UI Dolibarr.
-			$output .= '<input type="hidden" name="'.$fieldName.'" value="0">';
-			$output .= '<input type="checkbox" class="flat" id="'.$fieldName.'" name="'.$fieldName.'" value="1"'.($value ? ' checked="checked"' : '').'>';
-		} else {
-			$output .= $value ? $langs->trans('Yes') : $langs->trans('No');
-		}
-
-		if ($inherited) {
-			$output .= ' <span class="opacitymedium">('.$langs->trans('DelegationVatReverseChargeInherited').')</span>';
-		}
-
-		$output .= '</td>';
-		$output .= '</tr>';
-
-		return $output;
 	}
 
 	/**
