@@ -22,74 +22,73 @@
  *		\brief      Delegation module default view
  */
 
-llxHeader();
+llxHeader('', $langs->trans('Delegation'));
 
-echo ($message ? dol_htmloutput_mesg($message, '', ($error ? 'error' : 'ok'), 0) : '');
+if ($formconfirm) {
+	print $formconfirm;
+}
 
-dol_fiche_head($head, $current_head, $langs->trans('Delegation'));
+if ($message) {
+	print dol_htmloutput_mesg($message, '', ($error ? 'error' : 'ok'), 0);
+}
 
+print dol_get_fiche_head($head, $current_head, $langs->trans('InvoiceCustomer'), -1, 'bill');
+
+$socid = 0;
+if (! empty($soc) && ! empty($soc->id)) {
+	$socid = $soc->id;
+} elseif (! empty($object->thirdparty) && ! empty($object->thirdparty->id)) {
+	$socid = $object->thirdparty->id;
+}
+$linkback = '<a href="'.DOL_URL_ROOT.'/compta/facture/list.php?restore_lastsearch_values=1'.($socid ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+
+$morehtmlref = '<div class="refidno">';
+$morehtmlref .= $form->editfieldkey("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', 0, 1);
+$morehtmlref .= $form->editfieldval("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', null, null, '', 1);
+if (! empty($soc) && ! empty($soc->id)) {
+	$morehtmlref .= '<br>'.$langs->trans('ThirdParty').' : '.$soc->getNomUrl(1, 'compta');
+} elseif (! empty($object->thirdparty) && ! empty($object->thirdparty->id)) {
+	$morehtmlref .= '<br>'.$langs->trans('ThirdParty').' : '.$object->thirdparty->getNomUrl(1, 'compta');
+}
+if (! empty($conf->projet->enabled) && ! empty($project) && ! empty($project->id)) {
+	$morehtmlref .= '<br>'.$langs->trans('Project').' : '.$project->getNomUrl(1);
+}
+$morehtmlref .= '</div>';
+
+dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
+
+print '<div class="fichecenter">';
+print '<div class="underbanner clearboth"></div>';
 
 ?>
 
-<?php echo $formconfirm ? $formconfirm : ''; ?>
+<table class="border centpercent tableforfield">
+	<tr>
+		<td class="titlefield"><?php echo $langs->trans('Ref'); ?></td>
+		<td><?php echo $object->ref; ?></td>
+	</tr>
 
-<table class="border" width="100%">
-    <tr>
-        <td width="20%"><?php echo $langs->trans('Ref'); ?></td>
-        <td><?php echo $object->ref; ?></td>
-    </tr>
+	<tr>
+		<td class="titlefield"><?php echo $langs->trans('RefCustomer'); ?></td>
+		<td><?php echo $object->ref_client; ?></td>
+	</tr>
 
-    <tr>
-        <td><?php echo $langs->trans('RefCustomer'); ?></td>
-        <td><?php echo $object->ref_client; ?></td>
-    </tr>
+	<tr>
+		<td class="titlefield"><?php echo $langs->trans('Company'); ?></td>
+		<td><?php echo $soc ? $soc->getNomUrl(1, 'compta') : ''; ?></td>
+	</tr>
 
-    <tr>
-        <td><?php echo $langs->trans('Company'); ?></td>
-        <td><?php echo $soc->getNomUrl(1,'compta'); ?></td>
-    </tr>
-
-    <tr>
-        <td><?php echo $langs->trans('Type'); ?></td>
-        <td><?php echo $object->getLibType(); ?></td>
-    </tr>
-
-    <tr>
-        <td><?php echo $langs->trans('Date'); ?></td>
-        <td><?php echo dol_print_date($object->date,'daytext'); ?></td>
-    </tr>    
-  
-
-    <tr>
-        <td><?php echo $langs->trans('AmountHT'); ?></td>
-        <td><?php echo price($object->total_ht,1,'',1,-1,-1,$conf->currency); ?></td>
-    </tr>
-
-     <tr>
-        <td><?php echo $langs->trans('AmountVAT'); ?></td>
-        <td><?php echo price($object->total_tva,1,'',1,-1,-1,$conf->currency); ?></td>
-    </tr>
-
-    <tr>
-        <td><?php echo $langs->trans('AmountTTC'); ?></td>
-        <td><?php echo price($object->total_ttc,1,'',1,-1,-1,$conf->currency); ?></td>
-    </tr>
-
-     <tr>
-        <td><?php echo $langs->trans('Status'); ?></td>
-        <td align="left" colspan="3"><?php echo $object->getLibStatut(4, $totalpaye); ?></td>
-    </tr>
-
-    <?php if ($conf->projet->enabled){ ?>
-      <tr>
-        <td><?php echo $langs->trans('Project'); ?></td>
-        <td><?php if ($project->id > 0){ echo $project->getNomUrl(1); } ?></td>
-    </tr>
-   <?php } ?>
+	<?php if (! empty($conf->projet->enabled)) { ?>
+	<tr>
+		<td class="titlefield"><?php echo $langs->trans('Project'); ?></td>
+		<td><?php echo (! empty($project) && ! empty($project->id)) ? $project->getNomUrl(1) : ''; ?></td>
+	</tr>
+	<?php } ?>
 </table>
-<br />
+<br>
 
-<table id="tablelines" class="noborder" width="100%">
+<div class="div-table-responsive">
+<table id="tablelines" class="noborder centpercent">
 <?php if ($numLines > 0){ ?>
 	<tr class="liste_titre nodrag nodrop">
 		<td><?php echo $langs->trans('Supplier'); ?></td>
@@ -110,7 +109,7 @@ for ($i = 0; $i < $numLines; $i++) {
 	if ($action == 'editline' && $lineid == $line->rowid){ ?>
 
 	<form action="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id; ?>" method="POST">
-	<input type="hidden" name="token" value="<?php  echo $_SESSION['newtoken']; ?>" />
+	<input type="hidden" name="token" value="<?php echo newToken(); ?>" />
 	<input type="hidden" name="action" value="updateline" />
 	<input type="hidden" name="id" value="<?php echo $object->id; ?>" />
 	<input type="hidden" name="lineid" value="<?php echo $line->rowid; ?>" />
@@ -192,7 +191,7 @@ for ($i = 0; $i < $numLines; $i++) {
 </tr>
 
 <form action="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id; ?>" method="POST">
-<input type="hidden" name="token" value="<?php echo $_SESSION['newtoken']; ?>" />
+<input type="hidden" name="token" value="<?php echo newToken(); ?>" />
 <input type="hidden" name="action" value="addsupplierinvoice" />
 <input type="hidden" name="id" value="<?php echo $object->id; ?>" />
 
@@ -214,11 +213,10 @@ for ($i = 0; $i < $numLines; $i++) {
 </form>
 <?php } ?>
 </table>
+</div>
 
 </div>
 
-<br />
+<?php print dol_get_fiche_end(); ?>
 
-<?php dol_fiche_end(); ?>
-
-<?php llxFooter(''); ?>
+<?php llxFooter(); ?>

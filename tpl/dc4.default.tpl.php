@@ -27,20 +27,29 @@
  */
 
 if ($object->element == 'commande') {
-    $head = commande_prepare_head($object);
-    $title= $langs->trans("Order");
-    $help_url = 'EN:Customers_Orders|FR:Commandes_Clients|ES:Pedidos de clientes';
-    $linkback = '<a href="'.DOL_URL_ROOT.'/commande/list.php?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+	$head = commande_prepare_head($object);
+	$title= $langs->trans("Order");
+	$help_url = 'EN:Customers_Orders|FR:Commandes_Clients|ES:Pedidos de clientes';
+	$linkback = '<a href="'.DOL_URL_ROOT.'/commande/list.php?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+	if (function_exists('complete_head_from_modules')) {
+		$h = 0;
+		complete_head_from_modules($conf, $langs, $object, $head, $h, 'order');
+	}
 }else if ($object->element == 'order_supplier') {
-    $head = ordersupplier_prepare_head($object);
-    $help_url='EN:Module_Suppliers_Orders|FR:CommandeFournisseur|ES:Módulo_Pedidos_a_proveedores';
-    $title= $langs->trans("SupplierOrder");
-    $linkback = '<a href="'.DOL_URL_ROOT.'/fourn/commande/list.php'.(! empty($socid)?'?socid='.$socid:'').'">'.$langs->trans("BackToList").'</a>';
+	$head = ordersupplier_prepare_head($object);
+	$help_url='EN:Module_Suppliers_Orders|FR:CommandeFournisseur|ES:Módulo_Pedidos_a_proveedores';
+	$title= $langs->trans("SupplierOrder");
+	$linkback = '<a href="'.DOL_URL_ROOT.'/fourn/commande/list.php'.(! empty($socid)?'?socid='.$socid:'').'">'.$langs->trans("BackToList").'</a>';
+	if (function_exists('complete_head_from_modules')) {
+		$h = 0;
+		complete_head_from_modules($conf, $langs, $object, $head, $h, 'supplierorder');
+	}
+	if (empty($object->thirdparty)) {
+		$object->fetch_thirdparty();
+	}
 }
 
 llxHeader('', $langs->trans("DC4form").' - '.$langs->trans("Order"), $help_url);
-
-$current_head = 'dc4';
 
 dol_fiche_head($head, $current_head, $title, -1, 'order');
 
@@ -60,7 +69,9 @@ if ($object->element == 'commande') {
     $soc->fetch($object->socid);
     $morehtmlref .= '<br>'.$langs->trans('ThirdParty').' : '.$soc->getNomUrl(1);
 }else if ($object->element == 'order_supplier') {
-    $morehtmlref.='<br>'.$langs->trans('ThirdParty').' : '.$object->thirdparty->getNomUrl(1);
+	if (! empty($object->thirdparty)) {
+		$morehtmlref.='<br>'.$langs->trans('ThirdParty').' : '.$object->thirdparty->getNomUrl(1);
+	}
 }
 
 // Project
@@ -169,7 +180,7 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
                     <?php if ($action == 'editline' && $lineid == $line_dc4->rowid && $field == "dc4_object_declaration"){ ?>
                         <input type="submit" class="button" name="save" value="<?php print $langs->trans("Save"); ?>" />&nbsp;<input type="submit" class="button" name="cancel" value="<?php print $langs->trans("Cancel"); ?>" />
                     <?php }else{
-                        if ($canAddLines || $usercancreate) { ?>     
+                        if ($canAddLines) { ?>     
                             <a href="<?php print $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=editline&amp;lineid='.$line_dc4->rowid.'&amp;field=dc4_object_declaration'; ?>"><?php print img_edit();?></a>
                 <?php } } ?>
                 </td>
@@ -200,7 +211,7 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
                 </td>
             <?php }else{ ?>
                 <td align="right">
-                    <?php if ($canAddLines || $usercancreate) { ?>       
+                    <?php if ($canAddLines) { ?>       
                         <a href="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=editline&amp;lineid='.$line_dc4->rowid.'&amp;field=dc4_date_initiale'; ?>">
                             <?php echo img_edit(); ?>
                         </a>
@@ -233,7 +244,7 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
                     <?php if ($action == 'editline' && $lineid == $line_dc4->rowid && $field == "dc4_hypothese"){ ?>
                         <input type="submit" class="button" name="save" value="<?php print $langs->trans("Save"); ?>" />&nbsp;<input type="submit" class="button" name="cancel" value="<?php print $langs->trans("Cancel"); ?>" />
                     <?php }else{
-                        if ($canAddLines || $usercancreate) { ?>     
+                        if ($canAddLines) { ?>     
                             <a href="<?php print $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=editline&amp;lineid='.$line_dc4->rowid.'&amp;field=dc4_hypothese'; ?>"><?php print img_edit();?></a>
                 <?php } } ?>
                 </td>
@@ -263,7 +274,7 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
                     <?php if ($action == 'editline' && $lineid == $line_dc4->rowid && $field == "dc4_hypothese"){ ?>
                         <input type="submit" class="button" name="save" value="<?php print $langs->trans("Save"); ?>" />&nbsp;<input type="submit" class="button" name="cancel" value="<?php print $langs->trans("Cancel"); ?>" />
                     <?php }else{
-                        if ($canAddLines || $usercancreate) { ?>     
+                        if ($canAddLines) { ?>     
                             <a href="<?php print $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=editline&amp;lineid='.$line_dc4->rowid.'&amp;field=dc4_hypothese'; ?>"><?php print img_edit();?></a>
                 <?php } } ?>
                 </td>
@@ -294,7 +305,7 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
                     <?php if ($action == 'editline' && $lineid == $line_dc4->rowid && $field == "avance"){ ?>
                         <input type="submit" class="button" name="save" value="<?php print $langs->trans("Save"); ?>" />&nbsp;<input type="submit" class="button" name="cancel" value="<?php print $langs->trans("Cancel"); ?>" />
                     <?php }else{
-                        if ($canAddLines || $usercancreate) { ?>     
+                        if ($canAddLines) { ?>     
                             <a href="<?php print $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=editline&amp;lineid='.$line_dc4->rowid.'&amp;field=avance'; ?>"><?php print img_edit();?></a>
                 <?php } } ?>
                 </td>
@@ -327,7 +338,7 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
                     <?php if ($action == 'editline' && $lineid == $line_dc4->rowid && $field == "dc4_documents_fournis"){ ?>
                         <input type="submit" class="button" name="save" value="<?php print $langs->trans("Save"); ?>" />&nbsp;<input type="submit" class="button" name="cancel" value="<?php print $langs->trans("Cancel"); ?>" />
                     <?php }else{
-                        if ($canAddLines || $usercancreate) { ?>     
+                        if ($canAddLines) { ?>     
                             <a href="<?php print $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=editline&amp;lineid='.$line_dc4->rowid.'&amp;field=dc4_documents_fournis'; ?>"><?php print img_edit();?></a>
                 <?php } } ?>
                 </td>
@@ -354,7 +365,7 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
                     <?php if ($action == 'editline' && $lineid == $line_dc4->rowid && $field == "paiement_direct"){ ?>
                         <input type="submit" class="button" name="save" value="<?php print $langs->trans("Save"); ?>" />&nbsp;<input type="submit" class="button" name="cancel" value="<?php print $langs->trans("Cancel"); ?>" />
                     <?php }else{
-                        if ($canAddLines || $usercancreate) { ?>     
+                        if ($canAddLines) { ?>     
                             <a href="<?php print $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=editline&amp;lineid='.$line_dc4->rowid.'&amp;field=paiement_direct'; ?>"><?php print img_edit();?></a>
                 <?php } } ?>
                 </td>
@@ -377,7 +388,7 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
                 <?php if ($action == 'editline' && $lineid == $line_dc4->rowid && $field == "libelle_poste_cctp"){ ?>
                         <input type="submit" class="button" name="save" value="<?php print $langs->trans("Save"); ?>" />&nbsp;<input type="submit" class="button" name="cancel" value="<?php print $langs->trans("Cancel"); ?>" />
                 <?php }else{ 
-                    if ($canAddLines || $usercancreate) { ?>       
+                    if ($canAddLines) { ?>       
                         <a href="<?php print $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=editline&amp;lineid='.$line_dc4->rowid.'&amp;field=libelle_poste_cctp'; ?>">
                             <?php print img_edit(); ?>
                         </a>
@@ -407,7 +418,7 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
                     <?php if ($action == 'editline' && $lineid == $line_dc4->rowid && $field == "sps_travaux"){ ?>
                         <input type="submit" class="button" name="save" value="<?php print $langs->trans("Save"); ?>" />&nbsp;<input type="submit" class="button" name="cancel" value="<?php print $langs->trans("Cancel"); ?>" />
                     <?php }else{
-                        if ($canAddLines || $usercancreate) { ?>     
+                        if ($canAddLines) { ?>     
                             <a href="<?php print $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=editline&amp;lineid='.$line_dc4->rowid.'&amp;field=sps_travaux'; ?>"><?php print img_edit();?></a>
                 <?php } } ?>
                 </td>
@@ -438,7 +449,7 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
                 </td>
             <?php }else{ ?>
                 <td align="right">
-                    <?php if ($canAddLines || $usercancreate) { ?>       
+                    <?php if ($canAddLines) { ?>       
                         <a href="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=editline&amp;lineid='.$line_dc4->rowid.'&amp;field=sps_date_remise'; ?>">
                             <?php echo img_edit(); ?>
                         </a>
@@ -470,7 +481,7 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
                     <?php if ($action == 'editline' && $lineid == $line_dc4->rowid && $field == "cissct"){ ?>
                         <input type="submit" class="button" name="save" value="<?php print $langs->trans("Save"); ?>" />&nbsp;<input type="submit" class="button" name="cancel" value="<?php print $langs->trans("Cancel"); ?>" />
                     <?php }else{
-                        if ($canAddLines || $usercancreate) { ?>     
+                        if ($canAddLines) { ?>     
                             <a href="<?php print $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=editline&amp;lineid='.$line_dc4->rowid.'&amp;field=cissct'; ?>"><?php print img_edit();?></a>
                 <?php } } ?>
                 </td>
@@ -498,7 +509,7 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
                     <?php if ($action == 'editline' && $lineid == $line_dc4->rowid && $field == "DIUO"){ ?>
                         <input type="submit" class="button" name="save" value="<?php print $langs->trans("Save"); ?>" />&nbsp;<input type="submit" class="button" name="cancel" value="<?php print $langs->trans("Cancel"); ?>" />
                     <?php }else{
-                        if ($canAddLines || $usercancreate) { ?>     
+                        if ($canAddLines) { ?>     
                             <a href="<?php print $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=editline&amp;lineid='.$line_dc4->rowid.'&amp;field=DIUO'; ?>"><?php print img_edit();?></a>
                 <?php } } ?>
                 </td>
@@ -526,7 +537,7 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
                     <?php if ($action == 'editline' && $lineid == $line_dc4->rowid && $field == "responsabilite"){ ?>
                         <input type="submit" class="button" name="save" value="<?php print $langs->trans("Save"); ?>" />&nbsp;<input type="submit" class="button" name="cancel" value="<?php print $langs->trans("Cancel"); ?>" />
                     <?php }else{
-                        if ($canAddLines || $usercancreate) { ?>     
+                        if ($canAddLines) { ?>     
                             <a href="<?php print $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=editline&amp;lineid='.$line_dc4->rowid.'&amp;field=responsabilite'; ?>"><?php print img_edit();?></a>
                 <?php } } ?>
                 </td>

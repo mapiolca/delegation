@@ -49,7 +49,9 @@ if (empty($conf->global->DELEGATION_PAYMENT_MODE_ID)) {
 	$paymentId = 0;
 
 	$sql = "SELECT id, active FROM ".MAIN_DB_PREFIX."c_paiement";
-	$sql.= " WHERE code = '".$db->escape($paymentCode)."'";
+	// EN: Force binary comparison to avoid collation mix errors.
+	// FR: Forcer une comparaison binaire pour éviter les erreurs de collation.
+	$sql.= " WHERE BINARY code = '".$db->escape($paymentCode)."'";
 	$resql = $db->query($sql);
 	if ($resql) {
 		if ($db->num_rows($resql) > 0) {
@@ -87,9 +89,15 @@ if ($user->admin && $action == 'set_clearing_account') {
 if ($user->admin && $action == 'create_clearing_account') {
 	$account = new Account($db);
 	$account->ref = 'DELPASS';
-	$account->label = $langs->trans('DelegationClearingAccountLabel');
+	// EN: Limit label length to database column size.
+	// FR: Limiter la longueur du libellé à la taille de la colonne SQL.
+	$account->label = dol_trunc($langs->trans('DelegationClearingAccountLabel'), 30, 'right', 'UTF-8', 1);
 	$account->currency_code = $conf->currency;
 	$account->clos = 0;
+	// EN: Provide mandatory initial balance date and amount.
+	// FR: Renseigner la date et le montant du solde initial obligatoires.
+	$account->date_solde = dol_now();
+	$account->solde = 0;
 	// EN: Set default country to satisfy mandatory field.
 	// FR: Définir le pays par défaut pour satisfaire le champ obligatoire.
 	$defaultCountryId = 0;
@@ -194,6 +202,46 @@ function showParameters()
 			print '</form>';
 		print '</td>';
 	print '</tr>';
+
+	$var = ! $var;
+	print '<tr class="liste_titre">';
+		print '<td colspan="2">'.$langs->trans("DelegationTabsSection").'</td>';
+	print '</tr>';
+
+	$tabs = array(
+		'DELEGATION_ENABLE_TAB_DELEGATION' => array(
+			'label' => 'DelegationTabDelegationLabel',
+			'help' => 'DelegationTabDelegationHelp',
+		),
+		'DELEGATION_ENABLE_TAB_DETAILS' => array(
+			'label' => 'DelegationTabDetailsLabel',
+			'help' => 'DelegationTabDetailsHelp',
+		),
+		'DELEGATION_ENABLE_TAB_DC4_SUPPLIER' => array(
+			'label' => 'DelegationTabDc4SupplierLabel',
+			'help' => 'DelegationTabDc4SupplierHelp',
+		),
+		'DELEGATION_ENABLE_TAB_DC4_CUSTOMER' => array(
+			'label' => 'DelegationTabDc4CustomerLabel',
+			'help' => 'DelegationTabDc4CustomerHelp',
+		),
+	);
+
+	foreach ($tabs as $constName => $tabInfo) {
+		$var = ! $var;
+		print '<tr '.$bc[$var].'>';
+			print '<td align="left" class="">';
+				print $form->textwithtooltip($langs->trans($tabInfo['label']), $langs->trans($tabInfo['help']), 2, 1, img_info());
+			print '</td>';
+			print '<td align="center" width="300">';
+				if (function_exists('ajax_constantonoff')) {
+					print ajax_constantonoff($constName);
+				} else {
+					print $form->selectyesno($constName, (int) getDolGlobalInt($constName), 1);
+				}
+			print '</td>';
+		print '</tr>';
+	}
 }
 print '</tbody>';
 print '</table>';
