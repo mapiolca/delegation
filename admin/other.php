@@ -256,9 +256,22 @@ foreach($orders as $tmpkey => $tmpvalue)
     }
     $i++;
 }
-$value = $orders[$key];
-$tab=explode('_', $value);
-$familyposition=$tab[0]; $familykey=$tab[1]; $module_position=$tab[2]; $numero=$tab[3];
+$familyposition = '100';
+$familykey = 'other';
+$module_position = '50';
+$numero = '0';
+
+// EN: Protect against missing order value to avoid explode warnings.
+// FR: Protéger contre une valeur d'ordre manquante pour éviter les warnings d'explode.
+$value = isset($orders[$key]) ? $orders[$key] : '';
+if (! empty($value)) {
+	$tab = explode('_', $value);
+	$tab = array_pad($tab, 4, '');
+	$familyposition = ! empty($tab[0]) ? $tab[0] : '100';
+	$familykey = ! empty($tab[1]) ? $tab[1] : 'other';
+	$module_position = ! empty($tab[2]) ? $tab[2] : '50';
+	$numero = ! empty($tab[3]) ? $tab[3] : '0';
+}
 
 // EN: Stop if module descriptor not found.
 // FR: Arrêter si le descripteur du module est introuvable.
