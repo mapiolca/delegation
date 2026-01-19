@@ -121,6 +121,23 @@ if ($user->admin && $action == 'create_clearing_account') {
 	}
 }
 
+// EN: Handle admin actions for VAT reverse charge configuration.
+// FR: Gérer les actions d'administration pour l'autoliquidation de TVA.
+if ($user->admin && $action == 'set_vat_reverse_charge_scope') {
+	$scope = GETPOST('delegation_vat_reverse_charge_scope', 'alpha');
+	if (! in_array($scope, array('services_only', 'all_lines'), true)) {
+		$scope = 'services_only';
+	}
+	dolibarr_set_const($db, 'DELEGATION_VAT_REVERSE_CHARGE_SCOPE', $scope, 'chaine', 0, '', $conf->entity);
+	setEventMessages($langs->trans('DelegationVatReverseChargeScopeSaved'), null, 'mesgs');
+}
+
+if ($user->admin && $action == 'set_vat_reverse_charge_legal_text') {
+	$text = GETPOST('delegation_vat_reverse_charge_legal_text', 'restricthtml');
+	dolibarr_set_const($db, 'DELEGATION_VAT_REVERSE_CHARGE_LEGAL_TEXT', $text, 'chaine', 0, '', $conf->entity);
+	setEventMessages($langs->trans('DelegationVatReverseChargeLegalTextSaved'), null, 'mesgs');
+}
+
 /*
 *	View
 */
@@ -242,6 +259,60 @@ function showParameters()
 			print '</td>';
 		print '</tr>';
 	}
+
+	$var = ! $var;
+	print '<tr class="liste_titre">';
+		print '<td colspan="2">'.$langs->trans("DelegationVatReverseChargeSection").'</td>';
+	print '</tr>';
+
+	$var = ! $var;
+	print '<tr '.$bc[$var].'>';
+		print '<td align="left" class="">'.$langs->trans("DelegationEnableVatReverseCharge").'</td>';
+		print '<td align="center" width="300">';
+			print ajax_constantonoff('DELEGATION_ENABLE_VAT_REVERSE_CHARGE');
+		print '</td>';
+	print '</tr>';
+
+	$var = ! $var;
+	print '<tr '.$bc[$var].'>';
+		print '<td align="left" class="">'.$langs->trans("DelegationVatReverseChargeForceVat0").'</td>';
+		print '<td align="center" width="300">';
+			print ajax_constantonoff('DELEGATION_VAT_REVERSE_CHARGE_FORCE_VAT0');
+		print '</td>';
+	print '</tr>';
+
+	$var = ! $var;
+	print '<tr '.$bc[$var].'>';
+		print '<td align="left" class="">'.$langs->trans("DelegationVatReverseChargeScope").'</td>';
+		print '<td align="center" width="300">';
+			print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+				print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+				print '<input type="hidden" name="action" value="set_vat_reverse_charge_scope">';
+				$scopeOptions = array(
+					'services_only' => $langs->trans('DelegationVatReverseChargeScopeServicesOnly'),
+					'all_lines' => $langs->trans('DelegationVatReverseChargeScopeAllLines'),
+				);
+				$currentScope = getDolGlobalString('DELEGATION_VAT_REVERSE_CHARGE_SCOPE', 'services_only');
+				print $form->selectarray('delegation_vat_reverse_charge_scope', $scopeOptions, $currentScope, 0);
+				print ' <input type="submit" class="button" value="'.$langs->trans("Save").'">';
+			print '</form>';
+		print '</td>';
+	print '</tr>';
+
+	$var = ! $var;
+	print '<tr '.$bc[$var].'>';
+		print '<td align="left" class="">'.$langs->trans("DelegationVatReverseChargeLegalText").'</td>';
+		print '<td align="center" width="300">';
+			$defaultText = $langs->trans('DelegationVatReverseChargeLegalTextDefault');
+			$currentText = getDolGlobalString('DELEGATION_VAT_REVERSE_CHARGE_LEGAL_TEXT', $defaultText);
+			print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+				print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+				print '<input type="hidden" name="action" value="set_vat_reverse_charge_legal_text">';
+				print '<textarea name="delegation_vat_reverse_charge_legal_text" class="flat" rows="3" cols="40">'.dol_escape_htmltag($currentText).'</textarea>';
+				print '<br><input type="submit" class="button" value="'.$langs->trans("Save").'">';
+			print '</form>';
+		print '</td>';
+	print '</tr>';
 }
 print '</tbody>';
 print '</table>';

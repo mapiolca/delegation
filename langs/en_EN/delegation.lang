@@ -56,6 +56,10 @@ DelegationRightTabDc4SupplierRead=View DC4 tab (supplier order)
 DelegationRightTabDc4SupplierWrite=Edit DC4 tab (supplier order)
 DelegationRightTabDc4CustomerRead=View DC4 tab (customer order)
 DelegationRightTabDc4CustomerWrite=Edit DC4 tab (customer order)
+DelegationRightSubcontractContractRead=View subcontracting contracts
+DelegationRightSubcontractContractWrite=Create/Edit subcontracting contracts
+DelegationRightVatReverseChargeRead=View VAT reverse charge on documents
+DelegationRightVatReverseChargeWrite=Enable/Disable VAT reverse charge on documents
 
 lmdb_for=for
 
@@ -198,6 +202,22 @@ dc4=Information required to prepare a DC4 declaration, a subcontracting contract
 
 dc4_only=Information required to prepare a DC4 declaration.
 dc4_errordatemessage=This order is not at status "Ordered" or later, so the default initial date will be the current status date.
+
+DelegationVatReverseCharge=VAT reverse charge (subcontracting)
+DelegationVatReverseChargeInherited=Inherited from subcontracting contract
+DelegationApplyVatReverseCharge=Apply reverse charge (VAT 0%)
+DelegationApplyVatReverseChargeDone=Reverse charge applied to lines.
+DelegationApplyVatReverseChargeError=Error while applying reverse charge.
+DelegationVatReverseChargeSection=VAT reverse charge (subcontracting)
+DelegationEnableVatReverseCharge=Enable VAT reverse charge (subcontracting)
+DelegationVatReverseChargeForceVat0=Force VAT to 0% on lines
+DelegationVatReverseChargeScope=Application scope
+DelegationVatReverseChargeScopeServicesOnly=Services only
+DelegationVatReverseChargeScopeAllLines=All lines
+DelegationVatReverseChargeScopeSaved=VAT reverse charge scope saved.
+DelegationVatReverseChargeLegalText=Legal text to display on PDFs
+DelegationVatReverseChargeLegalTextSaved=Legal reverse charge text saved.
+DelegationVatReverseChargeLegalTextDefault=VAT due by the taxable customer – reverse charge (CGI art. 283-2, ann. II art. 242 nonies A).
 
 DC4_dc4_object_declaration=Purpose of the subcontractor declaration (DC4)
 DC4_dc4_object_declaration_Tooltip=Select the best case.

@@ -87,7 +87,7 @@ class modDelegation extends DolibarrModules
 		$this->module_parts = array(
 			'substitutions' => 1,
 			'models' => 1,
-			'hooks' => array('thirdpartycard')
+			'hooks' => array('thirdpartycard', 'propalcard', 'ordercard', 'invoicecard', 'contractcard', 'pdfgeneration')
 		);
 
 		// Data directories to create when module is enabled.
@@ -116,6 +116,10 @@ class modDelegation extends DolibarrModules
 			6 => array('DELEGATION_ENABLE_TAB_DETAILS', 'int', '1', 'Enable project details tab', 0, 'current', 1),
 			7 => array('DELEGATION_ENABLE_TAB_DC4_SUPPLIER', 'int', '1', 'Enable supplier order DC4 tab', 0, 'current', 1),
 			8 => array('DELEGATION_ENABLE_TAB_DC4_CUSTOMER', 'int', '1', 'Enable customer order DC4 tab', 0, 'current', 1),
+			9 => array('DELEGATION_ENABLE_VAT_REVERSE_CHARGE', 'int', '0', 'Enable VAT reverse charge for subcontracting', 0, 'current', 1),
+			10 => array('DELEGATION_VAT_REVERSE_CHARGE_FORCE_VAT0', 'int', '0', 'Force VAT rate to 0 when reverse charge is active', 0, 'current', 1),
+			11 => array('DELEGATION_VAT_REVERSE_CHARGE_SCOPE', 'chaine', 'services_only', 'Scope for VAT reverse charge lines', 0, 'current', 1),
+			12 => array('DELEGATION_VAT_REVERSE_CHARGE_LEGAL_TEXT', 'chaine', '', 'Legal text for VAT reverse charge mention', 0, 'current', 1),
 		);
 
 		// To add a new tab identified by code 
@@ -249,6 +253,38 @@ class modDelegation extends DolibarrModules
 		$this->rights[$r][5] = 'write';
 
 		$r++;
+		$this->rights[$r][0] = 440318;
+		$this->rights[$r][1] = $langs->trans('DelegationRightSubcontractContractRead');
+		$this->rights[$r][2] = 'r';
+		$this->rights[$r][3] = 0;
+		$this->rights[$r][4] = 'subcontract_contract';
+		$this->rights[$r][5] = 'read';
+
+		$r++;
+		$this->rights[$r][0] = 440319;
+		$this->rights[$r][1] = $langs->trans('DelegationRightSubcontractContractWrite');
+		$this->rights[$r][2] = 'r';
+		$this->rights[$r][3] = 0;
+		$this->rights[$r][4] = 'subcontract_contract';
+		$this->rights[$r][5] = 'write';
+
+		$r++;
+		$this->rights[$r][0] = 440320;
+		$this->rights[$r][1] = $langs->trans('DelegationRightVatReverseChargeRead');
+		$this->rights[$r][2] = 'r';
+		$this->rights[$r][3] = 0;
+		$this->rights[$r][4] = 'vat_reverse_charge';
+		$this->rights[$r][5] = 'read';
+
+		$r++;
+		$this->rights[$r][0] = 440321;
+		$this->rights[$r][1] = $langs->trans('DelegationRightVatReverseChargeWrite');
+		$this->rights[$r][2] = 'r';
+		$this->rights[$r][3] = 0;
+		$this->rights[$r][4] = 'vat_reverse_charge';
+		$this->rights[$r][5] = 'write';
+
+		$r++;
 		$this->rights[$r][0] = 440312;
 		$this->rights[$r][1] = $langs->trans('DelegationRightTabDetailsRead');
 		$this->rights[$r][2] = 'r';
@@ -362,6 +398,16 @@ class modDelegation extends DolibarrModules
 		if (empty($conf->global->BANK_ASK_PAYMENT_BANK_DURING_ORDER)) {
 			//$ext->addExtraField('lmdb_commande_account', 'lmdb_commande_account', 'sellist', 100, '255', 'commande', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:41:"bank_account:label:rowid::entity=$ENTITY$";N;}}', 1, '', 1, 'lmdb_commande_account_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
 		}
+
+		// EN: Subcontracting contracts.
+		// FR: Contrats de sous-traitance.
+		$ext->addExtraField('delegation_subcontract_vat_reverse_charge', 'DelegationVatReverseCharge', 'boolean', 20, '', 'contrat', 0, 0, 0, '', 0, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
+
+		// EN: Customer documents (proposals, orders, invoices).
+		// FR: Documents clients (devis, commandes, factures).
+		$ext->addExtraField('delegation_vat_reverse_charge', 'DelegationVatReverseCharge', 'boolean', 20, '', 'propal', 0, 0, 0, '', 0, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
+		$ext->addExtraField('delegation_vat_reverse_charge', 'DelegationVatReverseCharge', 'boolean', 20, '', 'commande', 0, 0, 0, '', 0, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
+		$ext->addExtraField('delegation_vat_reverse_charge', 'DelegationVatReverseCharge', 'boolean', 20, '', 'facture', 0, 0, 0, '', 0, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
 		
 		//$ext->addExtraField($attrname, $label, $type, $pos, $size, $element, $unique, $required, $default_value, $param, $alwayseditable, $perms, $list, $help, $computed, $entity, $langfile, $enabled, $sommable,$pdf)
 

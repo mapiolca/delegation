@@ -56,6 +56,10 @@ DelegationRightTabDc4SupplierRead=Vedere la scheda DC4 (ordine fornitore)
 DelegationRightTabDc4SupplierWrite=Modificare la scheda DC4 (ordine fornitore)
 DelegationRightTabDc4CustomerRead=Vedere la scheda DC4 (ordine cliente)
 DelegationRightTabDc4CustomerWrite=Modificare la scheda DC4 (ordine cliente)
+DelegationRightSubcontractContractRead=Visualizzare i contratti di subappalto
+DelegationRightSubcontractContractWrite=Creare/Modificare i contratti di subappalto
+DelegationRightVatReverseChargeRead=Visualizzare il reverse charge sui documenti
+DelegationRightVatReverseChargeWrite=Attivare/Disattivare il reverse charge sui documenti
 
 lmdb_for=per
 
@@ -198,6 +202,22 @@ dc4=Informazioni necessarie per preparare una dichiarazione DC4, un contratto di
 
 dc4_only=Informazioni necessarie per preparare una dichiarazione DC4.
 dc4_errordatemessage=Questo ordine non è allo stato "Ordinato" o successivo, quindi la data iniziale predefinita sarà quella dello stato corrente.
+
+DelegationVatReverseCharge=Inversione contabile IVA (subappalto)
+DelegationVatReverseChargeInherited=Ereditato dal contratto di subappalto
+DelegationApplyVatReverseCharge=Applica inversione contabile (IVA 0%)
+DelegationApplyVatReverseChargeDone=Inversione contabile applicata alle righe.
+DelegationApplyVatReverseChargeError=Errore durante l'applicazione dell'inversione contabile.
+DelegationVatReverseChargeSection=Inversione contabile IVA (subappalto)
+DelegationEnableVatReverseCharge=Attiva inversione contabile IVA (subappalto)
+DelegationVatReverseChargeForceVat0=Forza IVA allo 0% sulle righe
+DelegationVatReverseChargeScope=Ambito di applicazione
+DelegationVatReverseChargeScopeServicesOnly=Solo servizi
+DelegationVatReverseChargeScopeAllLines=Tutte le righe
+DelegationVatReverseChargeScopeSaved=Ambito di inversione contabile salvato.
+DelegationVatReverseChargeLegalText=Testo legale da mostrare nei PDF
+DelegationVatReverseChargeLegalTextSaved=Testo legale dell'inversione contabile salvato.
+DelegationVatReverseChargeLegalTextDefault=IVA dovuta dal committente soggetto passivo – inversione contabile (CGI art. 283-2, ann. II art. 242 nonies A).
 
 DC4_dc4_object_declaration=Oggetto della dichiarazione del subappaltatore (DC4)
 DC4_dc4_object_declaration_Tooltip=Seleziona il caso migliore.
