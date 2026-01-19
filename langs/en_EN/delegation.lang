@@ -1,10 +1,11 @@
 # Dolibarr language file - en_US - tos
 # Admin form
 CHARSET=UTF-8
-Module440300Desc=Module to manage payment delegation, subcontracting contracts, and DC4 forms (requires the BTP module from Dolistore)
+Module440300Desc=Module to manage payment delegation, subcontracting contracts, and DC4 forms.
 Module440300Name=Delegation
 Delegation=Delegation
 DelegationSetup=Payment delegation setup
+DelegationClearingAccountSection=Clearing account
 
 SetupG=General
 

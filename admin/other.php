@@ -35,7 +35,9 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 if(!$user->admin or empty($conf->delegation->enabled)) accessforbidden();
 
 // Load translation files required by the page
-$langs->loadLangs(array('errors', 'admin'));
+// EN: Load base/admin/modulebuilder translations for module details.
+// FR: Charger les traductions admin/modulebuilder nécessaires aux détails du module.
+$langs->loadLangs(array('errors', 'admin', 'modulebuilder', 'bank@delegation', 'delegation@delegation'));
 
 $mode=GETPOST('mode', 'alpha');
 $action=GETPOST('action', 'alpha');
@@ -43,10 +45,22 @@ $id = GETPOST('id', 'int');
 
 if (empty($mode)) $mode='desc';
 
-$langs->load("bank@delegation");
-$langs->load("admin");
-
-$mode = GETPOST('mode','alpha');
+// EN: Define default module families to avoid undefined array offsets.
+// FR: Définir les familles de modules par défaut pour éviter les accès indéfinis.
+$familyinfo = array(
+	'hr' => array('position' => '001', 'label' => $langs->trans("ModuleFamilyHr")),
+	'crm' => array('position' => '006', 'label' => $langs->trans("ModuleFamilyCrm")),
+	'srm' => array('position' => '007', 'label' => $langs->trans("ModuleFamilySrm")),
+	'financial' => array('position' => '009', 'label' => $langs->trans("ModuleFamilyFinancial")),
+	'products' => array('position' => '012', 'label' => $langs->trans("ModuleFamilyProducts")),
+	'projects' => array('position' => '015', 'label' => $langs->trans("ModuleFamilyProjects")),
+	'ecm' => array('position' => '018', 'label' => $langs->trans("ModuleFamilyECM")),
+	'technic' => array('position' => '021', 'label' => $langs->trans("ModuleFamilyTechnic")),
+	'portal' => array('position' => '040', 'label' => $langs->trans("ModuleFamilyPortal")),
+	'interface' => array('position' => '050', 'label' => $langs->trans("ModuleFamilyInterface")),
+	'base' => array('position' => '060', 'label' => $langs->trans("ModuleFamilyBase")),
+	'other' => array('position' => '100', 'label' => $langs->trans("ModuleFamilyOther")),
+);
 
 if ($mode == 'desc') {
   $onglet = 'Description';
@@ -166,13 +180,19 @@ foreach ($modulesdir as $dir)
                           $filename[$i]= $modName;
 
                           // Gives the possibility to the module, to provide his own family info and position of this family
-                          if (is_array($objMod->familyinfo) && !empty($objMod->familyinfo)) {
-                            if (!is_array($familyinfo)) $familyinfo=array();
-                            $familyinfo = array_merge($familyinfo, $objMod->familyinfo);
-                            $familykey = key($objMod->familyinfo);
-                          } else {
-                            $familykey = $objMod->family;
-                          }
+							if (is_array($objMod->familyinfo) && ! empty($objMod->familyinfo)) {
+								$familyinfo = array_merge($familyinfo, $objMod->familyinfo);
+								$familykey = key($objMod->familyinfo);
+							} else {
+								$familykey = $objMod->family;
+							}
+
+							if (empty($familyinfo[$familykey])) {
+								$familyinfo[$familykey] = array(
+									'position' => '100',
+									'label' => $familykey
+								);
+							}
 
                           $moduleposition = ($objMod->module_position?$objMod->module_position:'50');
                           if ($moduleposition == '50' && ($objMod->isCoreOrExternalModule() == 'external'))
@@ -180,7 +200,8 @@ foreach ($modulesdir as $dir)
                               $moduleposition = '80';   // External modules at end by default
                           }
 
-                          $orders[$i]  = $familyinfo[$familykey]['position']."_".$familykey."_".$moduleposition."_".$j;   // Sort by family, then by module position then number
+							$familyposition = $familyinfo[$familykey]['position'] ?? '100';
+							$orders[$i]  = $familyposition."_".$familykey."_".$moduleposition."_".$j;   // Sort by family, then by module position then number
                     $dirmod[$i]  = $dir;
                     //print $i.'-'.$dirmod[$i].'<br>';
                           // Set categ[$i]
