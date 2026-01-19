@@ -37,6 +37,8 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/pdf.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/companybankaccount.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/bank.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.facture.class.php';
+require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 
 // TSubtotal
 if (!empty($conf->subtotal->enabled)) dol_include_once('/subtotal/class/subtotal.class.php');
@@ -972,6 +974,10 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 				}
 
+				// EN: Add supplier invoices summary page for delegation.
+				// FR: Ajouter la page récapitulative des factures fournisseurs en délégation.
+				$this->_addDelegationSupplierInvoicesSummaryPage($pdf, $object, $outputlangs, $tplidx);
+
 				$pdf->Close();
 
 				$pdf->Output($file,'F');
@@ -1002,6 +1008,237 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		}
 	}
 
+
+	/**
+	 *  Add supplier invoices summary page for delegation.
+	 *
+	 *  @param	TCPDF		$pdf			Object PDF
+	 *  @param	Object		$object			Object invoice
+	 *  @param	Translate	$outputlangs	Object lang for output
+	 *  @param	int			$tplidx			Template index
+	 *  @return	int							<0 if KO, >=0 if OK
+	 */
+	protected function _addDelegationSupplierInvoicesSummaryPage(&$pdf, $object, $outputlangs, $tplidx)
+	{
+		global $conf;
+
+		if (empty($conf->delegation->enabled))
+		{
+			return 0;
+		}
+
+		$outputlangs->load("delegation@delegation");
+
+		// EN: Load delegation lines and supplier invoice ids.
+		// FR: Charger les lignes de délégation et les identifiants de factures fournisseurs.
+		dol_include_once("/delegation/class/delegation.class.php");
+		$GLOBALS['object'] = $object;
+		$delegation = new Delegation($this->db);
+		$delegation->fetch();
+
+		$supplierInvoiceIds = array();
+		foreach ($delegation->lines as $line)
+		{
+			if (! empty($line->fk_facture_fourn))
+			{
+				$supplierInvoiceIds[] = (int) $line->fk_facture_fourn;
+			}
+		}
+		$supplierInvoiceIds = array_unique($supplierInvoiceIds);
+
+		if (empty($supplierInvoiceIds))
+		{
+			return 0;
+		}
+
+		// EN: Order supplier invoices with same source as delegation tab.
+		// FR: Ordonner les factures fournisseurs avec la même source que l'onglet délégation.
+		$sql = "SELECT f.rowid";
+		$sql.= " FROM ".MAIN_DB_PREFIX."facture_fourn as f";
+		$sql.= " WHERE f.rowid IN (".implode(',', $supplierInvoiceIds).")";
+		$sql.= " ORDER BY f.datef DESC";
+
+		$resql = $this->db->query($sql);
+		if (! $resql)
+		{
+			$this->error = $this->db->lasterror();
+			return -1;
+		}
+
+		$supplierInvoices = array();
+		$total_ht = 0;
+		$total_tva = 0;
+		$total_ttc = 0;
+		while ($obj = $this->db->fetch_object($resql))
+		{
+			$invoice = new FactureFournisseur($this->db);
+			if ($invoice->fetch((int) $obj->rowid) > 0)
+			{
+				$invoice->fetch_thirdparty();
+				$supplierInvoices[] = $invoice;
+				$total_ht += (float) $invoice->total_ht;
+				$total_tva += (float) $invoice->total_tva;
+				$total_ttc += (float) $invoice->total_ttc;
+			}
+		}
+
+		if (empty($supplierInvoices))
+		{
+			return 0;
+		}
+
+		$default_font_size = pdf_getPDFFontSize($outputlangs);
+		$line_height = 6;
+		$posx = $this->marge_gauche;
+		$posy = $this->marge_haute;
+
+		// EN: Start summary page.
+		// FR: Démarrer la page de récapitulatif.
+		$pdf->AddPage();
+		if (! empty($tplidx)) $pdf->useTemplate($tplidx);
+		if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
+
+		$pdf->SetFont('', 'B', $default_font_size);
+		$pdf->SetXY($posx, $posy);
+		$pdf->MultiCell(0, 6, $outputlangs->transnoentities('DelegationSupplierInvoicesSummaryTitle'), 0, 'L', 0);
+		$posy = $pdf->GetY() + 2;
+
+		$columns = array(
+			array('label' => $outputlangs->transnoentities('Ref'), 'width' => 26, 'align' => 'L'),
+			array('label' => $outputlangs->transnoentities('Supplier'), 'width' => 54, 'align' => 'L'),
+			array('label' => $outputlangs->transnoentities('AmountHT'), 'width' => 18, 'align' => 'R'),
+			array('label' => $outputlangs->transnoentities('AmountVAT'), 'width' => 18, 'align' => 'R'),
+			array('label' => $outputlangs->transnoentities('AmountTTC'), 'width' => 18, 'align' => 'R'),
+			array('label' => $outputlangs->transnoentities('DateInvoice'), 'width' => 28, 'align' => 'C'),
+			array('label' => $outputlangs->transnoentities('DateDue'), 'width' => 28, 'align' => 'C'),
+		);
+
+		// EN: Draw table header.
+		// FR: Dessiner l'en-tête du tableau.
+		$pdf->SetFillColor(230, 230, 230);
+		$pdf->SetFont('', 'B', $default_font_size - 1);
+		$curx = $posx;
+		foreach ($columns as $column)
+		{
+			$pdf->SetXY($curx, $posy);
+			$pdf->MultiCell($column['width'], $line_height, $column['label'], 1, 'C', 1);
+			$curx += $column['width'];
+		}
+		$posy += $line_height;
+
+		$pdf->SetFont('', '', $default_font_size - 1);
+
+		foreach ($supplierInvoices as $invoice)
+		{
+			$values = array(
+				$invoice->ref,
+				$invoice->thirdparty->name,
+				price($invoice->total_ht, 0, $outputlangs),
+				price($invoice->total_tva, 0, $outputlangs),
+				price($invoice->total_ttc, 0, $outputlangs),
+				dol_print_date($invoice->datef, 'day', false, $outputlangs),
+				dol_print_date($invoice->date_lim_reglement, 'day', false, $outputlangs, true),
+			);
+
+			$row_height = $line_height;
+			if (method_exists($pdf, 'getStringHeight'))
+			{
+				foreach ($values as $index => $value)
+				{
+					$row_height = max($row_height, $pdf->getStringHeight($columns[$index]['width'], $value));
+				}
+			}
+
+			if ($posy + $row_height > ($this->page_hauteur - $this->marge_basse))
+			{
+				$pdf->AddPage();
+				if (! empty($tplidx)) $pdf->useTemplate($tplidx);
+				if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
+				$posy = $this->marge_haute;
+
+				$pdf->SetFont('', 'B', $default_font_size);
+				$pdf->SetXY($posx, $posy);
+				$pdf->MultiCell(0, 6, $outputlangs->transnoentities('DelegationSupplierInvoicesSummaryTitle'), 0, 'L', 0);
+				$posy = $pdf->GetY() + 2;
+
+				$pdf->SetFillColor(230, 230, 230);
+				$pdf->SetFont('', 'B', $default_font_size - 1);
+				$curx = $posx;
+				foreach ($columns as $column)
+				{
+					$pdf->SetXY($curx, $posy);
+					$pdf->MultiCell($column['width'], $line_height, $column['label'], 1, 'C', 1);
+					$curx += $column['width'];
+				}
+				$posy += $line_height;
+				$pdf->SetFont('', '', $default_font_size - 1);
+			}
+
+			$curx = $posx;
+			foreach ($values as $index => $value)
+			{
+				$pdf->SetXY($curx, $posy);
+				$pdf->MultiCell($columns[$index]['width'], $row_height, $value, 1, $columns[$index]['align'], 0);
+				$curx += $columns[$index]['width'];
+			}
+			$posy += $row_height;
+		}
+
+		// EN: Totals row with invoice count.
+		// FR: Ligne de totaux avec le nombre de factures.
+		$total_label = $outputlangs->transnoentities('DelegationTotalsWithCount', count($supplierInvoices));
+		$row_height = $line_height;
+		if (method_exists($pdf, 'getStringHeight'))
+		{
+			$row_height = max($row_height, $pdf->getStringHeight($columns[0]['width'] + $columns[1]['width'], $total_label));
+		}
+
+		if ($posy + $row_height > ($this->page_hauteur - $this->marge_basse))
+		{
+			$pdf->AddPage();
+			if (! empty($tplidx)) $pdf->useTemplate($tplidx);
+			if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
+			$posy = $this->marge_haute;
+
+			$pdf->SetFont('', 'B', $default_font_size);
+			$pdf->SetXY($posx, $posy);
+			$pdf->MultiCell(0, 6, $outputlangs->transnoentities('DelegationSupplierInvoicesSummaryTitle'), 0, 'L', 0);
+			$posy = $pdf->GetY() + 2;
+
+			$pdf->SetFillColor(230, 230, 230);
+			$pdf->SetFont('', 'B', $default_font_size - 1);
+			$curx = $posx;
+			foreach ($columns as $column)
+			{
+				$pdf->SetXY($curx, $posy);
+				$pdf->MultiCell($column['width'], $line_height, $column['label'], 1, 'C', 1);
+				$curx += $column['width'];
+			}
+			$posy += $line_height;
+		}
+
+		$pdf->SetFont('', 'B', $default_font_size - 1);
+		$pdf->SetXY($posx, $posy);
+		$pdf->MultiCell($columns[0]['width'] + $columns[1]['width'], $row_height, $total_label, 1, 'L', 0);
+
+		$curx = $posx + $columns[0]['width'] + $columns[1]['width'];
+		$totals_values = array(
+			price($total_ht, 0, $outputlangs),
+			price($total_tva, 0, $outputlangs),
+			price($total_ttc, 0, $outputlangs),
+			'',
+			'',
+		);
+		foreach ($totals_values as $index => $value)
+		{
+			$column_index = $index + 2;
+			$pdf->SetXY($curx, $posy);
+			$pdf->MultiCell($columns[$column_index]['width'], $row_height, $value, 1, $columns[$column_index]['align'], 0);
+			$curx += $columns[$column_index]['width'];
+		}
+
+		return 1;
+	}
 
 	/**
 	 *  Show payments table

@@ -6,6 +6,7 @@ Ce module gère :
 - les contrats de sous-traitance ;
 - l'autoliquidation de TVA sur les documents clients liés aux contrats de sous-traitance ;
 - le formulaire DC4 (saisie, génération et données associées).
+- un récapitulatif des factures fournisseurs en délégation dans certains modèles PDF.
 
 Compatibilité : Dolibarr v21+.
 
