@@ -23,7 +23,8 @@
 
 ?>
 
-<table id="tablelines" class="noborder" width="100%">
+<div class="div-table-responsive">
+<table id="tablelines" class="noborder centpercent">
 <?php if ($numLines > 0){ ?>
     <tr class="liste_titre nodrag nodrop">
         <td><?php print $langs->trans('Label'); ?></td>
@@ -37,7 +38,7 @@
         if ($action == 'editline' && $lineid == $line_details->rowid){ ?>
 
         <form name="details" action="<?php print $_SERVER["PHP_SELF"].'?id='.$object->id; ?>" method="POST">
-        <input type="hidden" name="token" value="<?php  print $_SESSION['newtoken']; ?>" />
+        <input type="hidden" name="token" value="<?php  print newToken(); ?>" />
         <input type="hidden" name="action" value="updateline" />
         <input type="hidden" name="id" value="<?php print $object->id; ?>" />
         <input type="hidden" name="lineid" value="<?php print $line_details->rowid; ?>"/>
@@ -284,12 +285,5 @@
     <?php } ?>
     </form>
 <?php } ?>
-
 </table>
-
-<?php 
-
-// End of page
-llxFooter();
-
-?>
+</div>
