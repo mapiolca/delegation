@@ -32,6 +32,22 @@ include_once(DOL_DOCUMENT_ROOT ."/core/modules/DolibarrModules.class.php");
 class modDelegation extends DolibarrModules
 {
 	/**
+	 * EN: Module special level.
+	 * FR: Niveau spécial du module.
+	 *
+	 * @var int
+	 */
+	public $special;
+
+	/**
+	 * EN: Dictionaries configuration.
+	 * FR: Configuration des dictionnaires.
+	 *
+	 * @var array
+	 */
+	public $dictionnaries;
+
+	/**
 	 *   \brief      Constructor. Define names, constants, directories, boxes, permissions
 	 *   \param      DB      Database handler
 	 */
