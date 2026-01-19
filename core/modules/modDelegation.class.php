@@ -433,8 +433,30 @@ class modDelegation extends DolibarrModules
 	function remove($options = '')
 	{
 		$sql = array();
+		$originalConst = $this->const;
 
-		return $this->_remove($sql);
+		// EN: Keep VAT reverse charge constants when disabling the module.
+		// FR: Conserver les constantes d'autoliquidation lors de la désactivation du module.
+		$this->const = array();
+		foreach ($originalConst as $constDefinition) {
+			if (empty($constDefinition[0])) {
+				continue;
+			}
+			if (in_array($constDefinition[0], array(
+				'DELEGATION_ENABLE_VAT_REVERSE_CHARGE',
+				'DELEGATION_VAT_REVERSE_CHARGE_FORCE_VAT0',
+				'DELEGATION_VAT_REVERSE_CHARGE_SCOPE',
+				'DELEGATION_VAT_REVERSE_CHARGE_LEGAL_TEXT',
+			), true)) {
+				continue;
+			}
+			$this->const[] = $constDefinition;
+		}
+
+		$result = $this->_remove($sql);
+		$this->const = $originalConst;
+
+		return $result;
 	}
 
 	private function cleanupObsoleteData()
