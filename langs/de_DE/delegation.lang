@@ -57,6 +57,10 @@ DelegationRightTabDc4SupplierRead=Registerkarte DC4 anzeigen (Lieferantenbestell
 DelegationRightTabDc4SupplierWrite=Registerkarte DC4 bearbeiten (Lieferantenbestellung)
 DelegationRightTabDc4CustomerRead=Registerkarte DC4 anzeigen (Kundenauftrag)
 DelegationRightTabDc4CustomerWrite=Registerkarte DC4 bearbeiten (Kundenauftrag)
+DelegationRightSubcontractContractRead=Unterverträge lesen
+DelegationRightSubcontractContractWrite=Unterverträge erstellen/bearbeiten
+DelegationRightVatReverseChargeRead=Autoliquidation auf Dokumenten anzeigen
+DelegationRightVatReverseChargeWrite=Autoliquidation auf Dokumenten aktivieren/deaktivieren
 
 lmdb_for=für
 
@@ -199,6 +203,22 @@ dc4=Informationen zur Erstellung einer DC4-Erklärung, eines Subunternehmervertr
 
 dc4_only=Informationen zur Erstellung einer DC4-Erklärung.
 dc4_errordatemessage=Dieser Auftrag hat nicht den Status "Bestellt" oder höher, daher ist das Standarddatum das aktuelle Statusdatum.
+
+DelegationVatReverseCharge=Steuerschuldnerschaft (Unterauftrag)
+DelegationVatReverseChargeInherited=Vom Untervertrag übernommen
+DelegationApplyVatReverseCharge=Steuerschuldnerschaft anwenden (MwSt. 0%)
+DelegationApplyVatReverseChargeDone=Steuerschuldnerschaft auf die Positionen angewendet.
+DelegationApplyVatReverseChargeError=Fehler beim Anwenden der Steuerschuldnerschaft.
+DelegationVatReverseChargeSection=Steuerschuldnerschaft (Unterauftrag)
+DelegationEnableVatReverseCharge=Steuerschuldnerschaft aktivieren (Unterauftrag)
+DelegationVatReverseChargeForceVat0=MwSt. auf 0% für Positionen setzen
+DelegationVatReverseChargeScope=Anwendungsbereich
+DelegationVatReverseChargeScopeServicesOnly=Nur Dienstleistungen
+DelegationVatReverseChargeScopeAllLines=Alle Positionen
+DelegationVatReverseChargeScopeSaved=Anwendungsbereich der Steuerschuldnerschaft gespeichert.
+DelegationVatReverseChargeLegalText=Rechtstext für PDFs
+DelegationVatReverseChargeLegalTextSaved=Rechtstext zur Steuerschuldnerschaft gespeichert.
+DelegationVatReverseChargeLegalTextDefault=Steuerschuldnerschaft des Leistungsempfängers – Reverse-Charge (CGI Art. 283-2, Anl. II Art. 242 nonies A).
 
 DC4_dc4_object_declaration=Zweck der Subunternehmererklärung (DC4)
 DC4_dc4_object_declaration_Tooltip=Wählen Sie den passenden Fall.

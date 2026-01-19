@@ -1,5 +1,9 @@
 # Délégation ChangeLog
 
+## 1.0.1 (2026-01-19)
+
+- Ajout du support de l'autoliquidation de TVA sur les devis, commandes et factures client liés à un contrat de sous-traitance.
+
 ## 1.0.0 (2026-01-18)
 
 - Redémarrage du versioning (restart versioning).

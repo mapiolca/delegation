@@ -57,6 +57,10 @@ DelegationRightTabDc4SupplierRead=Voir l'onglet DC4 (commande fournisseur)
 DelegationRightTabDc4SupplierWrite=Éditer l'onglet DC4 (commande fournisseur)
 DelegationRightTabDc4CustomerRead=Voir l'onglet DC4 (commande client)
 DelegationRightTabDc4CustomerWrite=Éditer l'onglet DC4 (commande client)
+DelegationRightSubcontractContractRead=Voir les contrats de sous-traitance
+DelegationRightSubcontractContractWrite=Créer/Modifier les contrats de sous-traitance
+DelegationRightVatReverseChargeRead=Voir l'autoliquidation sur les documents
+DelegationRightVatReverseChargeWrite=Activer/Désactiver l'autoliquidation sur les documents
 
 lmdb_for = pour
 
@@ -199,6 +203,22 @@ dc4 = Informations nécessaires à l'établissement d'une déclaration DC4, un c
 
 dc4_only = Informations nécessaires à l'établissement d'une déclaration DC4.
 dc4_errordatemessage = Vous cette commande n'est pas au statut « commandé » ou ultérieur, la date initiale sélectionnée par défaut sera donc celle du statut courant.
+
+DelegationVatReverseCharge=Autoliquidation TVA (sous-traitance)
+DelegationVatReverseChargeInherited=Hérité du contrat de sous-traitance
+DelegationApplyVatReverseCharge=Appliquer autoliquidation (TVA 0%)
+DelegationApplyVatReverseChargeDone=Autoliquidation appliquée aux lignes.
+DelegationApplyVatReverseChargeError=Erreur lors de l'application de l'autoliquidation.
+DelegationVatReverseChargeSection=Autoliquidation TVA (sous-traitance)
+DelegationEnableVatReverseCharge=Activer l'autoliquidation TVA (sous-traitance)
+DelegationVatReverseChargeForceVat0=Forcer TVA à 0% sur les lignes
+DelegationVatReverseChargeScope=Périmètre d'application
+DelegationVatReverseChargeScopeServicesOnly=Services uniquement
+DelegationVatReverseChargeScopeAllLines=Toutes les lignes
+DelegationVatReverseChargeScopeSaved=Périmètre d'autoliquidation enregistré.
+DelegationVatReverseChargeLegalText=Texte légal à afficher sur les PDF
+DelegationVatReverseChargeLegalTextSaved=Texte légal d'autoliquidation enregistré.
+DelegationVatReverseChargeLegalTextDefault=TVA due par le preneur assujetti – autoliquidation (CGI art. 283-2, ann. II art. 242 nonies A).
 
 DC4_dc4_object_declaration = Objet de la Déclaration du Sous-Traitant (DC4)
 DC4_dc4_object_declaration_Tooltip = Selectionnez le meilleur cas.

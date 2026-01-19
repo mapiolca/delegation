@@ -57,6 +57,10 @@ DelegationRightTabDc4SupplierRead=Ver la pestaña DC4 (pedido proveedor)
 DelegationRightTabDc4SupplierWrite=Editar la pestaña DC4 (pedido proveedor)
 DelegationRightTabDc4CustomerRead=Ver la pestaña DC4 (pedido cliente)
 DelegationRightTabDc4CustomerWrite=Editar la pestaña DC4 (pedido cliente)
+DelegationRightSubcontractContractRead=Ver contratos de subcontratación
+DelegationRightSubcontractContractWrite=Crear/Editar contratos de subcontratación
+DelegationRightVatReverseChargeRead=Ver la inversión del sujeto pasivo en documentos
+DelegationRightVatReverseChargeWrite=Activar/Desactivar la inversión del sujeto pasivo en documentos
 
 lmdb_for=para
 
@@ -199,6 +203,22 @@ dc4=Información necesaria para preparar una declaración DC4, un contrato de su
 
 dc4_only=Información necesaria para preparar una declaración DC4.
 dc4_errordatemessage=Esta orden no está en el estado "Pedido" o posterior, por lo que la fecha inicial por defecto será la del estado actual.
+
+DelegationVatReverseCharge=Inversión del sujeto pasivo (subcontratación)
+DelegationVatReverseChargeInherited=Heredado del contrato de subcontratación
+DelegationApplyVatReverseCharge=Aplicar inversión del sujeto pasivo (IVA 0%)
+DelegationApplyVatReverseChargeDone=Inversión del sujeto pasivo aplicada a las líneas.
+DelegationApplyVatReverseChargeError=Error al aplicar la inversión del sujeto pasivo.
+DelegationVatReverseChargeSection=Inversión del sujeto pasivo (subcontratación)
+DelegationEnableVatReverseCharge=Activar inversión del sujeto pasivo (subcontratación)
+DelegationVatReverseChargeForceVat0=Forzar IVA al 0% en las líneas
+DelegationVatReverseChargeScope=Ámbito de aplicación
+DelegationVatReverseChargeScopeServicesOnly=Solo servicios
+DelegationVatReverseChargeScopeAllLines=Todas las líneas
+DelegationVatReverseChargeScopeSaved=Ámbito de la inversión del sujeto pasivo guardado.
+DelegationVatReverseChargeLegalText=Texto legal para mostrar en PDFs
+DelegationVatReverseChargeLegalTextSaved=Texto legal de la inversión del sujeto pasivo guardado.
+DelegationVatReverseChargeLegalTextDefault=IVA debido por el destinatario sujeto pasivo – inversión del sujeto pasivo (CGI art. 283-2, anexo II art. 242 nonies A).
 
 DC4_dc4_object_declaration=Objeto de la declaración del subcontratista (DC4)
 DC4_dc4_object_declaration_Tooltip=Seleccione el caso más adecuado.
