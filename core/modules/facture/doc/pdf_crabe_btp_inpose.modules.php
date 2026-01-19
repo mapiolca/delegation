@@ -1963,27 +1963,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				    // reste à payer total
 				    
 				    
-				    	// reste à Payer HT
-					$index++;
-				    $pdf->SetFont('','', $default_font_size - 1);
-				    $pdf->SetFillColor(255,255,255);
-				    $pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
-				    $pdf->MultiCell($col1x, $tab2_hl, $outputlangs->transnoentities('DelegationTotalHTRestant'), 0, 'L', 1);
-				    
-				    $pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-				    $pdf->MultiCell($largcol2, $tab2_hl, price($total_ht_restant, 0, $outputlangs), 0, 'R', 1);
-
-				    	// reste à Payer TVA
-				    $index++;
-				    $pdf->SetFont('','', $default_font_size - 1);
-				    $pdf->SetFillColor(248,248,248);
-				    $pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
-				    $pdf->MultiCell($col1x, $tab2_hl, $outputlangs->transnoentities('DelegationTotalTVARestant'), 0, 'L', 1);
-				    
-				    $pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-				    $pdf->MultiCell($largcol2, $tab2_hl, price($tva_restante, 0, $outputlangs), 0, 'R', 1);
-
-				    	// reste à Payer TTC
+					// Remaining total TTC
 				    $index++;
 				    $pdf->SetFont('','', $default_font_size - 1);
 				    $pdf->SetFillColor(224,224,224);
