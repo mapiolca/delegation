@@ -775,6 +775,76 @@ class pdf_INPOSE extends ModelePDFFactures
 	}
 
 	/**
+	 * Truncate text to fit within a PDF cell width.
+	 *
+	 * @param	PDF		$pdf		Object PDF
+	 * @param	string	$text		Text to truncate
+	 * @param	float	$maxWidth	Max width in PDF unit
+	 * @return	string				Truncated text
+	 */
+	protected function _truncatePdfText($pdf, $text, $maxWidth)
+	{
+		$text = trim((string) $text);
+		if ($text === '')
+		{
+			return '';
+		}
+
+		if ($pdf->GetStringWidth($text) <= $maxWidth)
+		{
+			return $text;
+		}
+
+		$ellipsis = '…';
+		$available_width = $maxWidth - $pdf->GetStringWidth($ellipsis);
+		if ($available_width <= 0)
+		{
+			return $ellipsis;
+		}
+
+		$length = dol_strlen($text);
+		while ($length > 0 && $pdf->GetStringWidth(dol_substr($text, 0, $length)) > $available_width)
+		{
+			$length--;
+		}
+
+		if ($length <= 0)
+		{
+			return $ellipsis;
+		}
+
+		return rtrim(dol_substr($text, 0, $length)).$ellipsis;
+	}
+
+	/**
+	 * Print the summary table header.
+	 *
+	 * @param	PDF			$pdf				Object PDF
+	 * @param	Translate	$outputlangs		Object lang for output
+	 * @param	float		$posx				Position X
+	 * @param	float		$posy				Position Y
+	 * @param	array		$columns			Columns definition
+	 * @param	float		$head_height		Header height
+	 * @param	int			$default_font_size	Default font size
+	 * @return	float							New Y position
+	 */
+	protected function _printDelegationSupplierInvoicesSummaryHeader($pdf, $outputlangs, $posx, $posy, $columns, $head_height, $default_font_size)
+	{
+		$pdf->SetLineWidth(0.1);
+		$pdf->SetFillColor(240, 240, 240);
+		$pdf->SetFont('', 'B', $default_font_size - 1);
+		$curx = $posx;
+		foreach ($columns as $column)
+		{
+			$pdf->SetXY($curx, $posy);
+			$pdf->MultiCell($column['width'], $head_height, $column['label'], 1, 'C', 1);
+			$curx += $column['width'];
+		}
+
+		return $posy + $head_height;
+	}
+
+	/**
 	 *  Add supplier invoices summary page for delegation.
 	 *
 	 *  @param	PDF			$pdf			Object PDF
@@ -851,7 +921,8 @@ class pdf_INPOSE extends ModelePDFFactures
 		}
 
 		$default_font_size = pdf_getPDFFontSize($outputlangs);
-		$line_height = 6;
+		$line_height = 5;
+		$head_height = 6;
 		$title_top_offset = 25;
 		$table_top_offset = 5;
 		$posx = $this->marge_gauche;
@@ -868,13 +939,13 @@ class pdf_INPOSE extends ModelePDFFactures
 		$posy = $pdf->GetY() + 2 + $table_top_offset;
 
 		$base_columns = array(
-			array('label' => $outputlangs->transnoentities('Ref'), 'width' => 26, 'align' => 'L'),
-			array('label' => $outputlangs->transnoentities('Supplier'), 'width' => 54, 'align' => 'L'),
-			array('label' => $outputlangs->transnoentities('AmountHT'), 'width' => 18, 'align' => 'R'),
-			array('label' => $outputlangs->transnoentities('AmountVAT'), 'width' => 18, 'align' => 'R'),
-			array('label' => $outputlangs->transnoentities('AmountTTC'), 'width' => 18, 'align' => 'R'),
-			array('label' => $outputlangs->transnoentities('DateInvoice'), 'width' => 28, 'align' => 'C'),
-			array('label' => $outputlangs->transnoentities('DateDue'), 'width' => 28, 'align' => 'C'),
+			'ref' => array('label' => $outputlangs->transnoentities('Ref'), 'width' => 28, 'align' => 'L'),
+			'supplier' => array('label' => $outputlangs->transnoentities('Supplier'), 'width' => 65, 'align' => 'L'),
+			'ht' => array('label' => $outputlangs->transnoentities('AmountHT'), 'width' => 22, 'align' => 'R'),
+			'tva' => array('label' => $outputlangs->transnoentities('AmountVAT'), 'width' => 22, 'align' => 'R'),
+			'ttc' => array('label' => $outputlangs->transnoentities('AmountTTC'), 'width' => 22, 'align' => 'R'),
+			'date' => array('label' => $outputlangs->transnoentities('DateInvoice'), 'width' => 22, 'align' => 'C'),
+			'due' => array('label' => $outputlangs->transnoentities('DateDue'), 'width' => 22, 'align' => 'C'),
 		);
 		$usable_width = $this->page_largeur - $this->marge_gauche - $this->marge_droite;
 		$base_total = 0;
@@ -883,35 +954,41 @@ class pdf_INPOSE extends ModelePDFFactures
 			$base_total += $base_column['width'];
 		}
 		$columns = array();
+		$column_keys = array_keys($base_columns);
+		$last_column_key = end($column_keys);
+		$scale = 1;
+		$target_width = $base_total;
+		if ($base_total > $usable_width)
+		{
+			$scale = $usable_width / $base_total;
+			$target_width = $usable_width;
+		}
 		$running_width = 0;
-		foreach ($base_columns as $index => $base_column)
+		foreach ($base_columns as $key => $base_column)
 		{
 			$column = $base_column;
-			if ($index === (count($base_columns) - 1))
+			if ($key === $last_column_key)
 			{
-				$column['width'] = $usable_width - $running_width;
+				$column['width'] = $target_width - $running_width;
 			}
 			else
 			{
-				$column['width'] = $base_total > 0 ? round($base_column['width'] * $usable_width / $base_total, 2) : $base_column['width'];
+				$column['width'] = round($base_column['width'] * $scale, 2);
 				$running_width += $column['width'];
 			}
-			$columns[] = $column;
+			$columns[$key] = $column;
+		}
+		$table_width = $target_width;
+		if ($table_width < $usable_width)
+		{
+			$posx = $this->marge_gauche + (($usable_width - $table_width) / 2);
 		}
 
 		// Draw table header.
-		$pdf->SetFillColor(230, 230, 230);
-		$pdf->SetFont('', 'B', $default_font_size - 1);
-		$curx = $posx;
-		foreach ($columns as $column)
-		{
-			$pdf->SetXY($curx, $posy);
-			$pdf->MultiCell($column['width'], $line_height, $column['label'], 1, 'C', 1);
-			$curx += $column['width'];
-		}
-		$posy += $line_height;
+		$posy = $this->_printDelegationSupplierInvoicesSummaryHeader($pdf, $outputlangs, $posx, $posy, $columns, $head_height, $default_font_size);
 
 		$pdf->SetFont('', '', $default_font_size - 1);
+		$row_index = 0;
 
 		foreach ($supplierInvoices as $invoice)
 		{
@@ -921,25 +998,16 @@ class pdf_INPOSE extends ModelePDFFactures
 			$invoice_datef = ! empty($invDate) ? dol_print_date($invDate, 'day', false, $outputlangs) : '';
 			$invoice_date_due = ! empty($dueDate) ? dol_print_date($dueDate, 'day', false, $outputlangs, true) : '';
 			$values = array(
-				$invoice->ref,
-				$invoice->thirdparty->name,
-				price($invoice->total_ht, 0, $outputlangs),
-				price($invoice->total_tva, 0, $outputlangs),
-				price($invoice->total_ttc, 0, $outputlangs),
-				$invoice_datef,
-				$invoice_date_due,
+				'ref' => $this->_truncatePdfText($pdf, $invoice->ref, $columns['ref']['width']),
+				'supplier' => $this->_truncatePdfText($pdf, $invoice->thirdparty->name, $columns['supplier']['width']),
+				'ht' => price($invoice->total_ht, 0, $outputlangs),
+				'tva' => price($invoice->total_tva, 0, $outputlangs),
+				'ttc' => price($invoice->total_ttc, 0, $outputlangs),
+				'date' => $invoice_datef,
+				'due' => $invoice_date_due,
 			);
 
-			$row_height = $line_height;
-			if (method_exists($pdf, 'getStringHeight'))
-			{
-				foreach ($values as $index => $value)
-				{
-					$row_height = max($row_height, $pdf->getStringHeight($columns[$index]['width'], $value));
-				}
-			}
-
-			if ($posy + $row_height > ($this->page_hauteur - $this->marge_basse))
+			if ($posy + $line_height > ($this->page_hauteur - $this->marge_basse))
 			{
 				$this->_pagefoot($pdf, $object, $outputlangs);
 				$pdf->AddPage();
@@ -952,37 +1020,35 @@ class pdf_INPOSE extends ModelePDFFactures
 				$pdf->MultiCell(0, 6, $outputlangs->transnoentities('DelegationSupplierInvoicesSummaryTitle'), 0, 'L', 0);
 				$posy = $pdf->GetY() + 2 + $table_top_offset;
 
-				$pdf->SetFillColor(230, 230, 230);
-				$pdf->SetFont('', 'B', $default_font_size - 1);
-				$curx = $posx;
-				foreach ($columns as $column)
-				{
-					$pdf->SetXY($curx, $posy);
-					$pdf->MultiCell($column['width'], $line_height, $column['label'], 1, 'C', 1);
-					$curx += $column['width'];
-				}
-				$posy += $line_height;
+				$posy = $this->_printDelegationSupplierInvoicesSummaryHeader($pdf, $outputlangs, $posx, $posy, $columns, $head_height, $default_font_size);
 				$pdf->SetFont('', '', $default_font_size - 1);
 			}
 
+			$fill = ($row_index % 2 == 0);
+			if ($fill)
+			{
+				$pdf->SetFillColor(250, 250, 250);
+			}
+			else
+			{
+				$pdf->SetFillColor(255, 255, 255);
+			}
+			$pdf->SetLineWidth(0.1);
+
 			$curx = $posx;
-			foreach ($values as $index => $value)
+			foreach ($values as $key => $value)
 			{
 				$pdf->SetXY($curx, $posy);
-				$pdf->MultiCell($columns[$index]['width'], $row_height, $value, 1, $columns[$index]['align'], 0);
-				$curx += $columns[$index]['width'];
+				$pdf->MultiCell($columns[$key]['width'], $line_height, $value, 1, $columns[$key]['align'], $fill ? 1 : 0);
+				$curx += $columns[$key]['width'];
 			}
-			$posy += $row_height;
+			$posy += $line_height;
+			$row_index++;
 		}
 
 		// Totals row with invoice count.
 		$total_label = $outputlangs->transnoentities('DelegationTotalsWithCount', count($supplierInvoices));
 		$row_height = $line_height;
-		if (method_exists($pdf, 'getStringHeight'))
-		{
-			$row_height = max($row_height, $pdf->getStringHeight($columns[0]['width'] + $columns[1]['width'], $total_label));
-		}
-
 		if ($posy + $row_height > ($this->page_hauteur - $this->marge_basse))
 		{
 			$this->_pagefoot($pdf, $object, $outputlangs);
@@ -996,36 +1062,31 @@ class pdf_INPOSE extends ModelePDFFactures
 			$pdf->MultiCell(0, 6, $outputlangs->transnoentities('DelegationSupplierInvoicesSummaryTitle'), 0, 'L', 0);
 			$posy = $pdf->GetY() + 2 + $table_top_offset;
 
-			$pdf->SetFillColor(230, 230, 230);
-			$pdf->SetFont('', 'B', $default_font_size - 1);
-			$curx = $posx;
-			foreach ($columns as $column)
-			{
-				$pdf->SetXY($curx, $posy);
-				$pdf->MultiCell($column['width'], $line_height, $column['label'], 1, 'C', 1);
-				$curx += $column['width'];
-			}
-			$posy += $line_height;
+			$posy = $this->_printDelegationSupplierInvoicesSummaryHeader($pdf, $outputlangs, $posx, $posy, $columns, $head_height, $default_font_size);
 		}
 
+		$pdf->SetLineWidth(0.3);
+		$pdf->line($posx, $posy, $posx + $table_width, $posy);
+		$pdf->SetLineWidth(0.1);
+
+		$pdf->SetFillColor(230, 230, 230);
 		$pdf->SetFont('', 'B', $default_font_size - 1);
 		$pdf->SetXY($posx, $posy);
-		$pdf->MultiCell($columns[0]['width'] + $columns[1]['width'], $row_height, $total_label, 1, 'L', 0);
+		$pdf->MultiCell($columns['ref']['width'] + $columns['supplier']['width'], $row_height, $this->_truncatePdfText($pdf, $total_label, $columns['ref']['width'] + $columns['supplier']['width']), 1, 'L', 1);
 
-		$curx = $posx + $columns[0]['width'] + $columns[1]['width'];
+		$curx = $posx + $columns['ref']['width'] + $columns['supplier']['width'];
 		$totals_values = array(
-			price($total_ht, 0, $outputlangs),
-			price($total_tva, 0, $outputlangs),
-			price($total_ttc, 0, $outputlangs),
-			'',
-			'',
+			'ht' => price($total_ht, 0, $outputlangs),
+			'tva' => price($total_tva, 0, $outputlangs),
+			'ttc' => price($total_ttc, 0, $outputlangs),
+			'date' => '',
+			'due' => '',
 		);
-		foreach ($totals_values as $index => $value)
+		foreach ($totals_values as $key => $value)
 		{
-			$column_index = $index + 2;
 			$pdf->SetXY($curx, $posy);
-			$pdf->MultiCell($columns[$column_index]['width'], $row_height, $value, 1, $columns[$column_index]['align'], 0);
-			$curx += $columns[$column_index]['width'];
+			$pdf->MultiCell($columns[$key]['width'], $row_height, $value, 1, $columns[$key]['align'], 1);
+			$curx += $columns[$key]['width'];
 		}
 
 		$this->_pagefoot($pdf, $object, $outputlangs);
