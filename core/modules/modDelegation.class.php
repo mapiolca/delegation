@@ -205,55 +205,55 @@ class modDelegation extends DolibarrModules
 		// Permissions
 		$this->rights = array();		// Permission array used by this module
 		$r = 0;
-		$this->rights[$r][0] = 440301;
+		$this->rights[$r][0] = 45000701;
 		$this->rights[$r][1] = 'Ajouter des délégations liées à ce compte';
 		$this->rights[$r][2] = 'r';
 		$this->rights[$r][3] = 0;
 		$this->rights[$r][4] = 'myactions';
-        $this->rights[$r][5] = 'create';
+		$this->rights[$r][5] = 'create';
         
         $r++;
-		$this->rights[$r][0] = 440302;
+		$this->rights[$r][0] = 45000702;
 		$this->rights[$r][1] = 'Ajouter des délégations liées à tout le monde';
 		$this->rights[$r][2] = 'r';
 		$this->rights[$r][3] = 0;
 		$this->rights[$r][4] = 'allactions';
-        $this->rights[$r][5] = 'create';
+		$this->rights[$r][5] = 'create';
 
 		$r++;
-		$this->rights[$r][0] = 440303;
+		$this->rights[$r][0] = 45000703;
 		$this->rights[$r][1] = 'Lire les délégations liées à ce compte';
 		$this->rights[$r][2] = 'r';
 		$this->rights[$r][3] = 0;
 		$this->rights[$r][4] = 'myactions';
-        $this->rights[$r][5] = 'read';
+		$this->rights[$r][5] = 'read';
         
         $r++;
-		$this->rights[$r][0] = 440304;
+		$this->rights[$r][0] = 45000704;
 		$this->rights[$r][1] = 'Lire les délégations liées à tout le monde';
 		$this->rights[$r][2] = 'r';
 		$this->rights[$r][3] = 0;
 		$this->rights[$r][4] = 'allactions';
-        $this->rights[$r][5] = 'read';
+		$this->rights[$r][5] = 'read';
 
 		$r++;
-		$this->rights[$r][0] = 440305;
+		$this->rights[$r][0] = 45000705;
 		$this->rights[$r][1] = 'Supprimer les délégations liées à ce compte';
 		$this->rights[$r][2] = 'r';
 		$this->rights[$r][3] = 0;
 		$this->rights[$r][4] = 'myactions';
-        $this->rights[$r][5] = 'delete';
+		$this->rights[$r][5] = 'delete';
         
         $r++;
-		$this->rights[$r][0] = 440306;
+		$this->rights[$r][0] = 45000706;
 		$this->rights[$r][1] = 'Supprimer les délégations liées à tout le monde';
 		$this->rights[$r][2] = 'r';
 		$this->rights[$r][3] = 0;
 		$this->rights[$r][4] = 'allactions';
-        $this->rights[$r][5] = 'delete';
+		$this->rights[$r][5] = 'delete';
 		
 		$r++;
-		$this->rights[$r][0] = 440310;
+		$this->rights[$r][0] = 45000707;
 		$this->rights[$r][1] = $langs->trans('DelegationRightTabDelegationRead');
 		$this->rights[$r][2] = 'r';
 		$this->rights[$r][3] = 0;
@@ -261,7 +261,7 @@ class modDelegation extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 
 		$r++;
-		$this->rights[$r][0] = 440311;
+		$this->rights[$r][0] = 45000708;
 		$this->rights[$r][1] = $langs->trans('DelegationRightTabDelegationWrite');
 		$this->rights[$r][2] = 'r';
 		$this->rights[$r][3] = 0;
@@ -269,7 +269,7 @@ class modDelegation extends DolibarrModules
 		$this->rights[$r][5] = 'write';
 
 		$r++;
-		$this->rights[$r][0] = 440318;
+		$this->rights[$r][0] = 45000709;
 		$this->rights[$r][1] = $langs->trans('DelegationRightSubcontractContractRead');
 		$this->rights[$r][2] = 'r';
 		$this->rights[$r][3] = 0;
@@ -277,7 +277,7 @@ class modDelegation extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 
 		$r++;
-		$this->rights[$r][0] = 440319;
+		$this->rights[$r][0] = 45000710;
 		$this->rights[$r][1] = $langs->trans('DelegationRightSubcontractContractWrite');
 		$this->rights[$r][2] = 'r';
 		$this->rights[$r][3] = 0;
@@ -285,7 +285,7 @@ class modDelegation extends DolibarrModules
 		$this->rights[$r][5] = 'write';
 
 		$r++;
-		$this->rights[$r][0] = 440320;
+		$this->rights[$r][0] = 45000711;
 		$this->rights[$r][1] = $langs->trans('DelegationRightVatReverseChargeRead');
 		$this->rights[$r][2] = 'r';
 		$this->rights[$r][3] = 0;
@@ -293,7 +293,7 @@ class modDelegation extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 
 		$r++;
-		$this->rights[$r][0] = 440321;
+		$this->rights[$r][0] = 45000712;
 		$this->rights[$r][1] = $langs->trans('DelegationRightVatReverseChargeWrite');
 		$this->rights[$r][2] = 'r';
 		$this->rights[$r][3] = 0;
@@ -301,7 +301,7 @@ class modDelegation extends DolibarrModules
 		$this->rights[$r][5] = 'write';
 
 		$r++;
-		$this->rights[$r][0] = 440312;
+		$this->rights[$r][0] = 45000713;
 		$this->rights[$r][1] = $langs->trans('DelegationRightTabDetailsRead');
 		$this->rights[$r][2] = 'r';
 		$this->rights[$r][3] = 0;
@@ -309,7 +309,7 @@ class modDelegation extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 
 		$r++;
-		$this->rights[$r][0] = 440313;
+		$this->rights[$r][0] = 45000714;
 		$this->rights[$r][1] = $langs->trans('DelegationRightTabDetailsWrite');
 		$this->rights[$r][2] = 'r';
 		$this->rights[$r][3] = 0;
@@ -317,7 +317,7 @@ class modDelegation extends DolibarrModules
 		$this->rights[$r][5] = 'write';
 
 		$r++;
-		$this->rights[$r][0] = 440314;
+		$this->rights[$r][0] = 45000715;
 		$this->rights[$r][1] = $langs->trans('DelegationRightTabDc4SupplierRead');
 		$this->rights[$r][2] = 'r';
 		$this->rights[$r][3] = 0;
@@ -325,7 +325,7 @@ class modDelegation extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 
 		$r++;
-		$this->rights[$r][0] = 440315;
+		$this->rights[$r][0] = 45000716;
 		$this->rights[$r][1] = $langs->trans('DelegationRightTabDc4SupplierWrite');
 		$this->rights[$r][2] = 'r';
 		$this->rights[$r][3] = 0;
@@ -333,7 +333,7 @@ class modDelegation extends DolibarrModules
 		$this->rights[$r][5] = 'write';
 
 		$r++;
-		$this->rights[$r][0] = 440316;
+		$this->rights[$r][0] = 45000717;
 		$this->rights[$r][1] = $langs->trans('DelegationRightTabDc4CustomerRead');
 		$this->rights[$r][2] = 'r';
 		$this->rights[$r][3] = 0;
@@ -341,7 +341,7 @@ class modDelegation extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 
 		$r++;
-		$this->rights[$r][0] = 440317;
+		$this->rights[$r][0] = 45000718;
 		$this->rights[$r][1] = $langs->trans('DelegationRightTabDc4CustomerWrite');
 		$this->rights[$r][2] = 'r';
 		$this->rights[$r][3] = 0;
