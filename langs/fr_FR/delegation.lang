@@ -4,6 +4,7 @@ CHARSET=iso-8859-1
 Module440300Desc=Module pour gérer la délégation de paiement, les contrats de sous-traitance et les formulaires DC4 (nécessite le module BTP disponible sur le Dolistore)
 Module440300Name=Délégation
 Delegation=Délégation
+DelegationSetup=Configuration de la délégation de paiement
 
 SetupG=Général 
 

@@ -25,9 +25,13 @@ $res=@include("../../main.inc.php");					// For root directory
 if (! $res) $res=@include("../../../main.inc.php");	// For "custom" directory
 // Libraries
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/custom/delegation/class/lmdb.class.php';
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formbank.class.php';
+
+$delegationLibPath = dol_buildpath('/delegation/lib/delegation.lib.php', 0);
+if (file_exists($delegationLibPath)) {
+	require_once $delegationLibPath;
+}
 
 if(!$user->admin or empty($conf->delegation->enabled))
 	accessforbidden();
@@ -41,16 +45,14 @@ if (empty($conf->global->DELEGATION_CLEARING_BANKACCOUNT_ID)) {
 	setEventMessages($langs->trans('DelegationConfigMissingClearingAccount'), null, 'warnings');
 }
 
-// EN: Ensure payment mode exists on admin access (upgrade safety).
-// FR: S'assurer que le mode de règlement existe à l'accès admin (sécurité upgrade).
+// Ensure payment mode exists on admin access (upgrade safety).
 if (empty($conf->global->DELEGATION_PAYMENT_MODE_ID)) {
 	$paymentCode = 'DELPAY';
 	$paymentLabel = $langs->trans('DelegationPaymentMode');
 	$paymentId = 0;
 
 	$sql = "SELECT id, active FROM ".MAIN_DB_PREFIX."c_paiement";
-	// EN: Force binary comparison to avoid collation mix errors.
-	// FR: Forcer une comparaison binaire pour éviter les erreurs de collation.
+	// Force binary comparison to avoid collation mix errors.
 	$sql.= " WHERE BINARY code = '".$db->escape($paymentCode)."'";
 	$resql = $db->query($sql);
 	if ($resql) {
@@ -76,30 +78,44 @@ if (empty($conf->global->DELEGATION_PAYMENT_MODE_ID)) {
 	}
 }
 
-// EN: Handle admin actions for clearing account.
-// FR: Gérer les actions d'administration du compte de passage.
+// Handle admin actions for clearing account.
 $action = GETPOST('action', 'aZ09');
 
 if ($user->admin && $action == 'set_clearing_account') {
+	$tokenIsValid = true;
+	if (function_exists('checkToken')) {
+		$tokenIsValid = checkToken();
+	} elseif (! empty($_SESSION['newtoken'])) {
+		$tokenIsValid = (GETPOST('token', 'alphanohtml') === $_SESSION['newtoken']);
+	}
+	if (! $tokenIsValid) {
+		accessforbidden();
+	}
 	$bankAccountId = (int) GETPOST('delegation_clearing_bank_account', 'int');
 	dolibarr_set_const($db, 'DELEGATION_CLEARING_BANKACCOUNT_ID', $bankAccountId, 'int', 0, '', $conf->entity);
 	setEventMessages($langs->trans('DelegationClearingAccountSaved'), null, 'mesgs');
 }
 
 if ($user->admin && $action == 'create_clearing_account') {
+	$tokenIsValid = true;
+	if (function_exists('checkToken')) {
+		$tokenIsValid = checkToken();
+	} elseif (! empty($_SESSION['newtoken'])) {
+		$tokenIsValid = (GETPOST('token', 'alphanohtml') === $_SESSION['newtoken']);
+	}
+	if (! $tokenIsValid) {
+		accessforbidden();
+	}
 	$account = new Account($db);
 	$account->ref = 'DELPASS';
-	// EN: Limit label length to database column size.
-	// FR: Limiter la longueur du libellé à la taille de la colonne SQL.
+	// Limit label length to database column size.
 	$account->label = dol_trunc($langs->trans('DelegationClearingAccountLabel'), 30, 'right', 'UTF-8', 1);
 	$account->currency_code = $conf->currency;
 	$account->clos = 0;
-	// EN: Provide mandatory initial balance date and amount.
-	// FR: Renseigner la date et le montant du solde initial obligatoires.
+	// Provide mandatory initial balance date and amount.
 	$account->date_solde = dol_now();
 	$account->solde = 0;
-	// EN: Set default country to satisfy mandatory field.
-	// FR: Définir le pays par défaut pour satisfaire le champ obligatoire.
+	// Set default country to satisfy mandatory field.
 	$defaultCountryId = 0;
 	if (! empty($mysoc->country_id)) {
 		$defaultCountryId = (int) $mysoc->country_id;
@@ -125,15 +141,37 @@ if ($user->admin && $action == 'create_clearing_account') {
 *	View
 */
 
-llxHeader('',$langs->trans("LMDBSetup"));
+llxHeader('', $langs->trans("DelegationSetup"));
 
 // Configuration header
 
-$head = lmdb_prepare_head();
-dol_fiche_head($head,'SetupG', $langs->trans("Les Métiers du Bâtiment"), 0, "");
+$head = array();
+if (function_exists('delegation_admin_prepare_head')) {
+	$head = delegation_admin_prepare_head();
+} elseif (function_exists('delegation_prepare_head')) {
+	$head = delegation_prepare_head();
+} else {
+	$h = 0;
+	$head[$h][0] = dol_buildpath('/delegation/admin/setup.php', 1);
+	$head[$h][1] = $langs->trans("Setup");
+	$head[$h][2] = 'setup';
+	$h++;
+	$head[$h][0] = dol_buildpath('/delegation/admin/other.php', 1).'?mode=desc';
+	$head[$h][1] = $langs->trans("Description");
+	$head[$h][2] = 'Description';
+	$h++;
+	$head[$h][0] = dol_buildpath('/delegation/admin/other.php', 1).'?mode=feature';
+	$head[$h][1] = $langs->trans("Features");
+	$head[$h][2] = 'Features';
+	$h++;
+	$head[$h][0] = dol_buildpath('/delegation/admin/other.php', 1).'?mode=changelog';
+	$head[$h][1] = $langs->trans("Changelog");
+	$head[$h][2] = 'Changelog';
+}
+dol_fiche_head($head, 'setup', $langs->trans("DelegationSetup"), 0, "delegation@delegation");
 
 $linkback='<a href="'.DOL_URL_ROOT.'/admin/modules.php">'.$langs->trans("BackToModuleList").'</a>';
-print_fiche_titre($langs->trans("ModuleSetup"),$linkback);
+print_fiche_titre($langs->trans("DelegationSetup"), $linkback);
 print '<br>';
 print '<table class="noborder" width="100%">'."\n";
 	print '<thead>';
@@ -142,8 +180,8 @@ print '<table class="noborder" width="100%">'."\n";
 			print '<th  align="center" width="300">'.$langs->trans("Value").'</th>';
 		print '</tr>';
 	print '</thead>';
-showParameters();
 	print '<tbody>';
+showParameters();
 
 function showParameters()
 {
@@ -151,24 +189,17 @@ function showParameters()
 
 	$formbank = new FormBank($db);
 	$form = new Form($db);
-
-	$var = ! $var;
-	print '<tr '.$bc[$var].'>';
-		print '<td align="left" class="">'.$langs->trans("LMDB_USE_IDPROF3_DICTIONARY").'</td>';
-		print '<td align="center" width="300">';
-			print ajax_constantonoff('LMDB_USE_IDPROF3_DICTIONARY');
-		print '</td>';
-	print '</tr>';
+	$token = newToken();
+	$var = false;
 
 	$var = ! $var;
 	print '<tr '.$bc[$var].'>';
 		print '<td align="left" class="">'.$langs->trans("DelegationClearingBankAccount").'</td>';
 		print '<td align="center" width="300">';
 			print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
-				print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+				print '<input type="hidden" name="token" value="'.$token.'">';
 				print '<input type="hidden" name="action" value="set_clearing_account">';
-				// EN: Use FormBank selector when available, fallback to generic list otherwise.
-				// FR: Utiliser le sélecteur FormBank si disponible, sinon une liste générique.
+				// Use FormBank selector when available, fallback to generic list otherwise.
 				if (method_exists($formbank, 'select_comptes')) {
 					print $formbank->select_comptes($conf->global->DELEGATION_CLEARING_BANKACCOUNT_ID, 'delegation_clearing_bank_account', 0, '', 1);
 				} elseif (method_exists($formbank, 'selectAccount')) {
@@ -196,7 +227,7 @@ function showParameters()
 		print '<td align="left" class="">'.$langs->trans("DelegationCreateClearingAccount").'</td>';
 		print '<td align="center" width="300">';
 			print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
-				print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+				print '<input type="hidden" name="token" value="'.$token.'">';
 				print '<input type="hidden" name="action" value="create_clearing_account">';
 				print '<input type="submit" class="button" value="'.$langs->trans("DelegationCreateClearingAccount").'">';
 			print '</form>';
@@ -245,3 +276,6 @@ function showParameters()
 }
 print '</tbody>';
 print '</table>';
+
+llxFooter();
+$db->close();

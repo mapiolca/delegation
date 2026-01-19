@@ -4,6 +4,7 @@ CHARSET=UTF-8
 Module440300Desc=Modul zur Verwaltung von Zahlungsdelegation, Subunternehmerverträgen und DC4-Formularen (benötigt das BTP-Modul aus dem Dolistore)
 Module440300Name=Delegation
 Delegation=Delegation
+DelegationSetup=Konfiguration der Zahlungsdelegation
 
 SetupG=Allgemein
 
