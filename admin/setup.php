@@ -183,7 +183,7 @@ if ($user->admin && $action == 'set_vat_reverse_charge_legal_text') {
 *	View
 */
 
-llxHeader('', $langs->trans("DelegationSetup"));
+llxHeader('', $langs->trans("DelegationSetup"), '', '', 0, 0, array(), array(), '', $langs->trans("DelegationSetup"));
 
 // Configuration header
 
