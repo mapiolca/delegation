@@ -1,5 +1,9 @@
 # Délégation ChangeLog
 
+## 1.0.2 (2026-01-20)
+
+- Ajout d'une page récapitulative des factures fournisseurs en délégation dans les modèles PDF Inpose et Crabe BTP.
+
 ## 1.0.1 (2026-01-19)
 
 - Ajout du support de l'autoliquidation de TVA sur les devis, commandes et factures client liés à un contrat de sous-traitance.
