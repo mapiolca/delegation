@@ -1,5 +1,7 @@
 # Module Délégation
 
+## FR
+
 Ce module gère :
 
 - la délégation de paiement ;
@@ -10,3 +12,16 @@ Ce module gère :
 Compatibilité : Dolibarr v21+.
 
 Le module ajoute un mode de règlement dédié « Délégation de paiement » et nécessite la configuration d’un compte de passage pour enregistrer les mouvements liés aux délégations.
+
+## EN
+
+This module handles:
+
+- payment delegation;
+- subcontracting contracts;
+- VAT reverse charge on customer documents linked to subcontracting contracts;
+- the DC4 form (entry, generation, and related data).
+
+Compatibility: Dolibarr v21+.
+
+The module adds a dedicated payment mode named “Payment delegation” and requires configuring a clearing account to track delegation-related movements.

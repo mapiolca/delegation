@@ -10,6 +10,10 @@
 - Ajout du mode de règlement dédié « Délégation de paiement ».
 - Ajout d’un compte de passage configurable (création automatique + sélection).
 - Refonte de l’onglet « Délégation » avec sélection de factures fournisseurs filtrées (projet + mode de règlement).
+- Suppression des dépendances forcées à d’autres modules lors de l’activation.
+- Refonte de la page d’administration (setup) et ajout de helpers d’affichage.
+- Suppression des onglets Description/Fonctionnalités/Changelog et de la page admin associée.
+- Durcissement des pages admin pour éviter les warnings PHP 8.x.
 
 ## 4.4.1 (2025-03-10)
 

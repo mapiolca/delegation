@@ -32,6 +32,22 @@ include_once(DOL_DOCUMENT_ROOT ."/core/modules/DolibarrModules.class.php");
 class modDelegation extends DolibarrModules
 {
 	/**
+	 * EN: Module special level.
+	 * FR: Niveau spécial du module.
+	 *
+	 * @var int
+	 */
+	public $special;
+
+	/**
+	 * EN: Dictionaries configuration.
+	 * FR: Configuration des dictionnaires.
+	 *
+	 * @var array
+	 */
+	public $dictionnaries;
+
+	/**
 	 *   \brief      Constructor. Define names, constants, directories, boxes, permissions
 	 *   \param      DB      Database handler
 	 */
@@ -99,7 +115,7 @@ class modDelegation extends DolibarrModules
 		$this->config_page_url = array('setup.php@delegation');
 
 		// Dependencies
-		$this->depends = array('modBtp', 'modProjet', 'modSociete');		// List of modules id that must be enabled if this module is enabled
+		$this->depends = array();		// List of modules id that must be enabled if this module is enabled
 		$this->conflictwith = array();
 		$this->phpmin = array(5,0);					// Minimum version of PHP required by module
 		$this->need_dolibarr_version = array(21,0);	// Minimum version of Dolibarr required by module
