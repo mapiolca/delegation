@@ -82,7 +82,13 @@ if (empty($conf->global->DELEGATION_PAYMENT_MODE_ID)) {
 $action = GETPOST('action', 'aZ09');
 
 if ($user->admin && $action == 'set_clearing_account') {
-	if (! checkToken()) {
+	$tokenIsValid = true;
+	if (function_exists('checkToken')) {
+		$tokenIsValid = checkToken();
+	} elseif (! empty($_SESSION['newtoken'])) {
+		$tokenIsValid = (GETPOST('token', 'alphanohtml') === $_SESSION['newtoken']);
+	}
+	if (! $tokenIsValid) {
 		accessforbidden();
 	}
 	$bankAccountId = (int) GETPOST('delegation_clearing_bank_account', 'int');
@@ -91,7 +97,13 @@ if ($user->admin && $action == 'set_clearing_account') {
 }
 
 if ($user->admin && $action == 'create_clearing_account') {
-	if (! checkToken()) {
+	$tokenIsValid = true;
+	if (function_exists('checkToken')) {
+		$tokenIsValid = checkToken();
+	} elseif (! empty($_SESSION['newtoken'])) {
+		$tokenIsValid = (GETPOST('token', 'alphanohtml') === $_SESSION['newtoken']);
+	}
+	if (! $tokenIsValid) {
 		accessforbidden();
 	}
 	$account = new Account($db);
