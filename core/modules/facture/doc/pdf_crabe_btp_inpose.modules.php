@@ -1067,19 +1067,14 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$total_ht = 0;
 		$total_tva = 0;
 		$total_ttc = 0;
-		while ($obj = $this->db->fetch_object($resql))
-		{
-			$invoice = new FactureFournisseur($this->db);
-			if ($invoice->fetch((int) $obj->rowid) > 0)
+			while ($obj = $this->db->fetch_object($resql))
 			{
-				// Ensure invoice dates are loaded.
-				if (! isset($invoice->datef) || ! isset($invoice->date_lim_reglement))
+				$invoice = new FactureFournisseur($this->db);
+				if ($invoice->fetch((int) $obj->rowid) > 0)
 				{
-					$invoice->fetch((int) $obj->rowid);
-				}
-				$invoice->fetch_thirdparty();
-				$supplierInvoices[] = $invoice;
-				$total_ht += (float) $invoice->total_ht;
+					$invoice->fetch_thirdparty();
+					$supplierInvoices[] = $invoice;
+					$total_ht += (float) $invoice->total_ht;
 				$total_tva += (float) $invoice->total_tva;
 				$total_ttc += (float) $invoice->total_ttc;
 			}
@@ -1151,12 +1146,15 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		}
 		$posy += $line_height;
 
-		$pdf->SetFont('', '', $default_font_size - 1);
+			$pdf->SetFont('', '', $default_font_size - 1);
 
-		foreach ($supplierInvoices as $invoice)
-		{
-			$invoice_datef = ! empty($invoice->datef) ? dol_print_date($invoice->datef, 'day', false, $outputlangs) : '';
-			$invoice_date_due = ! empty($invoice->date_lim_reglement) ? dol_print_date($invoice->date_lim_reglement, 'day', false, $outputlangs, true) : '';
+			foreach ($supplierInvoices as $invoice)
+			{
+				// Robust dates for supplier invoices (Dolibarr v20+ / retro-compatible)
+				$invDate = ! empty($invoice->date) ? $invoice->date : (! empty($invoice->datef) ? $invoice->datef : 0);
+				$dueDate = ! empty($invoice->date_echeance) ? $invoice->date_echeance : (! empty($invoice->date_lim_reglement) ? $invoice->date_lim_reglement : 0);
+				$invoice_datef = ! empty($invDate) ? dol_print_date($invDate, 'day', false, $outputlangs) : '';
+				$invoice_date_due = ! empty($dueDate) ? dol_print_date($dueDate, 'day', false, $outputlangs, true) : '';
 			$values = array(
 				$invoice->ref,
 				$invoice->thirdparty->name,

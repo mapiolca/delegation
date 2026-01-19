@@ -837,11 +837,6 @@ class pdf_INPOSE extends ModelePDFFactures
 			$invoice = new FactureFournisseur($this->db);
 			if ($invoice->fetch((int) $obj->rowid) > 0)
 			{
-				// Ensure invoice dates are loaded.
-				if (! isset($invoice->datef) || ! isset($invoice->date_lim_reglement))
-				{
-					$invoice->fetch((int) $obj->rowid);
-				}
 				$invoice->fetch_thirdparty();
 				$supplierInvoices[] = $invoice;
 				$total_ht += (float) $invoice->total_ht;
@@ -920,8 +915,11 @@ class pdf_INPOSE extends ModelePDFFactures
 
 		foreach ($supplierInvoices as $invoice)
 		{
-			$invoice_datef = ! empty($invoice->datef) ? dol_print_date($invoice->datef, 'day', false, $outputlangs) : '';
-			$invoice_date_due = ! empty($invoice->date_lim_reglement) ? dol_print_date($invoice->date_lim_reglement, 'day', false, $outputlangs, true) : '';
+			// Robust dates for supplier invoices (Dolibarr v20+ / retro-compatible)
+			$invDate = ! empty($invoice->date) ? $invoice->date : (! empty($invoice->datef) ? $invoice->datef : 0);
+			$dueDate = ! empty($invoice->date_echeance) ? $invoice->date_echeance : (! empty($invoice->date_lim_reglement) ? $invoice->date_lim_reglement : 0);
+			$invoice_datef = ! empty($invDate) ? dol_print_date($invDate, 'day', false, $outputlangs) : '';
+			$invoice_date_due = ! empty($dueDate) ? dol_print_date($dueDate, 'day', false, $outputlangs, true) : '';
 			$values = array(
 				$invoice->ref,
 				$invoice->thirdparty->name,
