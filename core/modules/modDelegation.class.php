@@ -443,6 +443,7 @@ class modDelegation extends DolibarrModules
 				continue;
 			}
 			if (in_array($constDefinition[0], array(
+				'DELEGATION_CLEARING_BANKACCOUNT_ID',
 				'DELEGATION_ENABLE_VAT_REVERSE_CHARGE',
 				'DELEGATION_VAT_REVERSE_CHARGE_FORCE_VAT0',
 				'DELEGATION_VAT_REVERSE_CHARGE_SCOPE',
