@@ -93,6 +93,7 @@ class Actionsdelegation
 				$i = 0;
 				if ($num) {
 					$country = '';
+					$this->resprints.= '<option value="0">&nbsp;</option>';
 					while ($i < $num) {
 						$obj = $this->db->fetch_object($resql);
 						if ($obj->code == 0) {
