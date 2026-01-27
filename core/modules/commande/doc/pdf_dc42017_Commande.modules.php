@@ -339,14 +339,14 @@ class pdf_DC42017_Commande extends ModelePDFCommandes
 			// Page 1
 				$pdf->AddPage();
 				
-                $pagecount = $pdf->setSourceFile(DOL_DOCUMENT_ROOT.'/custom/delegation/core/modules/supplier_order/pdf/DC4-2017/DC4-2017.pdf');
+                $pagecount = $pdf->setSourceFile(DOL_DOCUMENT_ROOT.'/custom/delegation/core/modules/supplier_order/doc/DC4-2017/DC4-2017.pdf');
                 $tplidx = $pdf->importPage(1);
                 
 				
 				if (! empty($tplidx)) $pdf->useTemplate($tplidx);
 
 
-				include DOL_DOCUMENT_ROOT.'/custom/delegation/core/modules/supplier_order/pdf/DC4-2017/DC4-2017.php';
+				include DOL_DOCUMENT_ROOT.'/custom/delegation/core/modules/supplier_order/doc/DC4-2017/DC4-2017.php';
 
 				$logo=$conf->mycompany->dir_output.'/logos/'.$this->emetteur->logo;
 
