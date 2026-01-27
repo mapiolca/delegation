@@ -407,7 +407,7 @@ class modDelegation extends DolibarrModules
 		$ext->addExtraField('lmdb_link', 'lmdb_link', 'url', 1, '', 'supplier_proposal', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
 
 		//Produits/Services
-		$ext->addExtraField('lmdb_marque', 'lmdb_marque', 'varchar', 1, '255', 'product', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
+		//$ext->addExtraField('lmdb_marque', 'lmdb_marque', 'varchar', 1, '255', 'product', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
 
 		//Commandes Client
 
