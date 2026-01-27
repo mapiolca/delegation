@@ -333,7 +333,7 @@ class pdf_csstbtps2014_Commande extends ModelePDFCommandes
 			// Page 1
 				$pdf->AddPage();
 				
-                $pagecount = $pdf->setSourceFile(DOL_DOCUMENT_ROOT.'/custom/delegation/core/modules/supplier_order/pdf/contrat-sous-traitance-btp-simplifie-2014/contrat-sous-traitance-btp-simplifie-2014.pdf');
+                $pagecount = $pdf->setSourceFile(DOL_DOCUMENT_ROOT.'/custom/delegation/core/modules/supplier_order/doc/contrat-sous-traitance-btp-simplifie-2014/contrat-sous-traitance-btp-simplifie-2014.pdf');
                 $tplidx = $pdf->importPage(1);
                 
 				
