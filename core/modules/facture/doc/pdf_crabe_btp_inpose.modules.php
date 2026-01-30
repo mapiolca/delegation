@@ -2038,10 +2038,19 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $prev_total_ttc, 0, $outputlangs), 0, 'R', 1);
 		}
 
+		$retenue_de_garantie_ht = $total_ht * $retained_warranty_rate / 100;
+		$retenue_de_garantie_tva = $total_tva * $retained_warranty_rate / 100;
+		$compte_prorata_ht = $total_ht * $object->array_options['options_lmdb_compte_prorata'] / 100;
+		$compte_prorata_tva = $total_tva * $object->array_options['options_lmdb_compte_prorata'] / 100;
+
 		if ($retenue_de_garantie != 0) {
 			$index++;
 			$pdf->SetXY($colLabelX, $tab2_top + $tab2_hl * $index);
 			$pdf->MultiCell($labelWidth, $tab2_hl, $outputlangs->transnoentities('RetenueGarantieTTCDeduit'), 0, 'L', 1);
+			$pdf->SetXY($colHtX, $tab2_top + $tab2_hl * $index);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$retenue_de_garantie_ht, 0, $outputlangs), 0, 'R', 1);
+			$pdf->SetXY($colTvaX, $tab2_top + $tab2_hl * $index);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$retenue_de_garantie_tva, 0, $outputlangs), 0, 'R', 1);
 			$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
 			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$retenue_de_garantie, 0, $outputlangs), 0, 'R', 1);
 		}
@@ -2050,14 +2059,35 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$index++;
 			$pdf->SetXY($colLabelX, $tab2_top + $tab2_hl * $index);
 			$pdf->MultiCell($labelWidth, $tab2_hl, $outputlangs->transnoentities('CompteProrataTTCDeduit'), 0, 'L', 1);
+			$pdf->SetXY($colHtX, $tab2_top + $tab2_hl * $index);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$compte_prorata_ht, 0, $outputlangs), 0, 'R', 1);
+			$pdf->SetXY($colTvaX, $tab2_top + $tab2_hl * $index);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$compte_prorata_tva, 0, $outputlangs), 0, 'R', 1);
 			$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
 			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$compte_prorata, 0, $outputlangs), 0, 'R', 1);
 		}
 
 		if ($mpvalo_total_ttc != 0) {
+			$mpvalo_total_ht = 0;
+			$mpvalo_total_tva = 0;
+			foreach ($object->lines as $line) {
+				if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
+					if ($conf->multicurrency->enabled && $object->multicurrency_tx != 1) {
+						$mpvalo_total_ht += (float) $line->multicurrency_total_ht;
+						$mpvalo_total_tva += (float) $line->multicurrency_total_tva;
+					} else {
+						$mpvalo_total_ht += (float) $line->total_ht;
+						$mpvalo_total_tva += (float) $line->total_tva;
+					}
+				}
+			}
 			$index++;
 			$pdf->SetXY($colLabelX, $tab2_top + $tab2_hl * $index);
 			$pdf->MultiCell($labelWidth, $tab2_hl, $outputlangs->transnoentities('DelegationMpValoTotalLabel'), 0, 'L', 1);
+			$pdf->SetXY($colHtX, $tab2_top + $tab2_hl * $index);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $mpvalo_total_ht, 0, $outputlangs), 0, 'R', 1);
+			$pdf->SetXY($colTvaX, $tab2_top + $tab2_hl * $index);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $mpvalo_total_tva, 0, $outputlangs), 0, 'R', 1);
 			$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
 			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $mpvalo_total_ttc, 0, $outputlangs), 0, 'R', 1);
 		}
