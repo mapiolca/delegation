@@ -1961,7 +1961,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				$compte_prorata_ht = $total_ht * $object->array_options['options_lmdb_compte_prorata'] / 100 ;
 
 				$total_ht_restant = $total_ht - $retenue_de_garantie_ht - $compte_prorata_ht ;
-				$total_ttc_restant = $total_ttc - $total_delegation - $retenue_de_garantie - $compte_prorata ;
+				$total_ttc_restant = $total_ttc - $total_delegation - $retenue_de_garantie - $compte_prorata + $mpvalo_total_ttc;
 				$tva_restante = $total_ttc_restant - $total_ht_restant ;
 
 
