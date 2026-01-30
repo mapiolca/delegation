@@ -26,6 +26,7 @@ DelegationMpValoProductLabel=Révision/Actualisation du montant du marché
 DelegationMpValoProductSaved=Service enregistré.
 DelegationMpValoProductCreated=Service créé.
 DelegationMpValoProductLinked=Service déjà existant, liaison enregistrée.
+DelegationMpValoTotalLabel=Révisition/Valorisation
 DelegationSelectSupplierInvoice=Ajouter une facture fournisseur
 DelegationSupplierInvoices=Aucune facture fournisseur éligible
 DelegationConfigMissingClearingAccount=Veuillez configurer un compte de passage pour la délégation de paiement.

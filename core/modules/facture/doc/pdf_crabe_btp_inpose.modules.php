@@ -1702,8 +1702,14 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$total_ht = 0;
 		$total_tva = 0;
 		$total_ttc = 0;
+		$mpvalo_total_ttc = 0;
 		foreach ($object->lines as $line) {
 			if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
+				if ($conf->multicurrency->enabled && $object->multicurrency_tx != 1) {
+					$mpvalo_total_ttc += (float) $line->multicurrency_total_ttc;
+				} else {
+					$mpvalo_total_ttc += (float) $line->total_ttc;
+				}
 				continue;
 			}
 			if ($conf->multicurrency->enabled && $object->multicurrency_tx != 1) {
@@ -1971,6 +1977,16 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 					$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
 					$pdf->MultiCell($largcol2, $tab2_hl, price('-'.$retenue_de_garantie, 0, $outputlangs), $useborder, 'R', 1);
 
+				}
+
+				if ($mpvalo_total_ttc != 0) {
+					$index++;
+					$pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
+					$pdf->SetTextColor(0,0,60);
+					$pdf->SetFillColor(210,210,210);
+					$pdf->MultiCell($col1x, $tab2_hl, $outputlangs->transnoentities('DelegationMpValoTotalLabel'), $useborder, 'L', 1);
+					$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
+					$pdf->MultiCell($largcol2, $tab2_hl, price($sign * $mpvalo_total_ttc, 0, $outputlangs), $useborder, 'R', 1);
 				}
 
 				

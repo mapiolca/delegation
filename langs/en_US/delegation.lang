@@ -26,6 +26,7 @@ DelegationMpValoProductLabel=Market amount review/update
 DelegationMpValoProductSaved=Service saved.
 DelegationMpValoProductCreated=Service created.
 DelegationMpValoProductLinked=Existing service linked.
+DelegationMpValoTotalLabel=Review/Valuation
 DelegationSelectSupplierInvoice=Add a supplier invoice
 DelegationSupplierInvoices=No eligible supplier invoices
 DelegationConfigMissingClearingAccount=Please configure a clearing account for payment delegation.
