@@ -6,6 +6,7 @@ Module440300Name=Delegation
 Delegation=Delegation
 DelegationSetup=Konfiguration der Zahlungsdelegation
 DelegationClearingAccountSection=Durchlaufkonto
+DelegationMpValoSection=Marktbetrag Prüfung/Aktualisierung
 
 SetupG=Allgemein
 
@@ -18,6 +19,13 @@ DelegationCreateClearingAccount=Durchlaufkonto erstellen
 DelegationClearingAccountLabel=Durchlaufkonto – Zahlungsdelegation
 DelegationClearingAccountSaved=Durchlaufkonto gespeichert.
 DelegationClearingAccountCreated=Durchlaufkonto erstellt.
+DelegationMpValoSelectProduct=Service für Prüfung/Aktualisierung des Marktbetrags
+DelegationMpValoCreateProduct=Service für Prüfung/Aktualisierung erstellen
+DelegationMpValoCreateProductButton=Service Prüfung/Aktualisierung erstellen
+DelegationMpValoProductLabel=Prüfung/Aktualisierung des Marktbetrags
+DelegationMpValoProductSaved=Service gespeichert.
+DelegationMpValoProductCreated=Service erstellt.
+DelegationMpValoProductLinked=Vorhandener Service verknüpft.
 DelegationSelectSupplierInvoice=Lieferantenrechnung hinzufügen
 DelegationSupplierInvoices=Keine geeigneten Lieferantenrechnungen
 DelegationConfigMissingClearingAccount=Bitte ein Durchlaufkonto für die Zahlungsdelegation konfigurieren.
