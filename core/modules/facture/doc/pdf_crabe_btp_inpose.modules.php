@@ -601,8 +601,19 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				// Loop on each lines
 				$pageposbeforeprintlines=$pdf->getPage();
 				$pagenb = $pageposbeforeprintlines;
-				for ($i = 0; $i < $nblignes; $i++)
+				$displayLineIndexes = array();
+				$mpvaloProductId = (int) getDolGlobalInt('LMDB_MPVALO_PRODUCT_ID');
+				foreach ($object->lines as $lineIndex => $line) {
+					if ($mpvaloProductId > 0 && (int) $line->fk_product !== $mpvaloProductId) {
+						continue;
+					}
+					$displayLineIndexes[] = $lineIndex;
+				}
+				$nblignes = count($displayLineIndexes);
+
+				for ($lineIndex = 0; $lineIndex < $nblignes; $lineIndex++)
 				{
+					$i = $displayLineIndexes[$lineIndex];
                     $curY = $nexY;
                     $pdf->SetFont('','', $default_font_size - 1);   // Into loop to work with multipage
                     $pdf->SetTextColor(0,0,0);
@@ -658,7 +669,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
                             $pageposafter=$pdf->getPage();
                             $posyafter=$pdf->GetY();
                             //var_dump($posyafter); var_dump(($this->page_hauteur - ($heightforfooter+$heightforfreetext+$heightforinfotot))); exit;
-                            if ($i == ($nblignes-1) && $posyafter > ($this->page_hauteur - ($heightforfooter+$heightforfreetext+$heightforinfotot)))
+                            if ($lineIndex == ($nblignes-1) && $posyafter > ($this->page_hauteur - ($heightforfooter+$heightforfreetext+$heightforinfotot)))
                             {
                                 $pdf->AddPage('','',true);
                                 if (! empty($tplidx)) $pdf->useTemplate($tplidx);
@@ -858,7 +869,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 					$nexY = max($nexY,$posYAfterImage);
 
 					// Add line
-					if (! empty($conf->global->MAIN_PDF_DASH_BETWEEN_LINES) && $i < ($nblignes - 1))
+					if (! empty($conf->global->MAIN_PDF_DASH_BETWEEN_LINES) && $lineIndex < ($nblignes - 1))
 					{
 						$pdf->setPage($pageposafter);
 						$pdf->SetLineStyle(array('dash'=>'1,1','color'=>array(80,80,80)));
@@ -888,7 +899,8 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 						if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
 					}
 
-					if (isset($object->lines[$i+1]->pagebreak) && $object->lines[$i+1]->pagebreak)
+					$nextLineIndex = isset($displayLineIndexes[$lineIndex+1]) ? $displayLineIndexes[$lineIndex+1] : null;
+					if ($nextLineIndex !== null && ! empty($object->lines[$nextLineIndex]->pagebreak))
 					{
 						if ($pagenb == $pageposafter)
 						{
@@ -1685,13 +1697,33 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		    
 		}
 		
+		// EN: Compute totals without MP_VALO service lines.
+		// FR: Calculer les totaux en excluant les lignes de service MP_VALO.
+		$mpvaloProductId = (int) getDolGlobalInt('LMDB_MPVALO_PRODUCT_ID');
+		$total_ht = 0;
+		$total_tva = 0;
+		$total_ttc = 0;
+		foreach ($object->lines as $line) {
+			if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
+				continue;
+			}
+			if ($conf->multicurrency->enabled && $object->multicurrency_tx != 1) {
+				$total_ht += (float) $line->multicurrency_total_ht;
+				$total_tva += (float) $line->multicurrency_total_tva;
+				$total_ttc += (float) $line->multicurrency_total_ttc;
+			} else {
+				$total_ht += (float) $line->total_ht;
+				$total_tva += (float) $line->total_tva;
+				$total_ttc += (float) $line->total_ttc;
+			}
+		}
+
 		// Total HT
 		$index++;
 		$pdf->SetFillColor(255,255,255);
 		$pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
 		$pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("TotalHT"), 0, 'L', 1);
-		
-		$total_ht = ($conf->multicurrency->enabled && $object->multicurrency_tx != 1 ? $object->multicurrency_total_ht : $object->total_ht);
+
 		$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
 		$pdf->MultiCell($largcol2, $tab2_hl, price($sign * ($total_ht + (! empty($object->remise)?$object->remise:0)), 0, $outputlangs), 0, 'R', 1);
 
@@ -1911,7 +1943,6 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				$pdf->SetFillColor(224,224,224);
 				$pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("TotalTTC"), $useborder, 'L', 1);
 
-				$total_ttc = ($conf->multicurrency->enabled && $object->multiccurency_tx != 1) ? $object->multicurrency_total_ttc : $object->total_ttc;
 				$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
 				$pdf->MultiCell($largcol2, $tab2_hl, price($sign * $total_ttc, 0, $outputlangs), $useborder, 'R', 1);
 
@@ -2480,13 +2511,32 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 			$object->fetchPreviousNextSituationInvoice();
 			$TPreviousIncoice = $object->tab_previous_situation_invoice;
-			$total_ht = ($conf->multicurrency->enabled && $object->multicurrency_tx != 1 ? $object->multicurrency_total_ht : $object->total_ht);
-			$total_ttc = ($conf->multicurrency->enabled && $object->multiccurency_tx != 1) ? $object->multicurrency_total_ttc : $object->total_ttc;
+
+			// EN: Compute totals without MP_VALO service lines.
+			// FR: Calculer les totaux en excluant les lignes de service MP_VALO.
+			$mpvaloProductId = (int) getDolGlobalInt('LMDB_MPVALO_PRODUCT_ID');
+			$total_ht = 0;
+			$total_tva = 0;
+			$total_ttc = 0;
+			foreach ($object->lines as $line) {
+				if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
+					continue;
+				}
+				if ($conf->multicurrency->enabled && $object->multicurrency_tx != 1) {
+					$total_ht += (float) $line->multicurrency_total_ht;
+					$total_tva += (float) $line->multicurrency_total_tva;
+					$total_ttc += (float) $line->multicurrency_total_ttc;
+				} else {
+					$total_ht += (float) $line->total_ht;
+					$total_tva += (float) $line->total_tva;
+					$total_ttc += (float) $line->total_ttc;
+				}
+			}
 
 				
 			$total_a_payer = 0;
 			foreach ($TPreviousIncoice as &$fac) $total_a_payer += $fac->total_ht;
-			$total_a_payer += $object->total_ht;
+			$total_a_payer += $total_ht;
 
 			$retained_warranty_rate = (! empty($object->retained_warranty) ? $object->retained_warranty : 0);
 			$retenue_de_garantie = $total_ttc * $retained_warranty_rate / 100 ;
