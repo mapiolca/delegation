@@ -3313,7 +3313,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$pdf->MultiCell(80,2, $outputlangs->transnoentities("DelegationPayments"), '', 'C');
 		
 		$pdf->SetFont('','B', $default_font_size - 1);
-		$pdf->SetXY($this->marge_gauche+2, $tab_top+153);
+		$pdf->SetXY($this->marge_gauche+2, $tab_top+154);
 		$pdf->MultiCell(80,2, $outputlangs->transnoentities("BtpRayToRest"),'','C');
 		$pdf->SetFont('','', $default_font_size - 2);
 
@@ -3369,7 +3369,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[8]]), '', 'R');
 			$pdf->SetFont('','', $default_font_size - 2);
 
-			$pdf->SetXY($x, $tab_top+153);
+			$pdf->SetXY($x, $tab_top+154);
 			$pdf->SetFont('','B', $default_font_size - 1);
 			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[9]]), '', 'R');
 			
