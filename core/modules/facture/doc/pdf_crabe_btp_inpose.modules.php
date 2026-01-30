@@ -604,7 +604,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				$displayLineIndexes = array();
 				$mpvaloProductId = (int) getDolGlobalInt('LMDB_MPVALO_PRODUCT_ID');
 				foreach ($object->lines as $lineIndex => $line) {
-					if ($mpvaloProductId > 0 && (int) $line->fk_product !== $mpvaloProductId) {
+					if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
 						continue;
 					}
 					$displayLineIndexes[] = $lineIndex;
@@ -1697,8 +1697,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		    
 		}
 		
-		// EN: Compute totals without MP_VALO service lines.
-		// FR: Calculer les totaux en excluant les lignes de service MP_VALO.
+		// Compute totals without MP_VALO service lines.
 		$mpvaloProductId = (int) getDolGlobalInt('LMDB_MPVALO_PRODUCT_ID');
 		$total_ht = 0;
 		$total_tva = 0;
@@ -2512,8 +2511,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$object->fetchPreviousNextSituationInvoice();
 			$TPreviousIncoice = $object->tab_previous_situation_invoice;
 
-			// EN: Compute totals without MP_VALO service lines.
-			// FR: Calculer les totaux en excluant les lignes de service MP_VALO.
+			// Compute totals without MP_VALO service lines.
 			$mpvaloProductId = (int) getDolGlobalInt('LMDB_MPVALO_PRODUCT_ID');
 			$total_ht = 0;
 			$total_tva = 0;
