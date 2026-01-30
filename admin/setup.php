@@ -28,6 +28,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formbank.class.php';
+require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 require_once DOL_DOCUMENT_ROOT.'/custom/delegation/class/lmdb.class.php';
 
 $delegationLibPath = dol_buildpath('/delegation/lib/delegation.lib.php', 0);
@@ -108,7 +109,7 @@ if ($user->admin && preg_match('/^del_([A-Z0-9_]+)$/', $action, $reg)) {
 	exit;
 }
 
-if ($user->admin && in_array($action, array('set_clearing_account', 'create_clearing_account', 'set_vat_reverse_charge_scope', 'set_vat_reverse_charge_legal_text'), true)) {
+if ($user->admin && in_array($action, array('set_clearing_account', 'create_clearing_account', 'set_mpvalo_product', 'create_mpvalo_product', 'set_vat_reverse_charge_scope', 'set_vat_reverse_charge_legal_text'), true)) {
 	$tokenIsValid = true;
 	if (function_exists('checkToken')) {
 		$tokenIsValid = checkToken();
@@ -167,6 +168,48 @@ if ($user->admin && $action == 'create_clearing_account') {
 		setEventMessages($langs->trans('DelegationClearingAccountCreated'), null, 'mesgs');
 	} else {
 		setEventMessages($account->error, $account->errors, 'errors');
+	}
+	header("Location: ".$_SERVER["PHP_SELF"]);
+	exit;
+}
+
+// Handle admin actions for market revaluation service.
+if ($user->admin && $action == 'set_mpvalo_product') {
+	$productId = (int) GETPOST('delegation_mpvalo_product_id', 'int');
+	dolibarr_set_const($db, 'LMDB_MPVALO_PRODUCT_ID', $productId, 'int', 0, '', $conf->entity);
+	setEventMessages($langs->trans('DelegationMpValoProductSaved'), null, 'mesgs');
+	header("Location: ".$_SERVER["PHP_SELF"]);
+	exit;
+}
+
+if ($user->admin && $action == 'create_mpvalo_product') {
+	$productRef = 'MP_VALO';
+	$productLabel = $langs->transnoentities('DelegationMpValoProductLabel');
+	$product = new Product($db);
+	$productId = 0;
+	$created = false;
+
+	if ($product->fetch(0, $productRef) > 0) {
+		$productId = (int) $product->id;
+	} else {
+		$product->ref = $productRef;
+		$product->label = $productLabel;
+		$product->type = 1;
+		$product->status = 1;
+		$product->status_buy = 1;
+		$productId = $product->create($user);
+		$created = ($productId > 0);
+	}
+
+	if ($productId > 0) {
+		dolibarr_set_const($db, 'LMDB_MPVALO_PRODUCT_ID', $productId, 'int', 0, '', $conf->entity);
+		if ($created) {
+			setEventMessages($langs->trans('DelegationMpValoProductCreated'), null, 'mesgs');
+		} else {
+			setEventMessages($langs->trans('DelegationMpValoProductLinked'), null, 'mesgs');
+		}
+	} else {
+		setEventMessages($product->error, $product->errors, 'errors');
 	}
 	header("Location: ".$_SERVER["PHP_SELF"]);
 	exit;
@@ -240,6 +283,27 @@ if (method_exists($formbank, 'select_comptes')) {
 }
 delegation_setup_print_input_form_part($langs->trans("DelegationClearingBankAccount"), $accountSelect, 'set_clearing_account');
 delegation_setup_print_input_form_part($langs->trans("DelegationCreateClearingAccount"), '', 'create_clearing_account', $langs->trans("DelegationCreateClearingAccount"));
+
+delegation_setup_print_title($langs->trans("DelegationMpValoSection"));
+
+$serviceOptions = array();
+$sql = "SELECT rowid, ref, label FROM ".MAIN_DB_PREFIX."product";
+$sql.= " WHERE fk_product_type = 1";
+$sql.= " AND entity IN (".getEntity('product').")";
+$sql.= " ORDER BY ref";
+$resql = $db->query($sql);
+if ($resql) {
+	while ($obj = $db->fetch_object($resql)) {
+		$serviceLabel = $obj->ref;
+		if (! empty($obj->label)) {
+			$serviceLabel .= ' - '.$obj->label;
+		}
+		$serviceOptions[$obj->rowid] = $serviceLabel;
+	}
+}
+$serviceSelect = $form->selectarray('delegation_mpvalo_product_id', $serviceOptions, getDolGlobalInt('LMDB_MPVALO_PRODUCT_ID'), 1);
+delegation_setup_print_input_form_part($langs->trans("DelegationMpValoSelectProduct"), $serviceSelect, 'set_mpvalo_product');
+delegation_setup_print_input_form_part($langs->trans("DelegationMpValoCreateProduct"), '', 'create_mpvalo_product', $langs->trans("DelegationMpValoCreateProductButton"));
 
 delegation_setup_print_title($langs->trans("DelegationTabsSection"));
 
