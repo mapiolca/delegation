@@ -1758,7 +1758,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		* 					$pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
 		*
 		* 					$tvacompl='';
-		* 					if (preg_match('/\*/',$tvakey))
+		* 					if (preg_match('/\\*'.'/', $tvakey))
 		* 					{
 		* 						$tvakey=str_replace('*','',$tvakey);
 		* 						$tvacompl = " (".$outputlangs->transnoentities("NonPercuRecuperable").")";
@@ -1786,7 +1786,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		* 					$pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
 		*
 		* 					$tvacompl='';
-		* 					if (preg_match('/\*/',$tvakey))
+		* 					if (preg_match('/\\*'.'/', $tvakey))
 		* 					{
 		* 						$tvakey=str_replace('*','',$tvakey);
 		* 						$tvacompl = " (".$outputlangs->transnoentities("NonPercuRecuperable").")";
@@ -1833,7 +1833,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		* 				$pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
 		*
 		* 				$tvacompl='';
-		* 				if (preg_match('/\*/',$tvakey))
+		* 				if (preg_match('/\\*'.'/', $tvakey))
 		* 				{
 		* 					$tvakey=str_replace('*','',$tvakey);
 		* 					$tvacompl = " (".$outputlangs->transnoentities("NonPercuRecuperable").")";
@@ -1859,7 +1859,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		* 					$pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
 		*
 		* 					$tvacompl='';
-		* 					if (preg_match('/\*/',$tvakey))
+		* 					if (preg_match('/\\*'.'/', $tvakey))
 		* 					{
 		* 						$tvakey=str_replace('*','',$tvakey);
 		* 						$tvacompl = " (".$outputlangs->transnoentities("NonPercuRecuperable").")";
@@ -1886,7 +1886,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		* 					$pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
 		*
 		* 					$tvacompl='';
-		* 					if (preg_match('/\*/',$tvakey))
+		* 					if (preg_match('/\\*'.'/', $tvakey))
 		* 					{
 		* 						$tvakey=str_replace('*','',$tvakey);
 		* 						$tvacompl = " (".$outputlangs->transnoentities("NonPercuRecuperable").")";
