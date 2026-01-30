@@ -2014,6 +2014,8 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$retenue_de_garantie = $total_ttc * $retained_warranty_rate / 100;
 		$compte_prorata = $total_ttc * $object->array_options['options_lmdb_compte_prorata'] / 100;
 		$total_ttc_restant = $total_ttc - $total_delegation - $retenue_de_garantie - $compte_prorata + $mpvalo_total_ttc;
+		$total_ttc_restant_ht = $total_ht - $retenue_de_garantie_ht - $compte_prorata_ht;
+		$total_ttc_restant_tva = $total_tva - $retenue_de_garantie_tva - $compte_prorata_tva;
 
 		$index++;
 		$pdf->SetFillColor(255,255,255);
@@ -2096,6 +2098,10 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$pdf->SetFillColor(224,224,224);
 		$pdf->SetXY($colLabelX, $tab2_top + $tab2_hl * $index);
 		$pdf->MultiCell($labelWidth, $tab2_hl, $outputlangs->transnoentities('DelegationTotalDueAtMaturity'), 0, 'L', 1);
+		$pdf->SetXY($colHtX, $tab2_top + $tab2_hl * $index);
+		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_ttc_restant_ht, 0, $outputlangs), 0, 'R', 1);
+		$pdf->SetXY($colTvaX, $tab2_top + $tab2_hl * $index);
+		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_ttc_restant_tva, 0, $outputlangs), 0, 'R', 1);
 		$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
 		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_ttc_restant, 0, $outputlangs), 0, 'R', 1);
 
