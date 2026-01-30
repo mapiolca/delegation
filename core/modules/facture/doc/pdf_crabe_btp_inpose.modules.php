@@ -3477,7 +3477,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$TDataSituation['compte_prorata'] = $compte_prorata;
 		$TDataSituation['delegation_paiement'] = '';
 		$TDataSituation['mpvalo_nouveau_cumul'] = $mpvalo_nouveau_cumul;
-		$TDataSituation['total_ttc'] = $TDataSituation['nouveau_cumul_ttc'] - $TDataSituation['retenue_garantie'] - $TDataSituation['compte_prorata'];
+		$TDataSituation['total_ttc'] = $TDataSituation['nouveau_cumul_ttc'] - $TDataSituation['retenue_garantie'] - $TDataSituation['compte_prorata'] + $TDataSituation['mpvalo_nouveau_cumul'];
 		
 		$TDataSituation['mois'] = $total_ht;
 		$TDataSituation['mois_tva'] = $total_tva;
@@ -3486,7 +3486,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$TDataSituation['compte_prorata_mois'] = $compte_prorata - $compte_prorata_anterieur;
 		$TDataSituation['delegation_paiement_mois'] = $total_delegation;
 		$TDataSituation['mpvalo_mois'] = $mpvalo_mois;
-		$TDataSituation['total_ttc_mois'] = $TDataSituation['mois_ttc'] - $TDataSituation['retenue_garantie_mois'] - $TDataSituation['compte_prorata_mois'] - $TDataSituation['delegation_paiement_mois'];
+		$TDataSituation['total_ttc_mois'] = $TDataSituation['mois_ttc'] - $TDataSituation['retenue_garantie_mois'] - $TDataSituation['compte_prorata_mois'] - $TDataSituation['delegation_paiement_mois'] + $TDataSituation['mpvalo_mois'];
 		
 		return $TDataSituation;
 		
