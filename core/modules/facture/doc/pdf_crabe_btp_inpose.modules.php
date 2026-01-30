@@ -3443,11 +3443,23 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		
 		
 
-		$nouveau_cumul = $cumul_anterieur_ht + $object->total_ht;
-		$nouveau_cumul_tva = $cumul_anterieur_tva + $object->total_tva;
+		$total_ht = 0;
+		$total_tva = 0;
+		$total_ttc = 0;
+		foreach ($object->lines as $line) {
+			if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
+				continue;
+			}
+			$total_ht += (float) $line->total_ht;
+			$total_tva += (float) $line->total_tva;
+			$total_ttc += (float) $line->total_ttc;
+		}
+
+		$nouveau_cumul = $cumul_anterieur_ht + $total_ht;
+		$nouveau_cumul_tva = $cumul_anterieur_tva + $total_tva;
 		$retained_warranty_rate = (! empty($object->retained_warranty) ? $object->retained_warranty : 0);
-		$retenue_garantie = $retenue_garantie_anterieure + ($object->total_ttc * $retained_warranty_rate / 100);
-		$compte_prorata = $compte_prorata_anterieur + ($object->total_ttc * $object->array_options['options_lmdb_compte_prorata'] / 100);
+		$retenue_garantie = $retenue_garantie_anterieure + ($total_ttc * $retained_warranty_rate / 100);
+		$compte_prorata = $compte_prorata_anterieur + ($total_ttc * $object->array_options['options_lmdb_compte_prorata'] / 100);
 		
 		$TDataSituation['cumul_anterieur'] = $cumul_anterieur_ht;
 		$TDataSituation['cumul_anterieur_tva'] = $cumul_anterieur_tva;
@@ -3467,8 +3479,8 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$TDataSituation['mpvalo_nouveau_cumul'] = $mpvalo_nouveau_cumul;
 		$TDataSituation['total_ttc'] = $TDataSituation['nouveau_cumul_ttc'] - $TDataSituation['retenue_garantie'] - $TDataSituation['compte_prorata'];
 		
-		$TDataSituation['mois'] = $object->total_ht;
-		$TDataSituation['mois_tva'] = $object->total_tva;
+		$TDataSituation['mois'] = $total_ht;
+		$TDataSituation['mois_tva'] = $total_tva;
 		$TDataSituation['mois_ttc'] = $TDataSituation['mois'] + $TDataSituation['mois_tva'];
 		$TDataSituation['retenue_garantie_mois'] = $retenue_garantie - $retenue_garantie_anterieure;
 		$TDataSituation['compte_prorata_mois'] = $compte_prorata - $compte_prorata_anterieur;
