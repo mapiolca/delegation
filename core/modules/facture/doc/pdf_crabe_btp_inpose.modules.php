@@ -1686,62 +1686,66 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$deja_paye = 0;
 		$i = 1;
 		if(!empty($TPreviousIncoice)){
-		    
-		    $pdf->setY($tab2_top);
-		    $posy = $pdf->GetY();
-		    
-		    $pdf->SetFont('','', $default_font_size - 1);
-		    $pdf->SetFillColor(255,255,255);
-		    $pdf->SetXY($col1x, $posy);
-		    $pdf->MultiCell($col2x-$col1x+10, $tab2_hl, $outputlangs->transnoentities("BtpTotalProgress", $avancementGlobal), 0, 'L', 1);
-		   
-		    $pdf->SetXY($col2x,$posy);
-		    $pdf->MultiCell($largcol2, $tab2_hl, price($total_a_payer, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
-		    $pdf->SetFont('','', $default_font_size - 2);
-		    
-		    $posy += $tab2_hl;
-		    
-		    foreach ($TPreviousIncoice as &$fac){	        
-		        
-		        if($posy  > 180 ) {
-		            $this->_pagefoot($pdf,$object,$outputlangs,1);
-		            $pdf->addPage();
-		            $pdf->setY($this->marge_haute);
-		            $posy = $pdf->GetY();
-		        }
-		        	        
-		        // cumul TVA précédent
-		        $index++;
-		        $pdf->SetFillColor(255,255,255);
-		        $pdf->SetXY($col1x, $posy);
-		        $pdf->MultiCell($col2x-$col1x+20, $tab2_hl, $outputlangs->transnoentities("PDFCrabeBtpTitle", $i).' ('.$fac->ref.') '.$outputlangs->transnoentities("TotalHT"), 0, 'L', 1);
+			$pdf->setY($tab2_top);
+			$posy = $pdf->GetY();
 
-		        $pdf->SetXY($col2x,$posy);
-		        if ($fac->total_ht > 0) {
-		        	$pdf->MultiCell($largcol2, $tab2_hl, price($fac->total_ht * -1, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
-		        } 
-		        else {
-		        	$pdf->MultiCell($largcol2, $tab2_hl, ' + '.price($fac->total_ht * -1, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
-		        }
-		        
-		        
-		        $i++;
-		        $deja_paye += $fac->total_ht;
-		        $posy += $tab2_hl;
-		        
-		        $pdf->setY($posy);
-	       
-		    }
-		    
-		    if($posy  > 180 ) {
-		        $pdf->addPage();
-		        $pdf->setY($this->marge_haute);
-		        $posy = $pdf->GetY();
-		    }
-		    
-		    $tab2_top = $posy;
-		    $index=0;
-		    
+			$pdf->SetFont('','', $default_font_size - 1);
+			$pdf->SetFillColor(255,255,255);
+			$pdf->SetXY($col1x, $posy);
+			$pdf->MultiCell($col2x-$col1x+10, $tab2_hl, $outputlangs->transnoentities("BtpTotalProgress", $avancementGlobal), 0, 'L', 1);
+
+			$pdf->SetXY($col2x,$posy);
+			$pdf->MultiCell($largcol2, $tab2_hl, price($total_a_payer, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
+			$pdf->SetFont('','', $default_font_size - 2);
+
+			$posy += $tab2_hl;
+
+			foreach ($TPreviousIncoice as &$fac){
+				$fac->fetch_lines();
+				$fac_total_ht = 0;
+				foreach ($fac->lines as $line) {
+					if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
+						continue;
+					}
+					$fac_total_ht += (float) $line->total_ht;
+				}
+
+				if($posy  > 180 ) {
+					$this->_pagefoot($pdf,$object,$outputlangs,1);
+					$pdf->addPage();
+					$pdf->setY($this->marge_haute);
+					$posy = $pdf->GetY();
+				}
+
+				// cumul TVA précédent
+				$index++;
+				$pdf->SetFillColor(255,255,255);
+				$pdf->SetXY($col1x, $posy);
+				$pdf->MultiCell($col2x-$col1x+20, $tab2_hl, $outputlangs->transnoentities("PDFCrabeBtpTitle", $i).' ('.$fac->ref.') '.$outputlangs->transnoentities("TotalHT"), 0, 'L', 1);
+
+				$pdf->SetXY($col2x,$posy);
+				if ($fac_total_ht > 0) {
+					$pdf->MultiCell($largcol2, $tab2_hl, price($fac_total_ht * -1, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
+				} 
+				else {
+					$pdf->MultiCell($largcol2, $tab2_hl, ' + '.price($fac_total_ht * -1, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
+				}
+
+				$i++;
+				$deja_paye += $fac_total_ht;
+				$posy += $tab2_hl;
+
+				$pdf->setY($posy);
+			}
+
+			if($posy  > 180 ) {
+				$pdf->addPage();
+				$pdf->setY($this->marge_haute);
+				$posy = $pdf->GetY();
+			}
+
+			$tab2_top = $posy;
+			$index=0;
 		}
 		
 		// Compute totals without MP_VALO service lines.
