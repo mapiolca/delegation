@@ -1963,19 +1963,6 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			// Write delegations
 			if (sizeof($del_lines) > 0)
 			{
-				/*
-				foreach ($del_lines as $del_line)
-				{
-					$index++;
-					$pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
-					$pdf->SetTextColor(255,0,0);
-					$pdf->SetFillColor(255,255,255);
-					$pdf->MultiCell($col2x-$col1x, $tab2_hl, $del_line->label, $useborder, 'L', 1);
-
-					$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-					$pdf->MultiCell($largcol2, $tab2_hl, price(-1*$del_line->amount, 0, $outputlangs, 0, 0, 2), $useborder, 'R', 1);			
-				}
-				*/
 
 			// Total Délégation à Déduire
 			    $index++;
@@ -2695,7 +2682,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			'width' => 19, // in mm
 	        'status' => false,
 			'title' => array(
-				'textkey' => 'BtpTotHt'
+				'textkey' => 'Total_HT_Marche'
 			),
 			'border-left' => true, // add left line separator
 		);
