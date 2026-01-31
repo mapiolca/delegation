@@ -402,7 +402,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				$tab_height = 130;
 				$tab_height_newpage = 155;
 
-				$this->_tableauBtp($pdf, $tab_top, $this->page_hauteur - 75 - $heightforfreetext - $heightforfooter, 0, $outputlangs, 0, 0, $object->multicurrency_code);
+				$this->_tableauBtp($pdf, $tab_top, $this->page_hauteur - 80 - $heightforfreetext - $heightforfooter, 0, $outputlangs, 0, 0, $object->multicurrency_code);
 				$bottomlasttab=$this->page_hauteur - $heightforinfotot - $heightforfreetext - $heightforfooter + 1;
 
 				$this->_pagefoot($pdf,$object,$outputlangs,1);
