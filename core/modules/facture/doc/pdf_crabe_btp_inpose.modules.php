@@ -2095,9 +2095,9 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				$current_total_ttc += (float) $line->total_ttc;
 			}
 		}
-		$cumulative_total_ht = $prev_total_ht ;//+ $current_total_ht;
-		$cumulative_total_tva = $prev_total_tva + $current_total_tva;
-		$cumulative_total_ttc = $prev_total_ttc + $current_total_ttc;
+		$cumulative_total_ht = $prev_total_ht - $current_total_ht;
+		$cumulative_total_tva = $prev_total_tva - $current_total_tva;
+		$cumulative_total_ttc = $prev_total_ttc - $current_total_ttc;
 
 		$retained_warranty_rate = (! empty($object->retained_warranty) ? $object->retained_warranty : 0);
 		$retenue_de_garantie = $total_ttc * $retained_warranty_rate / 100;
