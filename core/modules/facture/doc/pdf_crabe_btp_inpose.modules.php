@@ -3352,7 +3352,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 		$pdf->line($this->marge_gauche, $tab_top+145, $this->page_largeur-$this->marge_droite, $tab_top+145);
 		
-		$pdf->line($this->marge_gauche, $tab_top+165, $this->page_largeur-$this->marge_droite, $tab_top+165);
+		//$pdf->line($this->marge_gauche, $tab_top+165, $this->page_largeur-$this->marge_droite, $tab_top+165);
 		
 		
 		// ADD TEXT INTO CELL
