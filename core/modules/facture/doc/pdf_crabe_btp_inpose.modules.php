@@ -2682,7 +2682,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			'width' => 19, // in mm
 	        'status' => false,
 			'title' => array(
-				'textkey' => 'Total_HT_Marche'
+				'textkey' => 'Total_HT'
 			),
 			'border-left' => true, // add left line separator
 		);
