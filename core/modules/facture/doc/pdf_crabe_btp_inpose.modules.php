@@ -2061,11 +2061,23 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$prev_total_ttc = 0;
 		if (! empty($TPreviousIncoice)) {
 			foreach ($TPreviousIncoice as $fac) {
-				$prev_total_ht += (float) $fac->total_ht;
-				$prev_total_tva += (float) $fac->total_tva;
-				$prev_total_ttc += (float) $fac->total_ttc;
+				$fac->fetch_lines();
+				foreach ($fac->lines as $line) {
+					if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
+						continue;
+					}
+					$prev_total_ht += (float) $line->total_ht;
+					$prev_total_tva += (float) $line->total_tva;
+					$prev_total_ttc += (float) $line->total_ttc;
+				}
 			}
 		}
+		$current_total_ht = $total_ht;
+		$current_total_tva = $total_tva;
+		$current_total_ttc = $total_ttc;
+		$cumulative_total_ht = $prev_total_ht + $current_total_ht;
+		$cumulative_total_tva = $prev_total_tva + $current_total_tva;
+		$cumulative_total_ttc = $prev_total_ttc + $current_total_ttc;
 
 		$retained_warranty_rate = (! empty($object->retained_warranty) ? $object->retained_warranty : 0);
 		$retenue_de_garantie = $total_ttc * $retained_warranty_rate / 100;
@@ -2079,11 +2091,11 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$pdf->SetXY($colLabelX, $tab2_top + $tab2_hl * $index);
 		$pdf->MultiCell($labelWidth, $tab2_hl, $outputlangs->transnoentities('DelegationTotalCumulativeLabel'), 0, 'L', 1);
 		$pdf->SetXY($colHtX, $tab2_top + $tab2_hl * $index);
-		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_ht, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
+		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $cumulative_total_ht, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		$pdf->SetXY($colTvaX, $tab2_top + $tab2_hl * $index);
-		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_tva, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
+		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $cumulative_total_tva, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
-		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_ttc, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
+		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $cumulative_total_ttc, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 
 		if (! empty($TPreviousIncoice)) {
 			$index++;
@@ -2096,6 +2108,16 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
 			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $prev_total_ttc, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		}
+
+		$index++;
+		$pdf->SetXY($colLabelX, $tab2_top + $tab2_hl * $index);
+		$pdf->MultiCell($labelWidth, $tab2_hl, $outputlangs->transnoentities('DelegationCurrentSituationLabel'), 0, 'L', 1);
+		$pdf->SetXY($colHtX, $tab2_top + $tab2_hl * $index);
+		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $current_total_ht, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
+		$pdf->SetXY($colTvaX, $tab2_top + $tab2_hl * $index);
+		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $current_total_tva, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
+		$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
+		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $current_total_ttc, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 
 		$retenue_de_garantie_ht = $total_ht * $retained_warranty_rate / 100;
 		$retenue_de_garantie_tva = $total_tva * $retained_warranty_rate / 100;
