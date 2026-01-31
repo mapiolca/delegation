@@ -1820,7 +1820,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				}
 				var_dump($prev_total_ht );//= 0;
 				var_dump($prev_total_tva);// = 0;
-				var_dump($prev_total_ttc);// = 0;
+				var_dump($prev_total_ttc.'<br><br>');// = 0;
 			}
 		}
 
