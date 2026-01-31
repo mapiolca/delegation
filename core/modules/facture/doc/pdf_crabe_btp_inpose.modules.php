@@ -1804,9 +1804,6 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		if (! empty($TPreviousIncoice)) {
 			foreach ($TPreviousIncoice as $fac) {
 				$fac->fetch_lines();
-				$prev_total_ht = 0;
-				$prev_total_tva = 0;
-				$prev_total_ttc = 0;
 				foreach ($fac->lines as $line) {
 					if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
 						continue;
@@ -1823,6 +1820,10 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				}
 			}
 		}
+
+		var_dump($prev_total_ht );//= 0;
+		var_dump($prev_total_tva);// = 0;
+		var_dump($prev_total_ttc);// = 0;
 
 		$current_total_ht = 0;
 		$current_total_tva = 0;
