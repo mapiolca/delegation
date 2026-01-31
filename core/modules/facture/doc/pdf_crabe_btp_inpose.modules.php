@@ -731,10 +731,32 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 						$nexY = max($pdf->GetY(),$nexY);
 					}
 
+					// EN: Load previous situation line info for cumulative columns
+					// FR: Charger les infos de la ligne précédente pour les colonnes cumulées
+					$TInfosLigneSituationPrecedente = array(
+						'total_ht_without_progress' => 0,
+						'total_ht' => 0,
+						'progress_prec' => 0,
+					);
+					if ($this->situationinvoice && ! empty($this->TDataSituation['date_derniere_situation'])) {
+						$TInfosLigneSituationPrecedente = $this->_getInfosLineDerniereSituation($object, $object->lines[$i]);
+						if (! is_array($TInfosLigneSituationPrecedente)) {
+							$TInfosLigneSituationPrecedente = array(
+								'total_ht_without_progress' => 0,
+								'total_ht' => 0,
+								'progress_prec' => 0,
+							);
+						}
+					}
+
 					// Situation progress
 					if ($this->getColumnStatus('progress'))
 					{
-						$progress = pdf_getlineprogress($object, $i, $outputlangs, $hidedetails);
+						if ($this->situationinvoice && ! empty($this->TDataSituation['date_derniere_situation'])) {
+							$progress = price($TInfosLigneSituationPrecedente['progress_prec'], 0, $outputlangs, 0, 0, 2).'%';
+						} else {
+							$progress = pdf_getlineprogress($object, $i, $outputlangs, $hidedetails);
+						}
 						if ($progress !== '' && $progress !== null) {
 							$progress_value = price2num(str_replace('%', '', $progress));
 							$progress = price($progress_value, 0, $outputlangs, 0, 0, 2).'%';
@@ -771,12 +793,6 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 						$this->printStdColumnContent($pdf, $curY, 'totalexcltax', $total_excl_tax);
 						$nexY = max($pdf->GetY(),$nexY);
 					}
-
-
-
-					// Récupération des infos de la ligne précédente
-					$TInfosLigneSituationPrecedente = $this->_getInfosLineDerniereSituation($object, $object->lines[$i]);
-
 					// "Sommes"
 					if(!class_exists('TSubtotal') || !TSubtotal::isModSubtotalLine($object->lines[$i])){
 
@@ -789,16 +805,18 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 						}
 
 
-						// "Progession actuelle mois"
+						// EN: Cumulative amount from previous situations
+						// FR: Montant cumulé des situations antérieures
 						$columkey = 'progress_amount';
 						if ($this->getColumnStatus($columkey))
 						{
-							$printval = price($object->lines[$i]->total_ht, 0, $outputlangs, 0, 0, 2);
+							$printval = price($TInfosLigneSituationPrecedente['total_ht'], 0, $outputlangs, 0, 0, 2);
 							$this->printStdColumnContent($pdf, $curY, $columkey, $printval);
 							$nexY = max($pdf->GetY(),$nexY);
 						}
 
-						// "Progession précédente line"
+						// EN: Previous cumulative percentage
+						// FR: Pourcentage cumulé précédent
 						$columkey = 'prev_progress';
 						if ($this->getColumnStatus($columkey))
 						{
@@ -807,7 +825,8 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 							$nexY = max($pdf->GetY(),$nexY);
 						}
 
-						// "Progession précédente mois"
+						// EN: Previous cumulative amount
+						// FR: Montant cumulé précédent
 						$columkey = 'prev_progress_amount';
 						if ($this->getColumnStatus($columkey))
 						{
