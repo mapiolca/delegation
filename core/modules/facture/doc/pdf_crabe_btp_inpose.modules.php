@@ -1720,7 +1720,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				// Previous situation total
 				$index++;
 				$pdf->SetFillColor(255,255,255);
-				$pdf->SetXY($col1x, $posy);
+				$pdf->SetXY($col2x-10, $posy);
 				$pdf->MultiCell($col2x-$col1x+20, $tab2_hl, $outputlangs->transnoentities("PDFCrabeBtpTitle", $i).' ('.$fac->ref.') '.$outputlangs->transnoentities("TotalHT"), 0, 'L', 1);
 
 				$pdf->SetXY($col2x,$posy);
