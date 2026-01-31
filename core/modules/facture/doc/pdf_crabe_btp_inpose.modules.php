@@ -1660,7 +1660,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		    $pdf->SetFont('','', $default_font_size - 1);
 		    $pdf->SetFillColor(255,255,255);
 		    $pdf->SetXY($col1x, $posy);
-		    $pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("BtpTotalProgress", $avancementGlobal), 0, 'L', 1);
+		    $pdf->MultiCell($col2x-$col1x+10, $tab2_hl, $outputlangs->transnoentities("BtpTotalProgress", $avancementGlobal), 0, 'L', 1);
 		   
 		    $pdf->SetXY($col2x,$posy);
 		    $pdf->MultiCell($largcol2, $tab2_hl, price($total_a_payer, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
