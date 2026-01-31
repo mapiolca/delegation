@@ -2066,9 +2066,15 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 					if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
 						continue;
 					}
-					$prev_total_ht += (float) $line->total_ht;
-					$prev_total_tva += (float) $line->total_tva;
-					$prev_total_ttc += (float) $line->total_ttc;
+					if ($conf->multicurrency->enabled && $object->multicurrency_tx != 1) {
+						$prev_total_ht += (float) $line->multicurrency_total_ht;
+						$prev_total_tva += (float) $line->multicurrency_total_tva;
+						$prev_total_ttc += (float) $line->multicurrency_total_ttc;
+					} else {
+						$prev_total_ht += (float) $line->total_ht;
+						$prev_total_tva += (float) $line->total_tva;
+						$prev_total_ttc += (float) $line->total_ttc;
+					}
 				}
 			}
 		}
