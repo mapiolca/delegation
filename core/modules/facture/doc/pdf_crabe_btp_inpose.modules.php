@@ -709,13 +709,14 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
                         $nexY = max($pdf->GetY(),$nexY);
                     }
 
-                    // Unit price before discount
-                    if ($this->getColumnStatus('subprice'))
-                    {
-                        $up_excl_tax = pdf_getlineupexcltax($object, $i, $outputlangs, $hidedetails);
-                        $this->printStdColumnContent($pdf, $curY, 'subprice', $up_excl_tax);
-                        $nexY = max($pdf->GetY(),$nexY);
-                    }
+					// Unit price before discount
+					if ($this->getColumnStatus('subprice'))
+					{
+						$up_excl_tax_value = ($conf->multicurrency->enabled && $object->multicurrency_tx != 1) ? $object->lines[$i]->multicurrency_subprice : $object->lines[$i]->subprice;
+						$up_excl_tax = price($up_excl_tax_value, 0, $outputlangs, 0, 0, 2);
+						$this->printStdColumnContent($pdf, $curY, 'subprice', $up_excl_tax);
+						$nexY = max($pdf->GetY(),$nexY);
+					}
 
                     // Quantity
 					// Enough for 6 chars
@@ -753,7 +754,8 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 					// Total HT line
 					if ($this->getColumnStatus('totalexcltax'))
 					{
-						$total_excl_tax = pdf_getlinetotalexcltax($object, $i, $outputlangs, $hidedetails);
+						$total_excl_tax_value = ($conf->multicurrency->enabled && $object->multicurrency_tx != 1) ? $object->lines[$i]->multicurrency_total_ht : $object->lines[$i]->total_ht;
+						$total_excl_tax = price($total_excl_tax_value, 0, $outputlangs, 0, 0, 2);
 						$this->printStdColumnContent($pdf, $curY, 'totalexcltax', $total_excl_tax);
 						$nexY = max($pdf->GetY(),$nexY);
 					}
