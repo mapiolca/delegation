@@ -398,7 +398,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 				/**** DEBUT TABLEAU SPECIFIQUE ****/
 
-				$summary_top = 55;
+				$summary_top = 90;
 				$tab_top_newpage = (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)?42:10);
 				$summary_height = $this->_tableauBtpOrdersSummary($pdf, $summary_top, $outputlangs, $object->multicurrency_code);
 				$tab_top = $summary_top + $summary_height + 5;
