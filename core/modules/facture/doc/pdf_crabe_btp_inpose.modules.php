@@ -704,7 +704,11 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
                     // VAT Rate
                     if ($this->getColumnStatus('vat'))
                     {
-                        $vat_rate = pdf_getlinevatrate($object, $i, $outputlangs, $hidedetails);
+					$vat_rate = pdf_getlinevatrate($object, $i, $outputlangs, $hidedetails);
+					if ($vat_rate !== '' && $vat_rate !== null) {
+						$vat_rate_value = price2num(str_replace('%', '', $vat_rate));
+						$vat_rate = price($vat_rate_value, 0, $outputlangs, 0, 0, 2).'%';
+					}
                         $this->printStdColumnContent($pdf, $curY, 'vat', $vat_rate);
                         $nexY = max($pdf->GetY(),$nexY);
                     }
@@ -731,6 +735,10 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 					if ($this->getColumnStatus('progress'))
 					{
 						$progress = pdf_getlineprogress($object, $i, $outputlangs, $hidedetails);
+						if ($progress !== '' && $progress !== null) {
+							$progress_value = price2num(str_replace('%', '', $progress));
+							$progress = price($progress_value, 0, $outputlangs, 0, 0, 2).'%';
+						}
 						$this->printStdColumnContent($pdf, $curY, 'progress', $progress);
 						$nexY = max($pdf->GetY(),$nexY);
 					}
@@ -747,6 +755,10 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 					if ($this->getColumnStatus('discount') && $object->lines[$i]->remise_percent)
 					{
 						$remise_percent = pdf_getlineremisepercent($object, $i, $outputlangs, $hidedetails);
+						if ($remise_percent !== '' && $remise_percent !== null) {
+							$remise_value = price2num(str_replace('%', '', $remise_percent));
+							$remise_percent = price($remise_value, 0, $outputlangs, 0, 0, 2).'%';
+						}
 						$this->printStdColumnContent($pdf, $curY, 'discount', $remise_percent);
 						$nexY = max($pdf->GetY(),$nexY);
 					}
@@ -790,7 +802,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 						$columkey = 'prev_progress';
 						if ($this->getColumnStatus($columkey))
 						{
-							$printval = $TInfosLigneSituationPrecedente['progress_prec'].'%';
+							$printval = price($TInfosLigneSituationPrecedente['progress_prec'], 0, $outputlangs, 0, 0, 2).'%';
 							$this->printStdColumnContent($pdf, $curY, $columkey, $printval);
 							$nexY = max($pdf->GetY(),$nexY);
 						}
@@ -1635,7 +1647,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		    }
 		}
 
-		$avancementGlobal = $total_a_payer / $SOMMES * 100;
+		$avancementGlobal = price($total_a_payer / $SOMMES * 100, 0, $outputlangs, 0, 0, 2);
 
 		
 		$deja_paye = 0;
