@@ -1652,13 +1652,17 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		// pourcentage global d'avancement
 		$percent = 0;
 		$i=0;
+		$SOMMES = 0;
 		foreach ($object->lines as $line)
 		{
-		    if(!class_exists('TSubtotal') || !TSubtotal::isModSubtotalLine($line)){
-		        $percent += $line->situation_percent;
-		        $SOMMES += ($line->subprice * $line->qty);
-		        $i++;
-		    }
+			if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
+				continue;
+			}
+			if(!class_exists('TSubtotal') || !TSubtotal::isModSubtotalLine($line)){
+				$percent += $line->situation_percent;
+				$SOMMES += ($line->subprice * $line->qty);
+				$i++;
+			}
 		}
 
 		$avancementGlobal = price($total_a_payer / $SOMMES * 100, 0, $outputlangs, 0, 0, 2);
