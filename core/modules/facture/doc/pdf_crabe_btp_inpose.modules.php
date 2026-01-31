@@ -1630,10 +1630,24 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				
 		$object->fetchPreviousNextSituationInvoice();
 		$TPreviousIncoice = $object->tab_previous_situation_invoice;
-				
+
+		$mpvaloProductId = (int) getDolGlobalInt('LMDB_MPVALO_PRODUCT_ID');
 		$total_a_payer = 0;
-		foreach ($TPreviousIncoice as &$fac) $total_a_payer += $fac->total_ht;
-		$total_a_payer += $object->total_ht;
+		foreach ($TPreviousIncoice as &$fac) {
+			$fac->fetch_lines();
+			foreach ($fac->lines as $line) {
+				if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
+					continue;
+				}
+				$total_a_payer += (float) $line->total_ht;
+			}
+		}
+		foreach ($object->lines as $line) {
+			if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
+				continue;
+			}
+			$total_a_payer += (float) $line->total_ht;
+		}
 
 		// pourcentage global d'avancement
 		$percent = 0;
@@ -1712,7 +1726,6 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		}
 		
 		// Compute totals without MP_VALO service lines.
-		$mpvaloProductId = (int) getDolGlobalInt('LMDB_MPVALO_PRODUCT_ID');
 		$total_ht = 0;
 		$total_tva = 0;
 		$total_ttc = 0;
