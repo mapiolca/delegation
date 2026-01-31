@@ -1802,7 +1802,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$prev_total_tva = 0;
 		$prev_total_ttc = 0;
 		if (! empty($TPreviousIncoice)) {
-			foreach ($TPreviousIncoice as $fac) {
+			foreach ($TPreviousIncoice as &$fac) {
 				$fac->fetch_lines();
 				foreach ($fac->lines as $line) {
 					if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
