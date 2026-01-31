@@ -1817,10 +1817,10 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 						$prev_total_tva += (float) $line->total_tva;
 						$prev_total_ttc += (float) $line->total_ttc;
 					}
-					var_dump($prev_total_ht );//= 0;
-					var_dump($prev_total_tva);// = 0;
-					var_dump($prev_total_ttc);// = 0;
 				}
+				var_dump($prev_total_ht );//= 0;
+				var_dump($prev_total_tva);// = 0;
+				var_dump($prev_total_ttc);// = 0;
 			}
 		}
 
