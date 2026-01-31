@@ -499,7 +499,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 							$pdf->AddPage();
 							$pagenb++;
 							if (! empty($tplidx)) $pdf->useTemplate($tplidx);
-							if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
+							if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs, 0, 0, 2);
 							// $this->_pagefoot($pdf,$object,$outputlangs,1);
 							$pdf->setTopMargin($tab_top_newpage);
 							// The only function to edit the bottom margin of current page to set it.
@@ -555,7 +555,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 						// apply note frame to last page
 						$pdf->setPage($pageposafternote);
 						if (! empty($tplidx)) $pdf->useTemplate($tplidx);
-						if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
+						if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs, 0, 0, 2);
 						$height_note=$posyafter-$tab_top_newpage;
 						$pdf->Rect($this->marge_gauche, $tab_top_newpage-1, $tab_width, $height_note+1);
 
@@ -576,7 +576,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 							$pageposafternote++;
 							$pdf->setPage($pageposafternote);
 							if (! empty($tplidx)) $pdf->useTemplate($tplidx);
-							if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
+							if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs, 0, 0, 2);
 
 							$posyafter = $tab_top_newpage;
 						}
@@ -769,7 +769,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 						$columkey = 'btpsomme';
 						if ($this->getColumnStatus($columkey))
 						{
-							$printval = price($TInfosLigneSituationPrecedente['total_ht_without_progress']);
+							$printval = price($TInfosLigneSituationPrecedente['total_ht_without_progress'], 0, $outputlangs, 0, 0, 2);
 							$this->printStdColumnContent($pdf, $curY, $columkey, $printval);
 							$nexY = max($pdf->GetY(),$nexY);
 						}
@@ -779,7 +779,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 						$columkey = 'progress_amount';
 						if ($this->getColumnStatus($columkey))
 						{
-							$printval = price($object->lines[$i]->total_ht);
+							$printval = price($object->lines[$i]->total_ht, 0, $outputlangs, 0, 0, 2);
 							$this->printStdColumnContent($pdf, $curY, $columkey, $printval);
 							$nexY = max($pdf->GetY(),$nexY);
 						}
@@ -797,7 +797,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 						$columkey = 'prev_progress_amount';
 						if ($this->getColumnStatus($columkey))
 						{
-							$printval = price($TInfosLigneSituationPrecedente['total_ht']);
+							$printval = price($TInfosLigneSituationPrecedente['total_ht'], 0, $outputlangs, 0, 0, 2);
 							$this->printStdColumnContent($pdf, $curY, $columkey, $printval);
 							$nexY = max($pdf->GetY(),$nexY);
 						}
@@ -896,7 +896,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 						$pagenb++;
 						$pdf->setPage($pagenb);
 						$pdf->setPageOrientation('', 1, 0);	// The only function to edit the bottom margin of current page to set it.
-						if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
+						if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs, 0, 0, 2);
 					}
 
 					$nextLineIndex = isset($displayLineIndexes[$lineIndex+1]) ? $displayLineIndexes[$lineIndex+1] : null;
@@ -915,7 +915,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 						$pdf->AddPage();
 						if (! empty($tplidx)) $pdf->useTemplate($tplidx);
 						$pagenb++;
-						if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
+						if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs, 0, 0, 2);
 					}
 
 				}
@@ -1107,7 +1107,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		// Start summary page.
 		$pdf->AddPage();
 		if (! empty($tplidx)) $pdf->useTemplate($tplidx);
-		if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
+		if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs, 0, 0, 2);
 
 		$pdf->SetFont('', 'B', $default_font_size);
 		$pdf->SetXY($posx, $posy + $title_top_offset);
@@ -1170,9 +1170,9 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$values = array(
 				$invoice->ref,
 				$invoice->thirdparty->name,
-				price($invoice->total_ht, 0, $outputlangs),
-				price($invoice->total_tva, 0, $outputlangs),
-				price($invoice->total_ttc, 0, $outputlangs),
+				price($invoice->total_ht, 0, $outputlangs, 0, 0, 2),
+				price($invoice->total_tva, 0, $outputlangs, 0, 0, 2),
+				price($invoice->total_ttc, 0, $outputlangs, 0, 0, 2),
 				$invoice_datef,
 				$invoice_date_due,
 			);
@@ -1191,7 +1191,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				$this->_pagefoot($pdf, $object, $outputlangs);
 				$pdf->AddPage();
 				if (! empty($tplidx)) $pdf->useTemplate($tplidx);
-				if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
+				if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs, 0, 0, 2);
 				$posy = $this->marge_haute;
 
 				$pdf->SetFont('', 'B', $default_font_size);
@@ -1235,7 +1235,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$this->_pagefoot($pdf, $object, $outputlangs);
 			$pdf->AddPage();
 			if (! empty($tplidx)) $pdf->useTemplate($tplidx);
-			if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
+			if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs, 0, 0, 2);
 			$posy = $this->marge_haute;
 
 			$pdf->SetFont('', 'B', $default_font_size);
@@ -1261,9 +1261,9 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 		$curx = $posx + $columns[0]['width'] + $columns[1]['width'];
 		$totals_values = array(
-			price($total_ht, 0, $outputlangs),
-			price($total_tva, 0, $outputlangs),
-			price($total_ttc, 0, $outputlangs),
+			price($total_ht, 0, $outputlangs, 0, 0, 2),
+			price($total_tva, 0, $outputlangs, 0, 0, 2),
+			price($total_ttc, 0, $outputlangs, 0, 0, 2),
 			'',
 			'',
 		);
@@ -1359,7 +1359,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				$pdf->SetXY($tab3_posx, $tab3_top+$y);
 				$pdf->MultiCell(20, 3, dol_print_date($obj->datef,'day',false,$outputlangs,true), 0, 'L', 0);
 				$pdf->SetXY($tab3_posx+21, $tab3_top+$y);
-				$pdf->MultiCell(20, 3, price(($conf->multicurrency->enabled && $object->multicurrency_tx != 1) ? $obj->multicurrency_amount_ttc : $obj->amount_ttc, 0, $outputlangs), 0, 'L', 0);
+				$pdf->MultiCell(20, 3, price(($conf->multicurrency->enabled && $object->multicurrency_tx != 1) ? $obj->multicurrency_amount_ttc : $obj->amount_ttc, 0, $outputlangs, 0, 0, 2), 0, 'L', 0);
 				$pdf->SetXY($tab3_posx+40, $tab3_top+$y);
 				$pdf->MultiCell(20, 3, $text, 0, 'L', 0);
 				$pdf->SetXY($tab3_posx+58, $tab3_top+$y);
@@ -1398,7 +1398,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				$pdf->SetXY($tab3_posx, $tab3_top+$y);
 				$pdf->MultiCell(20, 3, dol_print_date($this->db->jdate($row->date),'day',false,$outputlangs,true), 0, 'L', 0);
 				$pdf->SetXY($tab3_posx+21, $tab3_top+$y);
-				$pdf->MultiCell(20, 3, price($sign * (($conf->multicurrency->enabled && $object->multicurrency_tx != 1) ? $row->multicurrency_amount : $row->amount), 0, $outputlangs), 0, 'L', 0);
+				$pdf->MultiCell(20, 3, price($sign * (($conf->multicurrency->enabled && $object->multicurrency_tx != 1) ? $row->multicurrency_amount : $row->amount), 0, $outputlangs, 0, 0, 2), 0, 'L', 0);
 				$pdf->SetXY($tab3_posx+40, $tab3_top+$y);
 				$oper = $outputlangs->transnoentitiesnoconv("PaymentTypeShort" . $row->code);
 
@@ -1649,7 +1649,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		    $pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("BtpTotalProgress", $avancementGlobal), 0, 'L', 1);
 		   
 		    $pdf->SetXY($col2x,$posy);
-		    $pdf->MultiCell($largcol2, $tab2_hl, price($total_a_payer, 0, $outputlangs), 0, 'R', 1);
+		    $pdf->MultiCell($largcol2, $tab2_hl, price($total_a_payer, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		    $pdf->SetFont('','', $default_font_size - 2);
 		    
 		    $posy += $tab2_hl;
@@ -1671,10 +1671,10 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 		        $pdf->SetXY($col2x,$posy);
 		        if ($fac->total_ht > 0) {
-		        	$pdf->MultiCell($largcol2, $tab2_hl, price($fac->total_ht * -1, 0, $outputlangs), 0, 'R', 1);
+		        	$pdf->MultiCell($largcol2, $tab2_hl, price($fac->total_ht * -1, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		        } 
 		        else {
-		        	$pdf->MultiCell($largcol2, $tab2_hl, ' + '.price($fac->total_ht * -1, 0, $outputlangs), 0, 'R', 1);
+		        	$pdf->MultiCell($largcol2, $tab2_hl, ' + '.price($fac->total_ht * -1, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		        }
 		        
 		        
@@ -1732,7 +1732,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		* $pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("TotalHT"), 0, 'L', 1);
 		*
 		* $pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-		* $pdf->MultiCell($largcol2, $tab2_hl, price($sign * ($total_ht + (! empty($object->remise)?$object->remise:0)), 0, $outputlangs), 0, 'R', 1);
+		* $pdf->MultiCell($largcol2, $tab2_hl, price($sign * ($total_ht + (! empty($object->remise)?$object->remise:0)), 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		*
 		* $pdf->SetFillColor(248,248,248);
 		*
@@ -1769,7 +1769,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		* 					$pdf->MultiCell($col2x-$col1x, $tab2_hl, $totalvat, 0, 'L', 1);
 		*
 		* 					$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-		* 					$pdf->MultiCell($largcol2, $tab2_hl, price($tvaval, 0, $outputlangs), 0, 'R', 1);
+		* 					$pdf->MultiCell($largcol2, $tab2_hl, price($tvaval, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		* 				}
 		* 			}
 		* 		}
@@ -1796,7 +1796,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		* 					$pdf->MultiCell($col2x-$col1x, $tab2_hl, $totalvat, 0, 'L', 1);
 		*
 		* 					$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-		* 					$pdf->MultiCell($largcol2, $tab2_hl, price($tvaval, 0, $outputlangs), 0, 'R', 1);
+		* 					$pdf->MultiCell($largcol2, $tab2_hl, price($tvaval, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		* 				}
 		* 			}
 		* 		}
@@ -1843,7 +1843,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		* 				$pdf->MultiCell($col2x-$col1x, $tab2_hl, $totalvat, 0, 'L', 1);
 		*
 		* 				$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-		* 				$pdf->MultiCell($largcol2, $tab2_hl, price($tvaval, 0, $outputlangs), 0, 'R', 1);
+		* 				$pdf->MultiCell($largcol2, $tab2_hl, price($tvaval, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		* 			}
 		* 		}
 		*
@@ -1869,7 +1869,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		*
 		* 					$pdf->MultiCell($col2x-$col1x, $tab2_hl, $totalvat, 0, 'L', 1);
 		* 					$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-		* 					$pdf->MultiCell($largcol2, $tab2_hl, price($tvaval, 0, $outputlangs), 0, 'R', 1);
+		* 					$pdf->MultiCell($largcol2, $tab2_hl, price($tvaval, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		* 				}
 		* 			}
 		* 		}
@@ -1897,7 +1897,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		* 					$pdf->MultiCell($col2x-$col1x, $tab2_hl, $totalvat, 0, 'L', 1);
 		*
 		* 					$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-		* 					$pdf->MultiCell($largcol2, $tab2_hl, price($tvaval, 0, $outputlangs), 0, 'R', 1);
+		* 					$pdf->MultiCell($largcol2, $tab2_hl, price($tvaval, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		* 				}
 		* 			}
 		* 		}
@@ -1919,7 +1919,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		* 		$pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("TotalTTC"), $useborder, 'L', 1);
 		*
 		* 		$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-		* 		$pdf->MultiCell($largcol2, $tab2_hl, price($sign * $total_ttc, 0, $outputlangs), $useborder, 'R', 1);
+		* 		$pdf->MultiCell($largcol2, $tab2_hl, price($sign * $total_ttc, 0, $outputlangs, 0, 0, 2), $useborder, 'R', 1);
 		*
 		* 		$retained_warranty_rate = (! empty($object->retained_warranty) ? $object->retained_warranty : 0);
 		* 		$retenue_de_garantie = $total_ttc * $retained_warranty_rate / 100 ;
@@ -1937,7 +1937,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		* 			$pdf->SetFillColor(210,210,210);
 		* 			$pdf->MultiCell($col1x, $tab2_hl, $outputlangs->transnoentities('RetenueGarantieTTCDeduit'), $useborder, 'L', 1);
 		* 			$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-		* 			$pdf->MultiCell($largcol2, $tab2_hl, price('-'.$retenue_de_garantie, 0, $outputlangs), $useborder, 'R', 1);
+		* 			$pdf->MultiCell($largcol2, $tab2_hl, price('-'.$retenue_de_garantie, 0, $outputlangs, 0, 0, 2), $useborder, 'R', 1);
 		*
 		* 		}
 		*
@@ -1948,7 +1948,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		* 			$pdf->SetFillColor(210,210,210);
 		* 			$pdf->MultiCell($col1x, $tab2_hl, $outputlangs->transnoentities('DelegationMpValoTotalLabel'), $useborder, 'L', 1);
 		* 			$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-		* 			$pdf->MultiCell($largcol2, $tab2_hl, price($sign * $mpvalo_total_ttc, 0, $outputlangs), $useborder, 'R', 1);
+		* 			$pdf->MultiCell($largcol2, $tab2_hl, price($sign * $mpvalo_total_ttc, 0, $outputlangs, 0, 0, 2), $useborder, 'R', 1);
 		* 		}
 		*
 		* 		if ( $compte_prorata != 0) {
@@ -1959,7 +1959,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		* 			$pdf->SetFillColor(200,200,200);
 		* 			$pdf->MultiCell($col1x, $tab2_hl, $outputlangs->transnoentities('CompteProrataTTCDeduit'), $useborder, 'L', 1);
 		* 			$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-		* 			$pdf->MultiCell($largcol2, $tab2_hl, price('-'.$compte_prorata, 0, $outputlangs), $useborder, 'R', 1);
+		* 			$pdf->MultiCell($largcol2, $tab2_hl, price('-'.$compte_prorata, 0, $outputlangs, 0, 0, 2), $useborder, 'R', 1);
 		*
 		* 		}
 		*
@@ -1972,7 +1972,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		* 		    $pdf->MultiCell($col1x, $tab2_hl, $outputlangs->transnoentities('DelegationTotalTTCRestant'), 0, 'L', 1);
 		*
 		* 		    $pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-		* 		    $pdf->MultiCell($largcol2, $tab2_hl, price($total_ttc_restant, 0, $outputlangs), 0, 'R', 1);
+		* 		    $pdf->MultiCell($largcol2, $tab2_hl, price($total_ttc_restant, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		* 		}else{
 		* 			$total_ttc_restant = $total_ttc ;
 		* 		}
@@ -2029,22 +2029,22 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$pdf->SetXY($colLabelX, $tab2_top + $tab2_hl * $index);
 		$pdf->MultiCell($labelWidth, $tab2_hl, $outputlangs->transnoentities('DelegationTotalCumulativeLabel'), 0, 'L', 1);
 		$pdf->SetXY($colHtX, $tab2_top + $tab2_hl * $index);
-		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_ht, 0, $outputlangs), 0, 'R', 1);
+		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_ht, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		$pdf->SetXY($colTvaX, $tab2_top + $tab2_hl * $index);
-		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_tva, 0, $outputlangs), 0, 'R', 1);
+		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_tva, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
-		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_ttc, 0, $outputlangs), 0, 'R', 1);
+		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_ttc, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 
 		if (! empty($TPreviousIncoice)) {
 			$index++;
 			$pdf->SetXY($colLabelX, $tab2_top + $tab2_hl * $index);
 			$pdf->MultiCell($labelWidth, $tab2_hl, $outputlangs->transnoentities('DelegationPreviousSituationsLabel'), 0, 'L', 1);
 			$pdf->SetXY($colHtX, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $prev_total_ht, 0, $outputlangs), 0, 'R', 1);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $prev_total_ht, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 			$pdf->SetXY($colTvaX, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $prev_total_tva, 0, $outputlangs), 0, 'R', 1);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $prev_total_tva, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 			$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $prev_total_ttc, 0, $outputlangs), 0, 'R', 1);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $prev_total_ttc, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		}
 
 		$retenue_de_garantie_ht = $total_ht * $retained_warranty_rate / 100;
@@ -2057,11 +2057,11 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$pdf->SetXY($colLabelX, $tab2_top + $tab2_hl * $index);
 			$pdf->MultiCell($labelWidth, $tab2_hl, $outputlangs->transnoentities('RetenueGarantieTTCDeduit'), 0, 'L', 1);
 			$pdf->SetXY($colHtX, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$retenue_de_garantie_ht, 0, $outputlangs), 0, 'R', 1);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$retenue_de_garantie_ht, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 			$pdf->SetXY($colTvaX, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$retenue_de_garantie_tva, 0, $outputlangs), 0, 'R', 1);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$retenue_de_garantie_tva, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 			$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$retenue_de_garantie, 0, $outputlangs), 0, 'R', 1);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$retenue_de_garantie, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		}
 
 		if ($compte_prorata != 0) {
@@ -2069,11 +2069,11 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$pdf->SetXY($colLabelX, $tab2_top + $tab2_hl * $index);
 			$pdf->MultiCell($labelWidth, $tab2_hl, $outputlangs->transnoentities('CompteProrataTTCDeduit'), 0, 'L', 1);
 			$pdf->SetXY($colHtX, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$compte_prorata_ht, 0, $outputlangs), 0, 'R', 1);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$compte_prorata_ht, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 			$pdf->SetXY($colTvaX, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$compte_prorata_tva, 0, $outputlangs), 0, 'R', 1);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$compte_prorata_tva, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 			$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$compte_prorata, 0, $outputlangs), 0, 'R', 1);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$compte_prorata, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		}
 
 		if ($mpvalo_total_ttc != 0) {
@@ -2094,11 +2094,11 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$pdf->SetXY($colLabelX, $tab2_top + $tab2_hl * $index);
 			$pdf->MultiCell($labelWidth, $tab2_hl, $outputlangs->transnoentities('DelegationMpValoTotalLabel'), 0, 'L', 1);
 			$pdf->SetXY($colHtX, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $mpvalo_total_ht, 0, $outputlangs), 0, 'R', 1);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $mpvalo_total_ht, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 			$pdf->SetXY($colTvaX, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $mpvalo_total_tva, 0, $outputlangs), 0, 'R', 1);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $mpvalo_total_tva, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 			$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $mpvalo_total_ttc, 0, $outputlangs), 0, 'R', 1);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $mpvalo_total_ttc, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		}
 
 		$index++;
@@ -2106,11 +2106,11 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$pdf->SetXY($colLabelX, $tab2_top + $tab2_hl * $index);
 		$pdf->MultiCell($labelWidth, $tab2_hl, $outputlangs->transnoentities('DelegationTotalDueAtMaturity'), 0, 'L', 1);
 		$pdf->SetXY($colHtX, $tab2_top + $tab2_hl * $index);
-		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_ttc_restant_ht, 0, $outputlangs), 0, 'R', 1);
+		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_ttc_restant_ht, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		$pdf->SetXY($colTvaX, $tab2_top + $tab2_hl * $index);
-		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_ttc_restant_tva, 0, $outputlangs), 0, 'R', 1);
+		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_ttc_restant_tva, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
-		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_ttc_restant, 0, $outputlangs), 0, 'R', 1);
+		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_ttc_restant, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 
 		$pdf->SetTextColor(0,0,0);
 
@@ -2146,7 +2146,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 					$pdf->MultiCell($col2x-$col1x, $tab2_hl, $del_line->label, $useborder, 'L', 1);
 
 					$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-					$pdf->MultiCell($largcol2, $tab2_hl, price(-1*$del_line->amount, 0, $outputlangs), $useborder, 'R', 1);			
+					$pdf->MultiCell($largcol2, $tab2_hl, price(-1*$del_line->amount, 0, $outputlangs, 0, 0, 2), $useborder, 'R', 1);			
 				}
 				*/
 
@@ -2158,7 +2158,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			    $pdf->MultiCell($col1x, $tab2_hl, $outputlangs->transnoentities('LMDBtotaldelegationdeduit'), 0, 'L', 1);
 			    
 			    $pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-			    $pdf->MultiCell($largcol2, $tab2_hl, price(-1 * $total_delegation, 0, $outputlangs), 0, 'R', 1);
+			    $pdf->MultiCell($largcol2, $tab2_hl, price(-1 * $total_delegation, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 			
 			// Total à Payer
 				$index++;
@@ -2167,7 +2167,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				$pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
 				$pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("LMDBAmounttopay"), $useborder, 'L', 1);
 				$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-				$pdf->MultiCell($largcol2, $tab2_hl, price($total_ttc_restant - $total_delegation, 0, $outputlangs), $useborder, 'R', 1);	
+				$pdf->MultiCell($largcol2, $tab2_hl, price($total_ttc_restant - $total_delegation, 0, $outputlangs, 0, 0, 2), $useborder, 'R', 1);	
 			}
 			
 			$pdf->SetTextColor(0,0,0);		
@@ -2185,7 +2185,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
 			$pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("Paid"), 0, 'L', 0);
 			$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($largcol2, $tab2_hl, price($deja_regle + $depositsamount, 0, $outputlangs), 0, 'R', 0);
+			$pdf->MultiCell($largcol2, $tab2_hl, price($deja_regle + $depositsamount, 0, $outputlangs, 0, 0, 2), 0, 'R', 0);
 
 			// Credit note
 			if ($creditnoteamount)
@@ -2194,7 +2194,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				$pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
 				$pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("CreditNotes"), 0, 'L', 0);
 				$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-				$pdf->MultiCell($largcol2, $tab2_hl, price($creditnoteamount, 0, $outputlangs), 0, 'R', 0);
+				$pdf->MultiCell($largcol2, $tab2_hl, price($creditnoteamount, 0, $outputlangs, 0, 0, 2), 0, 'R', 0);
 			}
 
 			// Escompte
@@ -2206,7 +2206,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				$pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
 				$pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("EscompteOfferedShort"), $useborder, 'L', 1);
 				$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-				$pdf->MultiCell($largcol2, $tab2_hl, price($object->total_ttc - $deja_regle - $creditnoteamount - $depositsamount, 0, $outputlangs), $useborder, 'R', 1);
+				$pdf->MultiCell($largcol2, $tab2_hl, price($object->total_ttc - $deja_regle - $creditnoteamount - $depositsamount, 0, $outputlangs, 0, 0, 2), $useborder, 'R', 1);
 
 				$resteapayer=0;
 			} 
@@ -2217,7 +2217,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
 			$pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("RemainderToPay"), $useborder, 'L', 1);
 			$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($largcol2, $tab2_hl, price($resteapayer, 0, $outputlangs), $useborder, 'R', 1);
+			$pdf->MultiCell($largcol2, $tab2_hl, price($resteapayer, 0, $outputlangs, 0, 0, 2), $useborder, 'R', 1);
 
 			$pdf->SetFont('','', $default_font_size - 1);
 			$pdf->SetTextColor(0,0,0);
@@ -2671,7 +2671,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				$pdf->writeHTMLCell(190,4, 70, 214, dol_htmlentitiesbr(dol_print_date($object->date,"day",false,$outputlangs)),0,1);
 
 			//Montant TTC Mois pour contrôle
-				$pdf->writeHTMLCell(190,4, 15, 225, dol_htmlentitiesbr(price($total_ttc_restant)),0,1);
+				$pdf->writeHTMLCell(190,4, 15, 225, dol_htmlentitiesbr(price($total_ttc_restant, 0, $outputlangs, 0, 0, 2)),0,1);
 
 			//Date de Création
 				$pdf->writeHTMLCell(190,4, 45, 225, dol_htmlentitiesbr(dol_print_date($object->date,"day",false,$outputlangs)),0,1);
@@ -2680,7 +2680,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				$pdf->writeHTMLCell(190,4, 75, 225, dol_htmlentitiesbr(dol_print_date($object->date_lim_reglement,"day",false,$outputlangs,true)),0,1);
 
 			//Montant
-				$pdf->writeHTMLCell(190,4, 175, 225, dol_htmlentitiesbr(price($total_ttc_restant)),0,1);
+				$pdf->writeHTMLCell(190,4, 175, 225, dol_htmlentitiesbr(price($total_ttc_restant, 0, $outputlangs, 0, 0, 2)),0,1);
 
 			//Nom du Tiré
 				$pdf->writeHTMLCell(190,4, 100, 250, $object->thirdparty->name,0,1);
@@ -3422,42 +3422,42 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		foreach($TToDpisplay as $Tab) {
 			
 			$pdf->SetXY($x, $tab_top+8);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[0]]), '', 'R');
+			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[0]], 0, $outputlangs, 0, 0, 2), '', 'R');
 			
 			$pdf->SetXY($x, $tab_top+26);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[1]]), '', 'R');
+			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[1]], 0, $outputlangs, 0, 0, 2), '', 'R');
 			
 			$pdf->SetXY($x, $tab_top+30);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[2]]), '', 'R');
+			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[2]], 0, $outputlangs, 0, 0, 2), '', 'R');
 			
 			$pdf->SetXY($x, $tab_top+34);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[3]]), '', 'R');
+			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[3]], 0, $outputlangs, 0, 0, 2), '', 'R');
 			$pdf->SetFont('','B', $default_font_size - 1);
 
 			$pdf->SetXY($x, $tab_top+53);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[4]]), '', 'R');
+			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[4]], 0, $outputlangs, 0, 0, 2), '', 'R');
 			$pdf->SetFont('','', $default_font_size - 2);
 		
 		
 			$pdf->SetXY($x, $tab_top+74);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[5]]), '', 'R');
+			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[5]], 0, $outputlangs, 0, 0, 2), '', 'R');
 			$pdf->SetFont('','', $default_font_size - 2);
 	
 			$pdf->SetXY($x, $tab_top+93);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[6]]), '', 'R');
+			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[6]], 0, $outputlangs, 0, 0, 2), '', 'R');
 			$pdf->SetFont('','', $default_font_size - 2);
 
 			$pdf->SetXY($x, $tab_top+113);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[7]]), '', 'R');
+			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[7]], 0, $outputlangs, 0, 0, 2), '', 'R');
 			$pdf->SetFont('','', $default_font_size - 2);
 
 			$pdf->SetXY($x, $tab_top+133);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[8]]), '', 'R');
+			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[8]], 0, $outputlangs, 0, 0, 2), '', 'R');
 			$pdf->SetFont('','', $default_font_size - 2);
 
 			$pdf->SetXY($x, $tab_top+155);
 			$pdf->SetFont('','B', $default_font_size - 1);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[9]]), '', 'R');
+			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[9]], 0, $outputlangs, 0, 0, 2), '', 'R');
 			
 			
 			$x+=$column_width;
@@ -4028,7 +4028,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$this->_pagefoot($pdf,$object,$outputlangs,1);
 			$pdf->addPage();
 			$pdf->setY($this->marge_haute);
-			if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $posy = $this->_pagehead($pdf, $object, 0, $outputlangs);
+			if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $posy = $this->_pagehead($pdf, $object, 0, $outputlangs, 0, 0, 2);
 			$posy = (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD) ? 42 : 10);
 		}
 
