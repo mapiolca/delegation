@@ -732,7 +732,6 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 					}
 
 					// EN: Load previous situation line info for cumulative columns
-					// FR: Charger les infos de la ligne précédente pour les colonnes cumulées
 					$TInfosLigneSituationPrecedente = array(
 						'total_ht_without_progress' => 0,
 						'total_ht' => 0,
@@ -753,7 +752,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 					if ($this->getColumnStatus('progress'))
 					{
 						if ($this->situationinvoice && ! empty($this->TDataSituation['date_derniere_situation'])) {
-							$progress = price($TInfosLigneSituationPrecedente['progress_prec'], 0, $outputlangs, 0, 0, 2).'%';
+							$progress = price($TInfosLigneSituationPrecedente['progress_prec'] + $object->lines[$i]->situation_percent, 0, $outputlangs, 0, 0, 2).'%';
 						} else {
 							$progress = pdf_getlineprogress($object, $i, $outputlangs, $hidedetails);
 						}
@@ -805,18 +804,16 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 						}
 
 
-						// EN: Cumulative amount from previous situations
-						// FR: Montant cumulé des situations antérieures
+						// EN: Cumulative amount including current situation
 						$columkey = 'progress_amount';
 						if ($this->getColumnStatus($columkey))
 						{
-							$printval = price($TInfosLigneSituationPrecedente['total_ht'], 0, $outputlangs, 0, 0, 2);
+							$printval = price($TInfosLigneSituationPrecedente['total_ht'] + $object->lines[$i]->total_ht, 0, $outputlangs, 0, 0, 2);
 							$this->printStdColumnContent($pdf, $curY, $columkey, $printval);
 							$nexY = max($pdf->GetY(),$nexY);
 						}
 
 						// EN: Previous cumulative percentage
-						// FR: Pourcentage cumulé précédent
 						$columkey = 'prev_progress';
 						if ($this->getColumnStatus($columkey))
 						{
@@ -826,7 +823,6 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 						}
 
 						// EN: Previous cumulative amount
-						// FR: Montant cumulé précédent
 						$columkey = 'prev_progress_amount';
 						if ($this->getColumnStatus($columkey))
 						{
@@ -3747,39 +3743,47 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 	{
 		if (empty($object->situation_cycle_ref) || $object->situation_counter <= 1) return;
 
-		$facDerniereSituation = &$this->TDataSituation['derniere_situation'];
-		if (empty($facDerniereSituation->lines)) return;
-		//var_dump($current_line);exit;
-		// On cherche la ligne précédente de la ligne sur laquelle on se trouve :
-		$subtotal_ht=0;
-		foreach($facDerniereSituation->lines as $l) {
-			if ($l->special_code == 9) continue;
-			$subtotal_ht += $l->total_ht;
-			if(class_exists('TSubtotal') && TSubtotal::isSubtotal($l)){
-				$l->total_ht = $subtotal_ht;
-				$subtotal_ht = 0;
-			}
-
-			if($l->rowid == $current_line->fk_prev_id) {
-
-				// Récupération du total_ht sans prendre en compte la progression (pour la colonne "sommes")
-				$tabprice = $this->calcul_price_total($l->qty, $l->subprice, $l->remise_percent, $l->tva_tx, $l->localtax1_tx, $l->localtax2_tx, 0, 'HT', $l->info_bits, $l->product_type);
-				$total_ht  = $tabprice[0];
-				$total_tva = $tabprice[1];
-				$total_ttc = $tabprice[2];
-				$total_localtax1 = $tabprice[9];
-				$total_localtax2 = $tabprice[10];
-				$pu_ht = $tabprice[3];
-				//var_dump($tabprice);
-				return array(
-					'progress_prec'=>$l->situation_percent
-				,'total_ht_without_progress'=>$total_ht
-				,'total_ht'=>$l->total_ht
-				);
-
-			}
-
+		if (empty($object->tab_previous_situation_invoice)) {
+			$object->fetchPreviousNextSituationInvoice();
 		}
+
+		// EN: Build a map of previous situation lines for fast lookup
+		$prevLinesById = array();
+		foreach ($object->tab_previous_situation_invoice as $prevInvoice) {
+			if (empty($prevInvoice->lines)) {
+				$prevInvoice->fetch_lines();
+			}
+			if (empty($prevInvoice->lines)) {
+				continue;
+			}
+			foreach ($prevInvoice->lines as $prevLine) {
+				if ($prevLine->special_code == 9) {
+					continue;
+				}
+				$prevLinesById[$prevLine->rowid] = $prevLine;
+			}
+		}
+
+		// EN: Compute base amount without progress for current line
+		$tabprice = $this->calcul_price_total($current_line->qty, $current_line->subprice, $current_line->remise_percent, $current_line->tva_tx, $current_line->localtax1_tx, $current_line->localtax2_tx, 0, 'HT', $current_line->info_bits, $current_line->product_type);
+		$total_ht_without_progress = $tabprice[0];
+
+		// EN: Sum previous situation totals and percentages for the same line chain
+		$total_prev_ht = 0;
+		$total_prev_progress = 0;
+		$prevLineId = (int) $current_line->fk_prev_id;
+		while ($prevLineId > 0 && isset($prevLinesById[$prevLineId])) {
+			$prevLine = $prevLinesById[$prevLineId];
+			$total_prev_ht += (float) $prevLine->total_ht;
+			$total_prev_progress += (float) $prevLine->situation_percent;
+			$prevLineId = (int) $prevLine->fk_prev_id;
+		}
+
+		return array(
+			'progress_prec' => $total_prev_progress,
+			'total_ht_without_progress' => $total_ht_without_progress,
+			'total_ht' => $total_prev_ht,
+		);
 	}
 
 	function calcul_price_total($qty, $pu, $remise_percent_ligne, $txtva, $uselocaltax1_rate, $uselocaltax2_rate, $remise_percent_global, $price_base_type, $info_bits, $type, $seller = '',$localtaxes_array='')
