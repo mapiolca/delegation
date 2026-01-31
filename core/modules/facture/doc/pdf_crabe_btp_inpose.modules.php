@@ -1987,6 +1987,13 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$colTtcX = $col1x + 105;
 		$colWidth = 22;
 		$labelWidth = $colHtX - $colLabelX - 2;
+		$tableRightX = $this->page_largeur - $this->marge_droite;
+		$tableWidth = ($colTtcX + $colWidth) - $colLabelX;
+		$colLabelX = $tableRightX - $tableWidth;
+		$colHtX = $colLabelX + 55;
+		$colTvaX = $colLabelX + 80;
+		$colTtcX = $colLabelX + 105;
+		$labelWidth = $colHtX - $colLabelX - 2;
 
 		$index++;
 		$pdf->SetFillColor(230,230,230);
