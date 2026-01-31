@@ -1848,8 +1848,11 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$retenue_de_garantie_ht = $total_ht * $retained_warranty_rate / 100;
 		$retenue_de_garantie_tva = $total_tva * $retained_warranty_rate / 100;
 
-		$compte_prorata = $total_ttc * $object->array_options['options_lmdb_compte_prorata'] / 100;
-		$total_ttc_restant = $total_ttc - $total_delegation - $retenue_de_garantie_ttc - $compte_prorata + $mpvalo_total_ttc;
+		$compte_prorata_ttc = $total_ttc * $object->array_options['options_lmdb_compte_prorata'] / 100;
+		$compte_prorata_ht = $total_ht * $object->array_options['options_lmdb_compte_prorata'] / 100;
+		$compte_prorata_tva = $total_tva * $object->array_options['options_lmdb_compte_prorata'] / 100;
+
+		$total_ttc_restant = $total_ttc - $total_delegation - $retenue_de_garantie_ttc - $compte_prorata_ttc + $mpvalo_total_ttc;
 		$total_ttc_restant_ht = $total_ht - $total_delegation_ht - $retenue_de_garantie_ht - $compte_prorata_ht + $mpvalo_total_ht;
 		$total_ttc_restant_tva = $total_tva - $total_delegation_tva - $retenue_de_garantie_tva - $compte_prorata_tva + $mpvalo_total_tva;
 
@@ -1886,12 +1889,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
 		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $current_total_ttc, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 
-		$retenue_de_garantie_ht = $total_ht * $retained_warranty_rate / 100;
-		$retenue_de_garantie_tva = $total_tva * $retained_warranty_rate / 100;
-		$compte_prorata_ht = $total_ht * $object->array_options['options_lmdb_compte_prorata'] / 100;
-		$compte_prorata_tva = $total_tva * $object->array_options['options_lmdb_compte_prorata'] / 100;
-
-		if ($retenue_de_garantie != 0) {
+		if ($retenue_de_garantie_ttc != 0) {
 			$index++;
 			$pdf->SetXY($colLabelX, $tab2_top + $tab2_hl * $index);
 			$pdf->MultiCell($labelWidth, $tab2_hl, $outputlangs->transnoentities('RetenueGarantieTTCDeduit'), 0, 'L', 1);
@@ -1903,7 +1901,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$retenue_de_garantie, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		}
 
-		if ($compte_prorata != 0) {
+		if ($compte_prorata_ttc != 0) {
 			$index++;
 			$pdf->SetXY($colLabelX, $tab2_top + $tab2_hl * $index);
 			$pdf->MultiCell($labelWidth, $tab2_hl, $outputlangs->transnoentities('CompteProrataTTCDeduit'), 0, 'L', 1);
@@ -1912,7 +1910,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$pdf->SetXY($colTvaX, $tab2_top + $tab2_hl * $index);
 			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$compte_prorata_tva, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 			$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$compte_prorata, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$compte_prorata_ttc, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		}
 
 		if ($mpvalo_total_ttc != 0) {
