@@ -39,6 +39,7 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/companybankaccount.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/bank.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.facture.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
+require_once DOL_DOCUMENT_ROOT.'/commande/class/commande.class.php';
 
 // TSubtotal
 if (!empty($conf->subtotal->enabled)) dol_include_once('/subtotal/class/subtotal.class.php');
@@ -3179,10 +3180,45 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		// ADD TEXT INTO CELL
 		/**********************Titres*******************************/
 		$pdf->SetXY($this->marge_gauche+2, $tab_top+8);
-		$pdf->MultiCell(80,2, $outputlangs->transnoentities("BtpMainWork"),'','L');
+		$mainWorkLabel = $outputlangs->transnoentities("BtpMainWork");
+		if (! empty($this->TDataSituation['main_order_ref'])) {
+			$mainOrderRef = $outputlangs->convToOutputCharset($this->TDataSituation['main_order_ref']);
+			$mainOrderRefClient = $this->TDataSituation['main_order_ref_client'];
+			if (empty($mainOrderRefClient)) {
+				$mainOrderRefClient = $outputlangs->transnoentities('non_renseigne');
+			}
+			$mainWorkLabel = $outputlangs->transnoentities(
+				"BtpMainWorkWithRef",
+				$mainOrderRef,
+				$outputlangs->convToOutputCharset($mainOrderRefClient)
+			);
+		}
+		$pdf->MultiCell(80,2, $mainWorkLabel,'','L');
 		
 		$pdf->SetXY($this->marge_gauche+2, $tab_top+12);
-		$pdf->MultiCell(80,2, $outputlangs->transnoentities("BtpAdditionalWork"),'','L');
+		$additionalWorkLabel = $outputlangs->transnoentities("BtpAdditionalWork");
+		if (! empty($this->TDataSituation['additional_orders']) && is_array($this->TDataSituation['additional_orders'])) {
+			$additionalLines = array();
+			$additionalIndex = 1;
+			foreach ($this->TDataSituation['additional_orders'] as $orderInfo) {
+				$orderRef = $outputlangs->convToOutputCharset($orderInfo['ref']);
+				$orderRefClient = $orderInfo['ref_client'];
+				if (empty($orderRefClient)) {
+					$orderRefClient = $outputlangs->transnoentities('non_renseigne');
+				}
+				$additionalLines[] = $outputlangs->transnoentities(
+					"BtpAvenantLine",
+					$additionalIndex,
+					$orderRef,
+					$outputlangs->convToOutputCharset($orderRefClient)
+				);
+				$additionalIndex++;
+			}
+			if (! empty($additionalLines)) {
+				$additionalWorkLabel .= "\n".implode("\n", $additionalLines);
+			}
+		}
+		$pdf->MultiCell(80,2, $additionalWorkLabel,'','L');
 		
 		$pdf->SetXY($this->marge_gauche+2, $tab_top+26);
 		$pdf->MultiCell(80,2, $outputlangs->transnoentities("TotalHT"),'','C');
@@ -3222,13 +3258,13 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		/**********************Données*******************************/
 		$TToDpisplay = array(
 								0=>array(
-											'nouveau_cumul', 'nouveau_cumul', 'nouveau_cumul_tva', 'nouveau_cumul_ttc', 'nouveau_cumul_ttc', 'retenue_garantie', 'mpvalo_nouveau_cumul', 'compte_prorata', 'delegation_paiement', 'total_ttc'
+											'marche_initial', 'nouveau_cumul', 'nouveau_cumul_tva', 'nouveau_cumul_ttc', 'nouveau_cumul_ttc', 'retenue_garantie', 'mpvalo_nouveau_cumul', 'compte_prorata', 'delegation_paiement', 'total_ttc'
 										)
 								,1=>array(
-											'cumul_anterieur', 'cumul_anterieur', 'cumul_anterieur_tva', 'cumul_anterieur_ttc', 'cumul_anterieur_ttc', 'retenue_garantie_anterieure', 'mpvalo_cumul_anterieur', 'compte_prorata_anterieur', 'delegation_paiement_anterieur', 'total_ttc_anterieur'
+											'marche_initial', 'cumul_anterieur', 'cumul_anterieur_tva', 'cumul_anterieur_ttc', 'cumul_anterieur_ttc', 'retenue_garantie_anterieure', 'mpvalo_cumul_anterieur', 'compte_prorata_anterieur', 'delegation_paiement_anterieur', 'total_ttc_anterieur'
 										)
 								,2=>array(
-											'mois', 'mois', 'mois_tva', 'mois_ttc', 'mois_ttc', 'retenue_garantie_mois', 'mpvalo_mois', 'compte_prorata_mois', 'delegation_paiement_mois', 'total_ttc_mois'
+											'marche_initial', 'mois', 'mois_tva', 'mois_ttc', 'mois_ttc', 'retenue_garantie_mois', 'mpvalo_mois', 'compte_prorata_mois', 'delegation_paiement_mois', 'total_ttc_mois'
 										)
 							);
 		
@@ -3281,6 +3317,95 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		
 	}
 
+	/**
+	 * @param array $invoiceIds
+	 * @return array
+	 */
+	private function getLinkedOrdersByInvoiceIds($invoiceIds)
+	{
+		$ordersByInvoice = array();
+
+		if (empty($invoiceIds) || ! is_array($invoiceIds)) {
+			return $ordersByInvoice;
+		}
+
+		$filteredInvoiceIds = array();
+		foreach ($invoiceIds as $invoiceId) {
+			$invoiceId = (int) $invoiceId;
+			if ($invoiceId > 0) {
+				$filteredInvoiceIds[$invoiceId] = $invoiceId;
+			}
+		}
+		if (empty($filteredInvoiceIds)) {
+			return $ordersByInvoice;
+		}
+
+		$sql = "SELECT ee.fk_source, ee.fk_target, ee.sourcetype, ee.targettype";
+		$sql.= " FROM ".MAIN_DB_PREFIX."element_element as ee";
+		$sql.= " WHERE (ee.sourcetype = 'facture'";
+		$sql.= " AND ee.fk_source IN (".implode(',', $filteredInvoiceIds).")";
+		$sql.= " AND ee.targettype = 'commande')";
+		$sql.= " OR (ee.targettype = 'facture'";
+		$sql.= " AND ee.fk_target IN (".implode(',', $filteredInvoiceIds).")";
+		$sql.= " AND ee.sourcetype = 'commande')";
+
+		$resql = $this->db->query($sql);
+		if (! $resql) {
+			return $ordersByInvoice;
+		}
+
+		while ($obj = $this->db->fetch_object($resql)) {
+			$invoiceId = ($obj->sourcetype === 'facture') ? (int) $obj->fk_source : (int) $obj->fk_target;
+			$orderId = ($obj->sourcetype === 'facture') ? (int) $obj->fk_target : (int) $obj->fk_source;
+			if ($invoiceId <= 0 || $orderId <= 0) {
+				continue;
+			}
+			if (empty($ordersByInvoice[$invoiceId])) {
+				$ordersByInvoice[$invoiceId] = array();
+			}
+			$ordersByInvoice[$invoiceId][$orderId] = $orderId;
+		}
+
+		foreach ($ordersByInvoice as $invoiceId => $orderIds) {
+			$ordersByInvoice[$invoiceId] = array_values($orderIds);
+		}
+
+		return $ordersByInvoice;
+	}
+
+	/**
+	 * @param array $orderIds
+	 * @return array
+	 */
+	private function getOrdersInfo($orderIds)
+	{
+		$ordersInfo = array();
+
+		if (empty($orderIds) || ! is_array($orderIds)) {
+			return $ordersInfo;
+		}
+
+		foreach ($orderIds as $orderId) {
+			$orderId = (int) $orderId;
+			if ($orderId <= 0) {
+				continue;
+			}
+			$order = new Commande($this->db);
+			if ($order->fetch($orderId) <= 0) {
+				continue;
+			}
+			$ordersInfo[$orderId] = array(
+				'id' => $orderId,
+				'ref' => $order->ref,
+				'ref_client' => $order->ref_client,
+				'total_ht' => $order->total_ht,
+				'date' => $order->date_commande,
+			);
+		}
+
+		return $ordersInfo;
+	}
+
 
 
 	function _getDataSituation(&$object) 
@@ -3305,6 +3430,82 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 									'derniere_situation'=>$facDerniereSituation
 									,'date_derniere_situation'=>$facDerniereSituation->date
 								);
+
+		$situationInvoices = array();
+		if (! empty($TPreviousIncoice)) {
+			foreach ($TPreviousIncoice as $previousInvoice) {
+				if (! empty($previousInvoice->id)) {
+					$situationInvoices[$previousInvoice->id] = $previousInvoice;
+				}
+			}
+		}
+		if (! empty($object->id)) {
+			$situationInvoices[$object->id] = $object;
+		}
+		if (! empty($object->tab_next_situation_invoice) && is_array($object->tab_next_situation_invoice)) {
+			foreach ($object->tab_next_situation_invoice as $nextInvoice) {
+				if (! empty($nextInvoice->id)) {
+					$situationInvoices[$nextInvoice->id] = $nextInvoice;
+				}
+			}
+		}
+
+		$ordersByInvoice = $this->getLinkedOrdersByInvoiceIds(array_keys($situationInvoices));
+		$allOrderIds = array();
+		foreach ($ordersByInvoice as $orderIds) {
+			foreach ($orderIds as $orderId) {
+				$allOrderIds[$orderId] = $orderId;
+			}
+		}
+		$ordersInfo = $this->getOrdersInfo($allOrderIds);
+
+		$firstSituationInvoice = null;
+		foreach ($situationInvoices as $invoice) {
+			if ($firstSituationInvoice === null) {
+				$firstSituationInvoice = $invoice;
+				continue;
+			}
+			$invoiceDate = (int) $invoice->date;
+			$firstDate = (int) $firstSituationInvoice->date;
+			if ($invoiceDate > 0 && ($firstDate == 0 || $invoiceDate < $firstDate)) {
+				$firstSituationInvoice = $invoice;
+			}
+		}
+
+		$mainOrderInfo = null;
+		if ($firstSituationInvoice && ! empty($ordersByInvoice[$firstSituationInvoice->id])) {
+			foreach ($ordersByInvoice[$firstSituationInvoice->id] as $orderId) {
+				if (empty($ordersInfo[$orderId])) {
+					continue;
+				}
+				if ($mainOrderInfo === null) {
+					$mainOrderInfo = $ordersInfo[$orderId];
+					continue;
+				}
+				$orderDate = (int) $ordersInfo[$orderId]['date'];
+				$mainOrderDate = (int) $mainOrderInfo['date'];
+				if ($orderDate > 0 && ($mainOrderDate == 0 || $orderDate < $mainOrderDate)) {
+					$mainOrderInfo = $ordersInfo[$orderId];
+				}
+			}
+		}
+
+		$additionalOrders = array();
+		foreach ($ordersInfo as $orderInfo) {
+			if (! empty($mainOrderInfo) && $orderInfo['id'] == $mainOrderInfo['id']) {
+				continue;
+			}
+			$additionalOrders[] = $orderInfo;
+		}
+		if (! empty($additionalOrders)) {
+			$additionalOrderDates = array();
+			$additionalOrderRefs = array();
+			foreach ($additionalOrders as $index => $orderInfo) {
+				$additionalOrderDates[$index] = (int) $orderInfo['date'];
+				$additionalOrderRefs[$index] = $orderInfo['ref'];
+			}
+			array_multisort($additionalOrderDates, SORT_ASC, $additionalOrderRefs, SORT_ASC, $additionalOrders);
+		}
 
 		$del_lines = array();
 
@@ -3390,6 +3591,15 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$TDataSituation['delegation_paiement'] = '';
 		$TDataSituation['mpvalo_nouveau_cumul'] = $mpvalo_nouveau_cumul;
 		$TDataSituation['total_ttc'] = $TDataSituation['nouveau_cumul_ttc'] - $TDataSituation['retenue_garantie'] - $TDataSituation['compte_prorata'] + $TDataSituation['mpvalo_nouveau_cumul'];
+
+		$marcheInitial = $nouveau_cumul;
+		if (! empty($mainOrderInfo) && isset($mainOrderInfo['total_ht'])) {
+			$marcheInitial = (float) $mainOrderInfo['total_ht'];
+		}
+		$TDataSituation['marche_initial'] = $marcheInitial;
+		$TDataSituation['main_order_ref'] = (! empty($mainOrderInfo) ? $mainOrderInfo['ref'] : '');
+		$TDataSituation['main_order_ref_client'] = (! empty($mainOrderInfo) ? $mainOrderInfo['ref_client'] : '');
+		$TDataSituation['additional_orders'] = $additionalOrders;
 		
 		$TDataSituation['mois'] = $total_ht;
 		$TDataSituation['mois_tva'] = $total_tva;
