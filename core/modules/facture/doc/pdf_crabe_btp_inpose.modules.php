@@ -1717,7 +1717,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 					$posy = $pdf->GetY();
 				}
 
-				// cumul TVA précédent
+				// Previous situation total
 				$index++;
 				$pdf->SetFillColor(255,255,255);
 				$pdf->SetXY($col1x, $posy);
@@ -1725,10 +1725,10 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 				$pdf->SetXY($col2x,$posy);
 				if ($fac_total_ht > 0) {
-					$pdf->MultiCell($largcol2, $tab2_hl, price($fac_total_ht * -1, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
+					$pdf->MultiCell($largcol2, $tab2_hl, '- '.price(abs($fac_total_ht), 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 				} 
 				else {
-					$pdf->MultiCell($largcol2, $tab2_hl, ' + '.price($fac_total_ht * -1, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
+					$pdf->MultiCell($largcol2, $tab2_hl, '- '.price(abs($fac_total_ht), 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 				}
 
 				$i++;
@@ -3549,11 +3549,23 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 	
 		if(!empty($TPreviousIncoice)) {
 			foreach($TPreviousIncoice as $fac) {
-				$cumul_anterieur_ht += $fac->total_ht;
-				$cumul_anterieur_tva += $fac->total_tva;
+				$fac->fetch_lines();
+				$fac_total_ht = 0;
+				$fac_total_tva = 0;
+				$fac_total_ttc = 0;
+				foreach ($fac->lines as $line) {
+					if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
+						continue;
+					}
+					$fac_total_ht += (float) $line->total_ht;
+					$fac_total_tva += (float) $line->total_tva;
+					$fac_total_ttc += (float) $line->total_ttc;
+				}
+				$cumul_anterieur_ht += $fac_total_ht;
+				$cumul_anterieur_tva += $fac_total_tva;
 				$retained_warranty_rate = (! empty($fac->retained_warranty) ? $fac->retained_warranty : 0);
-				$retenue_garantie_anterieure += $fac->total_ttc * $retained_warranty_rate / 100;
-				$compte_prorata_anterieur += $fac->total_ttc * $fac->array_options['options_lmdb_compte_prorata'] / 100;
+				$retenue_garantie_anterieure += $fac_total_ttc * $retained_warranty_rate / 100;
+				$compte_prorata_anterieur += $fac_total_ttc * $fac->array_options['options_lmdb_compte_prorata'] / 100;
 				if ($mpvaloProductId > 0) {
 					if (! isset($fac->lines) || ! is_array($fac->lines)) {
 						$fac->fetch_lines();
