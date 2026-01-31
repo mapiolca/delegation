@@ -33,6 +33,7 @@ DelegationTotalsHeaderVAT=IVA
 DelegationTotalsHeaderTTC=TTC
 DelegationTotalCumulativeLabel=Importe total acumulado
 DelegationPreviousSituationsLabel=Situaciones anteriores
+DelegationCurrentSituationLabel=Situación actual
 DelegationTotalDueAtMaturity=Total a pagar al vencimiento
 DelegationSelectSupplierInvoice=Añadir una factura de proveedor
 DelegationSupplierInvoices=No hay facturas de proveedor elegibles
