@@ -2110,6 +2110,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$pdf->SetDrawColor(128,128,128);
 		$pdf->SetFont('','', $default_font_size - 1);
 
+		$header_height = 5;
 		$header_fill_color = array(240, 240, 240);
 		if (! empty($conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR)) {
 			$header_fill_color = explode(',', $conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR);
@@ -2139,10 +2140,11 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 			if (empty($hidetop))
 			{
+				$pdf->Rect($colDef['xStartPos'], $tab_top, $colDef['width'], $header_height, 'F');
 				$pdf->SetXY($colDef['xStartPos'] + $colDef['title']['padding'][3], $tab_top + $colDef['title']['padding'][0] );
 
 				$textWidth = $colDef['width'] - $colDef['title']['padding'][3] -$colDef['title']['padding'][1];
-				$pdf->MultiCell($textWidth,2,$colDef['title']['label'],'',$colDef['title']['align'],1);
+				$pdf->MultiCell($textWidth,2,$colDef['title']['label'],'',$colDef['title']['align']);
 			}
 		}
 
