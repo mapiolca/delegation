@@ -2126,6 +2126,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$pdf->SetFillColor($header_fill_color[0], $header_fill_color[1], $header_fill_color[2]);
 		}
 
+		$is_first_col = true;
 		foreach ($this->cols as $colKey => $colDef)
 		{
 			if(!$this->getColumnStatus($colKey)) continue;
@@ -2140,12 +2141,16 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 			if (empty($hidetop))
 			{
+				if (! $is_first_col) {
+					$pdf->line($colDef['xStartPos'], $tab_top, $colDef['xStartPos'], $tab_top + $header_height);
+				}
 				$pdf->Rect($colDef['xStartPos'], $tab_top, $colDef['width'], $header_height, 'F');
 				$pdf->SetXY($colDef['xStartPos'] + $colDef['title']['padding'][3], $tab_top + $colDef['title']['padding'][0] );
 
 				$textWidth = $colDef['width'] - $colDef['title']['padding'][3] -$colDef['title']['padding'][1];
 				$pdf->MultiCell($textWidth,2,$colDef['title']['label'],'',$colDef['title']['align']);
 			}
+			$is_first_col = false;
 		}
 
 		if (empty($hidetop)){
