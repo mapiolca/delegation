@@ -2110,6 +2110,11 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$pdf->SetDrawColor(128,128,128);
 		$pdf->SetFont('','', $default_font_size - 1);
 
+		$header_fill_color = array(240, 240, 240);
+		if (! empty($conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR)) {
+			$header_fill_color = explode(',', $conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR);
+		}
+
 		// Output Rect
 		$this->printRect($pdf,$this->marge_gauche, $tab_top, $this->page_largeur-$this->marge_gauche-$this->marge_droite, $tab_height, $hidetop, $hidebottom);	// Rect prend une longueur en 3eme param et 4eme param
 
@@ -2117,6 +2122,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		if (empty($hidetop)) {
 			$pdf->SetFont('', 'B', $default_font_size - 2);
 			$pdf->SetTextColor(0, 0, 0);
+			$pdf->SetFillColor($header_fill_color[0], $header_fill_color[1], $header_fill_color[2]);
 		}
 
 		foreach ($this->cols as $colKey => $colDef)
@@ -2136,7 +2142,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				$pdf->SetXY($colDef['xStartPos'] + $colDef['title']['padding'][3], $tab_top + $colDef['title']['padding'][0] );
 
 				$textWidth = $colDef['width'] - $colDef['title']['padding'][3] -$colDef['title']['padding'][1];
-				$pdf->MultiCell($textWidth,2,$colDef['title']['label'],'',$colDef['title']['align']);
+				$pdf->MultiCell($textWidth,2,$colDef['title']['label'],'',$colDef['title']['align'],1);
 			}
 		}
 
@@ -3262,6 +3268,11 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$pdf->SetLineWidth(0.1);
 		$pdf->SetFont('','', $default_font_size - 1);
 
+		$header_fill_color = array(240, 240, 240);
+		if (! empty($conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR)) {
+			$header_fill_color = explode(',', $conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR);
+		}
+
 		// Output Rect
 		// KEEPTHIS => Affiche les bords extérieurs
 		$this->printRectBtp($pdf,$this->marge_gauche, $tab_top, $this->page_largeur-$this->marge_gauche-$this->marge_droite, $tab_height, $hidetop, $hidebottom);	// Rect prend une longueur en 3eme param et 4eme param
@@ -3272,21 +3283,24 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		{
 			$pdf->SetFont('','B', $default_font_size - 1);
 			$pdf->SetXY($this->posx_new_cumul-1, $tab_top+0.5);
-			$pdf->MultiCell($column_width, 2, $outputlangs->transnoentities("BtpNewCumul"), '', 'C');
+			$pdf->SetFillColor($header_fill_color[0], $header_fill_color[1], $header_fill_color[2]);
+			$pdf->MultiCell($column_width, 2, $outputlangs->transnoentities("BtpNewCumul"), '', 'C', 1);
 		}
 		
 		$pdf->line($this->posx_cumul_anterieur-1, $tab_top, $this->posx_cumul_anterieur-1, $tab_top + $tab_height);
 		if (empty($hidetop))
 		{
 			$pdf->SetXY($this->posx_cumul_anterieur-1, $tab_top+0.5);
-			$pdf->MultiCell($column_width, 2, $outputlangs->transnoentities("BtpAnteCumul"), '', 'C');
+			$pdf->SetFillColor($header_fill_color[0], $header_fill_color[1], $header_fill_color[2]);
+			$pdf->MultiCell($column_width, 2, $outputlangs->transnoentities("BtpAnteCumul"), '', 'C', 1);
 		}
 		
 		$pdf->line($this->posx_month-1, $tab_top, $this->posx_month-1, $tab_top + $tab_height);
 		if (empty($hidetop))
 		{
 			$pdf->SetXY($this->posx_month-1, $tab_top+0.5);
-			$pdf->MultiCell($column_width, 2, $outputlangs->transnoentities("Month"), '', 'C');
+			$pdf->SetFillColor($header_fill_color[0], $header_fill_color[1], $header_fill_color[2]);
+			$pdf->MultiCell($column_width, 2, $outputlangs->transnoentities("Month"), '', 'C', 1);
 			$pdf->SetFont('','', $default_font_size - 1);
 		}
 		
@@ -3415,6 +3429,11 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$pdf->SetFillColor(255, 255, 255);
 		}
 
+		$header_fill_color = array(240, 240, 240);
+		if (! empty($conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR)) {
+			$header_fill_color = explode(',', $conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR);
+		}
+
 		$pdf->SetDrawColor(128, 128, 128);
 		$pdf->SetLineWidth(0.1);
 		$pdf->Rect($this->marge_gauche, $top, $table_width, $height);
@@ -3427,16 +3446,17 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 		$pdf->SetFont('', 'B', $default_font_size - 2);
 		$pdf->SetTextColor(0, 0, 0);
+		$pdf->SetFillColor($header_fill_color[0], $header_fill_color[1], $header_fill_color[2]);
 		$pdf->SetXY($this->marge_gauche + 1, $top + 1);
-		$pdf->MultiCell($desc_width - 2, $line_height - 1, $outputlangs->transnoentities("BtpOrdersSummaryDescription"), 0, 'L');
+		$pdf->MultiCell($desc_width - 2, $line_height - 1, $outputlangs->transnoentities("BtpOrdersSummaryDescription"), 0, 'L', 1);
 		$pdf->SetXY($col_positions[1] + 1, $top + 1);
-		$pdf->MultiCell($fixed_width - 2, $line_height - 1, $outputlangs->transnoentities("BtpOrdersSummaryDate"), 0, 'L');
+		$pdf->MultiCell($fixed_width - 2, $line_height - 1, $outputlangs->transnoentities("BtpOrdersSummaryDate"), 0, 'L', 1);
 		$pdf->SetXY($col_positions[2] + 1, $top + 1);
-		$pdf->MultiCell($fixed_width - 2, $line_height - 1, $outputlangs->transnoentities("BtpOrdersSummaryAmountHT"), 0, 'R');
+		$pdf->MultiCell($fixed_width - 2, $line_height - 1, $outputlangs->transnoentities("BtpOrdersSummaryAmountHT"), 0, 'R', 1);
 		$pdf->SetXY($col_positions[3] + 1, $top + 1);
-		$pdf->MultiCell($fixed_width - 2, $line_height - 1, $outputlangs->transnoentities("BtpOrdersSummaryVAT"), 0, 'R');
+		$pdf->MultiCell($fixed_width - 2, $line_height - 1, $outputlangs->transnoentities("BtpOrdersSummaryVAT"), 0, 'R', 1);
 		$pdf->SetXY($col_positions[4] + 1, $top + 1);
-		$pdf->MultiCell($fixed_width - 2, $line_height - 1, $outputlangs->transnoentities("BtpOrdersSummaryAmountTTC"), 0, 'R');
+		$pdf->MultiCell($fixed_width - 2, $line_height - 1, $outputlangs->transnoentities("BtpOrdersSummaryAmountTTC"), 0, 'R', 1);
 
 		$pdf->SetFont('', '', $default_font_size - 2);
 		$row_index = 0;
