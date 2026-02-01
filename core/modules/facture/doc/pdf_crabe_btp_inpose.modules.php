@@ -413,7 +413,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				$pdf->MultiCell(($pdf->GetStringWidth($titre) + 3), 2, $titre);
 				$tab_top_newpage = (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)?42:10);
 				$summary_height = $this->_tableauBtpOrdersSummary($pdf, $summary_top, $outputlangs, $object->multicurrency_code);
-				$tab_top = $summary_top + $summary_height + $section_spacing;
+				$tab_top = $summary_top + $summary_height + $section_spacing + 10;
 				$title_btp = $outputlangs->transnoentities("BtpSituationTableTitle");
 				$pdf->SetFont('','B', $default_font_size - 1);
 				$pdf->SetXY($this->marge_gauche, $tab_top - $title_spacing);
