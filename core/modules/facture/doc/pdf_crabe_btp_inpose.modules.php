@@ -398,22 +398,25 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 				/**** DEBUT TABLEAU SPECIFIQUE ****/
 
-				$summary_top = 90;
+				$section_shift = 10;
+				$section_spacing = 6;
+				$title_spacing = 4;
+				$summary_top = 90 + $section_shift;
 				$currency = ! empty($object->multicurrency_code) ? $object->multicurrency_code : $conf->currency;
 				$titre = $outputlangs->transnoentities("AmountInCurrency",$outputlangs->transnoentitiesnoconv("Currency".$currency));
 				$title_summary = $outputlangs->transnoentities("BtpOrdersSummaryTitle");
 				$pdf->SetFont('','B', $default_font_size - 1);
-				$pdf->SetXY($this->marge_gauche, $summary_top-8);
+				$pdf->SetXY($this->marge_gauche, $summary_top - $title_spacing);
 				$pdf->MultiCell(0, 2, $title_summary, 0, 'L');
 				$pdf->SetFont('','', $default_font_size - 2);
 				$pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3), $summary_top-4);
 				$pdf->MultiCell(($pdf->GetStringWidth($titre) + 3), 2, $titre);
 				$tab_top_newpage = (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)?42:10);
 				$summary_height = $this->_tableauBtpOrdersSummary($pdf, $summary_top, $outputlangs, $object->multicurrency_code);
-				$tab_top = $summary_top + $summary_height + 5;
+				$tab_top = $summary_top + $summary_height + $section_spacing;
 				$title_btp = $outputlangs->transnoentities("BtpSituationTableTitle");
 				$pdf->SetFont('','B', $default_font_size - 1);
-				$pdf->SetXY($this->marge_gauche, $tab_top-5);
+				$pdf->SetXY($this->marge_gauche, $tab_top - $title_spacing);
 				$pdf->MultiCell(0, 2, $title_btp, 0, 'L');
 				$tab_bottom = $this->page_hauteur + 5 - $heightforfreetext - $heightforfooter;
 				$tab_height = $tab_bottom - $tab_top;
