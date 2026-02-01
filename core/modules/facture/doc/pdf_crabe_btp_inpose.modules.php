@@ -2141,10 +2141,10 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 			if (empty($hidetop))
 			{
+				$pdf->Rect($colDef['xStartPos'], $tab_top, $colDef['width'], $header_height, 'F');
 				if (! $is_first_col) {
 					$pdf->line($colDef['xStartPos'], $tab_top, $colDef['xStartPos'], $tab_top + $header_height);
 				}
-				$pdf->Rect($colDef['xStartPos'], $tab_top, $colDef['width'], $header_height, 'F');
 				$pdf->SetXY($colDef['xStartPos'] + $colDef['title']['padding'][3], $tab_top + $colDef['title']['padding'][0] );
 
 				$textWidth = $colDef['width'] - $colDef['title']['padding'][3] -$colDef['title']['padding'][1];
