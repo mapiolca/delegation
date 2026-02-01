@@ -1,6 +1,6 @@
 # Délégation ChangeLog
 
-## 1.1.0 (2026-01-19)
+## 1.1.0 (2026-02-01)
 
 - Ajout du support de la Révision/Valorisation des marchés via montant absolu sur ligne.
 
