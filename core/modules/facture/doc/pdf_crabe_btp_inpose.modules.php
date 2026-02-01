@@ -2126,6 +2126,8 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$pdf->SetFillColor($header_fill_color[0], $header_fill_color[1], $header_fill_color[2]);
 		}
 
+		$pdf->SetLineWidth(0.1);
+
 		$is_first_col = true;
 		foreach ($this->cols as $colKey => $colDef)
 		{
