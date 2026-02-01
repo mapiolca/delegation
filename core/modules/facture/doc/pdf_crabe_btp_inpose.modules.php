@@ -399,6 +399,11 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				/**** DEBUT TABLEAU SPECIFIQUE ****/
 
 				$summary_top = 90;
+				$currency = ! empty($object->multicurrency_code) ? $object->multicurrency_code : $conf->currency;
+				$titre = $outputlangs->transnoentities("AmountInCurrency",$outputlangs->transnoentitiesnoconv("Currency".$currency));
+				$pdf->SetFont('','', $default_font_size - 2);
+				$pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3), $summary_top-4);
+				$pdf->MultiCell(($pdf->GetStringWidth($titre) + 3), 2, $titre);
 				$tab_top_newpage = (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)?42:10);
 				$summary_height = $this->_tableauBtpOrdersSummary($pdf, $summary_top, $outputlangs, $object->multicurrency_code);
 				$tab_top = $summary_top + $summary_height + 5;
@@ -3218,10 +3223,6 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 		if (empty($hidetop))
 		{
-			$titre = $outputlangs->transnoentities("AmountInCurrency",$outputlangs->transnoentitiesnoconv("Currency".$currency));
-			$pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3), $tab_top-4);
-			$pdf->MultiCell(($pdf->GetStringWidth($titre) + 3), 2, $titre);
-
 			$width = $this->page_largeur-$this->marge_gauche-$this->marge_droite-83;
 			
 			//$conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR='230,230,230';
