@@ -3,6 +3,7 @@
 ## 1.1.0 (2026-02-01)
 
 - Ajout du support de la Révision/Valorisation des marchés via montant absolu sur ligne.
+- Refonte du modèle LMDB BTP
 
 ## 1.0.0 (2026-01-19)
 
