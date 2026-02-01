@@ -2114,6 +2114,11 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$this->printRect($pdf,$this->marge_gauche, $tab_top, $this->page_largeur-$this->marge_gauche-$this->marge_droite, $tab_height, $hidetop, $hidebottom);	// Rect prend une longueur en 3eme param et 4eme param
 
 
+		if (empty($hidetop)) {
+			$pdf->SetFont('', 'B', $default_font_size - 2);
+			$pdf->SetTextColor(0, 0, 0);
+		}
+
 		foreach ($this->cols as $colKey => $colDef)
 		{
 			if(!$this->getColumnStatus($colKey)) continue;
@@ -2136,6 +2141,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		}
 
 		if (empty($hidetop)){
+			$pdf->SetFont('', '', $default_font_size - 1);
 			$pdf->line($this->marge_gauche, $tab_top+5, $this->page_largeur-$this->marge_droite, $tab_top+5);	// line prend une position y en 2eme param et 4eme param
 		}
 
