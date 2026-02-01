@@ -39,6 +39,7 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/companybankaccount.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/bank.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.facture.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
+require_once DOL_DOCUMENT_ROOT.'/commande/class/commande.class.php';
 
 // TSubtotal
 if (!empty($conf->subtotal->enabled)) dol_include_once('/subtotal/class/subtotal.class.php');
@@ -397,12 +398,31 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 				/**** DEBUT TABLEAU SPECIFIQUE ****/
 
-				$tab_top = 90;
+				$section_shift = 10;
+				$section_spacing = 6;
+				$title_spacing = 4;
+				$summary_top = 90 + $section_shift;
+				$currency = ! empty($object->multicurrency_code) ? $object->multicurrency_code : $conf->currency;
+				$titre = $outputlangs->transnoentities("AmountInCurrency",$outputlangs->transnoentitiesnoconv("Currency".$currency));
+				$title_summary = $outputlangs->transnoentities("BtpOrdersSummaryTitle");
+				$pdf->SetFont('','B', $default_font_size - 1);
+				$pdf->SetXY($this->marge_gauche, $summary_top - $title_spacing);
+				$pdf->MultiCell(0, 2, $title_summary, 0, 'L');
+				$pdf->SetFont('','', $default_font_size - 2);
+				$pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3), $summary_top-4);
+				$pdf->MultiCell(($pdf->GetStringWidth($titre) + 3), 2, $titre);
 				$tab_top_newpage = (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)?42:10);
-				$tab_height = 130;
+				$summary_height = $this->_tableauBtpOrdersSummary($pdf, $summary_top, $outputlangs, $object->multicurrency_code);
+				$tab_top = $summary_top + $summary_height + $section_spacing + 10;
+				$title_btp = $outputlangs->transnoentities("BtpSituationTableTitle");
+				$pdf->SetFont('','B', $default_font_size - 1);
+				$pdf->SetXY($this->marge_gauche, $tab_top - $title_spacing);
+				$pdf->MultiCell(0, 2, $title_btp, 0, 'L');
+				$tab_bottom = $this->page_hauteur + 5 - $heightforfreetext - $heightforfooter;
+				$tab_height = $tab_bottom - $tab_top;
 				$tab_height_newpage = 150;
 
-				$this->_tableauBtp($pdf, $tab_top, $this->page_hauteur - 85 - $heightforfreetext - $heightforfooter, 0, $outputlangs, 0, 0, $object->multicurrency_code);
+				$this->_tableauBtp($pdf, $tab_top, $tab_height, 0, $outputlangs, 0, 0, $object->multicurrency_code);
 				$bottomlasttab=$this->page_hauteur - $heightforinfotot - $heightforfreetext - $heightforfooter + 1;
 
 				$this->_pagefoot($pdf,$object,$outputlangs,1);
@@ -2069,6 +2089,14 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$pdf->SetTextColor(0,0,0);
 		$pdf->SetFont('','', $default_font_size - 2);
 
+		$highlight_row_index = null;
+		foreach ($rows as $index => $row) {
+			if (! empty($row['highlight'])) {
+				$highlight_row_index = $index;
+				break;
+			}
+		}
+
 		if (empty($hidetop))
 		{
 			$titre = $outputlangs->transnoentities("AmountInCurrency",$outputlangs->transnoentitiesnoconv("Currency".$currency));
@@ -2082,10 +2110,26 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$pdf->SetDrawColor(128,128,128);
 		$pdf->SetFont('','', $default_font_size - 1);
 
+		$header_height = 5;
+		$header_inset = 0.1;
+		$header_fill_color = array(240, 240, 240);
+		if (! empty($conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR)) {
+			$header_fill_color = explode(',', $conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR);
+		}
+
 		// Output Rect
 		$this->printRect($pdf,$this->marge_gauche, $tab_top, $this->page_largeur-$this->marge_gauche-$this->marge_droite, $tab_height, $hidetop, $hidebottom);	// Rect prend une longueur en 3eme param et 4eme param
 
 
+		if (empty($hidetop)) {
+			$pdf->SetFont('', 'B', $default_font_size - 2);
+			$pdf->SetTextColor(0, 0, 0);
+			$pdf->SetFillColor($header_fill_color[0], $header_fill_color[1], $header_fill_color[2]);
+		}
+
+		$pdf->SetLineWidth(0.1);
+
+		$is_first_col = true;
 		foreach ($this->cols as $colKey => $colDef)
 		{
 			if(!$this->getColumnStatus($colKey)) continue;
@@ -2100,14 +2144,20 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 			if (empty($hidetop))
 			{
+				$pdf->Rect($colDef['xStartPos'] + $header_inset, $tab_top + $header_inset, $colDef['width'] - ($header_inset * 2), $header_height - ($header_inset * 2), 'F');
+				if (! $is_first_col) {
+					$pdf->line($colDef['xStartPos'], $tab_top, $colDef['xStartPos'], $tab_top + $header_height);
+				}
 				$pdf->SetXY($colDef['xStartPos'] + $colDef['title']['padding'][3], $tab_top + $colDef['title']['padding'][0] );
 
 				$textWidth = $colDef['width'] - $colDef['title']['padding'][3] -$colDef['title']['padding'][1];
 				$pdf->MultiCell($textWidth,2,$colDef['title']['label'],'',$colDef['title']['align']);
 			}
+			$is_first_col = false;
 		}
 
 		if (empty($hidetop)){
+			$pdf->SetFont('', '', $default_font_size - 1);
 			$pdf->line($this->marge_gauche, $tab_top+5, $this->page_largeur-$this->marge_droite, $tab_top+5);	// line prend une position y en 2eme param et 4eme param
 		}
 
@@ -3085,10 +3135,112 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$this->posx_cumul_anterieur = 130;
 		$this->posx_month = 166;
 		
-		$tab_height -= 15; // Réduction de la hauteur global du tableau
+		$row_height = 12;
 		$column_width = 35;
 		$header_height = 5;
 		$cell_padding = 1;
+		$row_text_offset = 3;
+		$columns_x = array(
+			$this->posx_new_cumul + $cell_padding,
+			$this->posx_cumul_anterieur + $cell_padding,
+			$this->posx_month + $cell_padding
+		);
+
+		// EN: Build rows dynamically for a flexible layout.
+		// FR: Construire les lignes dynamiquement pour un tableau souple.
+		$rows = array();
+		$rows[] = array(
+			'label' => $outputlangs->transnoentities("BtpAmountsHT"),
+			'values' => array(
+				$this->TDataSituation['nouveau_cumul'],
+				$this->TDataSituation['cumul_anterieur'],
+				$this->TDataSituation['mois']
+			)
+		);
+
+		$vat_rates = array();
+		if (! empty($this->TDataSituation['vat_rates']) && is_array($this->TDataSituation['vat_rates'])) {
+			$vat_rates = $this->TDataSituation['vat_rates'];
+		}
+
+		if (! empty($vat_rates)) {
+			foreach ($vat_rates as $vatRateInfo) {
+				$rateLabel = price($vatRateInfo['rate'], 0, $outputlangs, 0, 0, 2).'%';
+				$rows[] = array(
+					'label' => $outputlangs->transnoentities("BtpAmountsVatRate", $rateLabel),
+					'values' => array(
+						$vatRateInfo['nouveau_cumul'],
+						$vatRateInfo['cumul_anterieur'],
+						$vatRateInfo['mois']
+					)
+				);
+			}
+		} else {
+			$rows[] = array(
+				'label' => $outputlangs->transnoentities("BtpAmountsVat"),
+				'values' => array(
+					$this->TDataSituation['nouveau_cumul_tva'],
+					$this->TDataSituation['cumul_anterieur_tva'],
+					$this->TDataSituation['mois_tva']
+				)
+			);
+		}
+
+		$rows[] = array(
+			'label' => $outputlangs->transnoentities("BtpAmountsTTC"),
+			'values' => array(
+				$this->TDataSituation['nouveau_cumul_ttc'],
+				$this->TDataSituation['cumul_anterieur_ttc'],
+				$this->TDataSituation['mois_ttc']
+			),
+			'bold' => true,
+			'highlight' => true
+		);
+
+		$rows[] = array(
+			'label' => $outputlangs->transnoentities("BtpRetenueGarantie"),
+			'values' => array(
+				$this->TDataSituation['retenue_garantie'],
+				$this->TDataSituation['retenue_garantie_anterieure'],
+				$this->TDataSituation['retenue_garantie_mois']
+			)
+		);
+		$rows[] = array(
+			'label' => $outputlangs->transnoentities("DelegationMpValoTotalLabel"),
+			'values' => array(
+				$this->TDataSituation['mpvalo_nouveau_cumul'],
+				$this->TDataSituation['mpvalo_cumul_anterieur'],
+				$this->TDataSituation['mpvalo_mois']
+			)
+		);
+		$rows[] = array(
+			'label' => $outputlangs->transnoentities("Compte Prorata"),
+			'values' => array(
+				$this->TDataSituation['compte_prorata'],
+				$this->TDataSituation['compte_prorata_anterieur'],
+				$this->TDataSituation['compte_prorata_mois']
+			)
+		);
+		$rows[] = array(
+			'label' => $outputlangs->transnoentities("DelegationPayments"),
+			'values' => array(
+				$this->TDataSituation['delegation_paiement'],
+				$this->TDataSituation['delegation_paiement_anterieur'],
+				$this->TDataSituation['delegation_paiement_mois']
+			)
+		);
+		$rows[] = array(
+			'label' => $outputlangs->transnoentities("BtpRayToRest"),
+			'values' => array(
+				$this->TDataSituation['total_ttc'],
+				$this->TDataSituation['total_ttc_anterieur'],
+				$this->TDataSituation['total_ttc_mois']
+			),
+			'bold' => true
+		);
+
+		$row_count = count($rows);
+		$tab_height = $header_height + ($row_height * $row_count);
 		
 		
 		// Force to disable hidetop and hidebottom
@@ -3104,17 +3256,15 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 		if (empty($hidetop))
 		{
-			$titre = $outputlangs->transnoentities("AmountInCurrency",$outputlangs->transnoentitiesnoconv("Currency".$currency));
-			$pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3), $tab_top-4);
-			$pdf->MultiCell(($pdf->GetStringWidth($titre) + 3), 2, $titre);
-
 			$width = $this->page_largeur-$this->marge_gauche-$this->marge_droite-83;
 			
 			//$conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR='230,230,230';
 			if (! empty($conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR))
 			{
-				$pdf->Rect($this->posx_new_cumul-1, $tab_top, $width, 5, 'F', null, explode(',',$conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR));
-				$pdf->Rect($this->marge_gauche, $tab_top+92.5, $this->page_largeur-$this->marge_gauche-$this->marge_droite, 5, 'F', null, explode(',',$conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR));
+				$pdf->Rect($this->posx_new_cumul-1, $tab_top, $width, $header_height, 'F', null, explode(',',$conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR));
+				if ($highlight_row_index !== null) {
+					$pdf->Rect($this->marge_gauche, $tab_top + $header_height + ($row_height * $highlight_row_index), $this->page_largeur-$this->marge_gauche-$this->marge_droite, $row_height, 'F', null, explode(',',$conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR));
+				}
 			}
 			else
 			{
@@ -3128,6 +3278,11 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$pdf->SetLineWidth(0.1);
 		$pdf->SetFont('','', $default_font_size - 1);
 
+		$header_fill_color = array(240, 240, 240);
+		if (! empty($conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR)) {
+			$header_fill_color = explode(',', $conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR);
+		}
+
 		// Output Rect
 		// KEEPTHIS => Affiche les bords extérieurs
 		$this->printRectBtp($pdf,$this->marge_gauche, $tab_top, $this->page_largeur-$this->marge_gauche-$this->marge_droite, $tab_height, $hidetop, $hidebottom);	// Rect prend une longueur en 3eme param et 4eme param
@@ -3138,147 +3293,296 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		{
 			$pdf->SetFont('','B', $default_font_size - 1);
 			$pdf->SetXY($this->posx_new_cumul-1, $tab_top+0.5);
-			$pdf->MultiCell($column_width, 2, $outputlangs->transnoentities("BtpNewCumul"), '', 'C');
+			$pdf->SetFillColor($header_fill_color[0], $header_fill_color[1], $header_fill_color[2]);
+			$pdf->MultiCell($column_width, 2, $outputlangs->transnoentities("BtpNewCumul"), '', 'C', 1);
 		}
 		
 		$pdf->line($this->posx_cumul_anterieur-1, $tab_top, $this->posx_cumul_anterieur-1, $tab_top + $tab_height);
 		if (empty($hidetop))
 		{
 			$pdf->SetXY($this->posx_cumul_anterieur-1, $tab_top+0.5);
-			$pdf->MultiCell($column_width, 2, $outputlangs->transnoentities("BtpAnteCumul"), '', 'C');
+			$pdf->SetFillColor($header_fill_color[0], $header_fill_color[1], $header_fill_color[2]);
+			$pdf->MultiCell($column_width, 2, $outputlangs->transnoentities("BtpAnteCumul"), '', 'C', 1);
 		}
 		
 		$pdf->line($this->posx_month-1, $tab_top, $this->posx_month-1, $tab_top + $tab_height);
 		if (empty($hidetop))
 		{
 			$pdf->SetXY($this->posx_month-1, $tab_top+0.5);
-			$pdf->MultiCell($column_width, 2, $outputlangs->transnoentities("Month"), '', 'C');
+			$pdf->SetFillColor($header_fill_color[0], $header_fill_color[1], $header_fill_color[2]);
+			$pdf->MultiCell($column_width, 2, $outputlangs->transnoentities("Month"), '', 'C', 1);
 			$pdf->SetFont('','', $default_font_size - 1);
 		}
 		
 		// ADD HORIZONTALE LINES
-		$pdf->line($this->posx_new_cumul-1, $tab_top+5, $this->page_largeur-$this->marge_droite, $tab_top+5);
-		
-		$pdf->line($this->posx_new_cumul-1, $tab_top+25, $this->page_largeur-$this->marge_droite, $tab_top+25);
-		
-		$pdf->line($this->marge_gauche, $tab_top+45, $this->page_largeur-$this->marge_droite, $tab_top+45);
-		
-		$pdf->line($this->marge_gauche, $tab_top+65, $this->page_largeur-$this->marge_droite, $tab_top+65);
-
-		$pdf->line($this->marge_gauche, $tab_top+85, $this->page_largeur-$this->marge_droite, $tab_top+85);
-
-		$pdf->line($this->marge_gauche, $tab_top+105, $this->page_largeur-$this->marge_droite, $tab_top+105);
-		
-		$pdf->line($this->marge_gauche, $tab_top+125, $this->page_largeur-$this->marge_droite, $tab_top+125);
-
-		$pdf->line($this->marge_gauche, $tab_top+145, $this->page_largeur-$this->marge_droite, $tab_top+145);
-		
-		//$pdf->line($this->marge_gauche, $tab_top+165, $this->page_largeur-$this->marge_droite, $tab_top+165);
-		
+		for ($row_index = 0; $row_index <= $row_count; $row_index++) {
+			$line_y = $tab_top + $header_height + ($row_height * $row_index);
+			$line_start_x = ($row_index === 0 ? $this->posx_new_cumul-1 : $this->marge_gauche);
+			$pdf->line($line_start_x, $line_y, $this->page_largeur-$this->marge_droite, $line_y);
+		}
 		
 		// ADD TEXT INTO CELL
-		/**********************Titres*******************************/
-		$pdf->SetXY($this->marge_gauche+2, $tab_top+8);
-		$pdf->MultiCell(80,2, $outputlangs->transnoentities("BtpMainWork"),'','L');
-		
-		$pdf->SetXY($this->marge_gauche+2, $tab_top+12);
-		$pdf->MultiCell(80,2, $outputlangs->transnoentities("BtpAdditionalWork"),'','L');
-		
-		$pdf->SetXY($this->marge_gauche+2, $tab_top+26);
-		$pdf->MultiCell(80,2, $outputlangs->transnoentities("TotalHT"),'','C');
-		
-		$pdf->SetXY($this->marge_gauche+2, $tab_top+30);
-		$pdf->MultiCell(80,2, $outputlangs->transnoentities("VAT"),'','C');
-		
-		$pdf->SetXY($this->marge_gauche+2, $tab_top+34);
-		$pdf->MultiCell(80,2, $outputlangs->transnoentities("TotalTTC"),'','C');
+		foreach ($rows as $row_index => $row) {
+			$row_y = $tab_top + $header_height + ($row_height * $row_index);
+			$is_bold = (! empty($row['bold']));
+			$font_size = $default_font_size - ($is_bold ? 1 : 2);
 
-		
-		$pdf->SetFont('','B', $default_font_size - 1);
-		$pdf->SetXY($this->marge_gauche+2, $tab_top+53);
-		$pdf->MultiCell(80,2, $outputlangs->transnoentities("BtpTotalSituationTTC"),'','C');
-		$pdf->SetFont('','', $default_font_size - 2);
-		
-		
-		$pdf->SetXY($this->marge_gauche+2, $tab_top+74);
-		$pdf->MultiCell(80,2, $outputlangs->transnoentities("BtpRetenueGarantie"),'','C');
+			$pdf->SetFont('', ($is_bold ? 'B' : ''), $font_size);
+			$pdf->SetXY($this->marge_gauche+2, $row_y + $row_text_offset);
+			$pdf->MultiCell(80, 2, $row['label'], '', 'C');
 
-		$pdf->SetXY($this->marge_gauche+2, $tab_top+94);
-		$pdf->MultiCell(80,2, $outputlangs->transnoentities("DelegationMpValoTotalLabel"), '', 'C');
-
-		$pdf->SetXY($this->marge_gauche+2, $tab_top+114);
-		$pdf->MultiCell(80,2, $outputlangs->transnoentities("Compte Prorata"), '', 'C');
-
-		$pdf->SetXY($this->marge_gauche+2, $tab_top+134);
-		$pdf->MultiCell(80,2, $outputlangs->transnoentities("DelegationPayments"), '', 'C');
-		
-		$pdf->SetFont('','B', $default_font_size - 1);
-		$pdf->SetXY($this->marge_gauche+2, $tab_top+155);
-		$pdf->MultiCell(80,2, $outputlangs->transnoentities("BtpRayToRest"),'','C');
-		$pdf->SetFont('','', $default_font_size - 2);
-
-		/***********************************************************/
-		
-		/**********************Données*******************************/
-		$TToDpisplay = array(
-								0=>array(
-											'nouveau_cumul', 'nouveau_cumul', 'nouveau_cumul_tva', 'nouveau_cumul_ttc', 'nouveau_cumul_ttc', 'retenue_garantie', 'mpvalo_nouveau_cumul', 'compte_prorata', 'delegation_paiement', 'total_ttc'
-										)
-								,1=>array(
-											'cumul_anterieur', 'cumul_anterieur', 'cumul_anterieur_tva', 'cumul_anterieur_ttc', 'cumul_anterieur_ttc', 'retenue_garantie_anterieure', 'mpvalo_cumul_anterieur', 'compte_prorata_anterieur', 'delegation_paiement_anterieur', 'total_ttc_anterieur'
-										)
-								,2=>array(
-											'mois', 'mois', 'mois_tva', 'mois_ttc', 'mois_ttc', 'retenue_garantie_mois', 'mpvalo_mois', 'compte_prorata_mois', 'delegation_paiement_mois', 'total_ttc_mois'
-										)
-							);
-		
-		$x = $this->posx_new_cumul + $cell_padding;
-		foreach($TToDpisplay as $Tab) {
-			
-			$pdf->SetXY($x, $tab_top+8);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[0]], 0, $outputlangs, 0, 0, 2), '', 'R');
-			
-			$pdf->SetXY($x, $tab_top+26);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[1]], 0, $outputlangs, 0, 0, 2), '', 'R');
-			
-			$pdf->SetXY($x, $tab_top+30);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[2]], 0, $outputlangs, 0, 0, 2), '', 'R');
-			
-			$pdf->SetXY($x, $tab_top+34);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[3]], 0, $outputlangs, 0, 0, 2), '', 'R');
-			$pdf->SetFont('','B', $default_font_size - 1);
-
-			$pdf->SetXY($x, $tab_top+53);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[4]], 0, $outputlangs, 0, 0, 2), '', 'R');
-			$pdf->SetFont('','', $default_font_size - 2);
-		
-		
-			$pdf->SetXY($x, $tab_top+74);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[5]], 0, $outputlangs, 0, 0, 2), '', 'R');
-			$pdf->SetFont('','', $default_font_size - 2);
-	
-			$pdf->SetXY($x, $tab_top+93);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[6]], 0, $outputlangs, 0, 0, 2), '', 'R');
-			$pdf->SetFont('','', $default_font_size - 2);
-
-			$pdf->SetXY($x, $tab_top+113);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[7]], 0, $outputlangs, 0, 0, 2), '', 'R');
-			$pdf->SetFont('','', $default_font_size - 2);
-
-			$pdf->SetXY($x, $tab_top+133);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[8]], 0, $outputlangs, 0, 0, 2), '', 'R');
-			$pdf->SetFont('','', $default_font_size - 2);
-
-			$pdf->SetXY($x, $tab_top+155);
-			$pdf->SetFont('','B', $default_font_size - 1);
-			$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($this->TDataSituation[$Tab[9]], 0, $outputlangs, 0, 0, 2), '', 'R');
-			
-			
-			$x+=$column_width;
-
+			foreach ($row['values'] as $col_index => $value) {
+				if (! isset($columns_x[$col_index])) {
+					continue;
+				}
+				$pdf->SetXY($columns_x[$col_index], $row_y + $row_text_offset);
+				$pdf->MultiCell($column_width - ($cell_padding * 2), 2, price($value, 0, $outputlangs, 0, 0, 2), '', 'R');
+			}
 		}
-		/************************************************************/
 		
+	}
+
+	/**
+	 * @param TCPDF $pdf
+	 * @param float $top
+	 * @param Translate $outputlangs
+	 * @param string $currency
+	 * @return float
+	 */
+	function _tableauBtpOrdersSummary(&$pdf, $top, $outputlangs, $currency='')
+	{
+		global $conf;
+
+		$currency = ! empty($currency) ? $currency : $conf->currency;
+		$default_font_size = pdf_getPDFFontSize($outputlangs);
+		$line_height = 5;
+		$table_width = $this->page_largeur - $this->marge_gauche - $this->marge_droite;
+		$fixed_width = 25;
+		$desc_width = $table_width - ($fixed_width * 4);
+		$col_positions = array(
+			$this->marge_gauche,
+			$this->marge_gauche + $desc_width,
+			$this->marge_gauche + $desc_width + $fixed_width,
+			$this->marge_gauche + $desc_width + ($fixed_width * 2),
+			$this->marge_gauche + $desc_width + ($fixed_width * 3),
+			$this->marge_gauche + $desc_width + ($fixed_width * 4),
+		);
+
+		$rows = array();
+
+		$mainLabel = $outputlangs->transnoentities("BtpMainWork");
+		if (! empty($this->TDataSituation['main_order_ref'])) {
+			$mainOrderRefClient = $this->TDataSituation['main_order_ref_client'];
+			if (empty($mainOrderRefClient)) {
+				$mainOrderRefClient = $outputlangs->transnoentities('non_renseigne');
+			}
+			$mainLabel = $outputlangs->transnoentities(
+				"BtpMainWorkWithRef",
+				$outputlangs->convToOutputCharset($this->TDataSituation['main_order_ref']),
+				$outputlangs->convToOutputCharset($mainOrderRefClient)
+			);
+		}
+		$rows[] = array(
+			'desc' => $mainLabel,
+			'date' => $this->TDataSituation['main_order_date'],
+			'ht' => $this->TDataSituation['main_order_total_ht'],
+			'tva' => $this->TDataSituation['main_order_total_tva'],
+			'ttc' => $this->TDataSituation['main_order_total_ttc'],
+		);
+
+		if (! empty($this->TDataSituation['additional_orders']) && is_array($this->TDataSituation['additional_orders'])) {
+			$additionalIndex = 1;
+			foreach ($this->TDataSituation['additional_orders'] as $orderInfo) {
+				$orderRefClient = $orderInfo['ref_client'];
+				if (empty($orderRefClient)) {
+					$orderRefClient = $outputlangs->transnoentities('non_renseigne');
+				}
+				$rows[] = array(
+					'desc' => $outputlangs->transnoentities(
+						"BtpAvenantLine",
+						$additionalIndex,
+						$outputlangs->convToOutputCharset($orderInfo['ref']),
+						$outputlangs->convToOutputCharset($orderRefClient)
+					),
+					'date' => $orderInfo['date'],
+					'ht' => $orderInfo['total_ht'],
+					'tva' => $orderInfo['total_tva'],
+					'ttc' => $orderInfo['total_ttc'],
+				);
+				$additionalIndex++;
+			}
+		}
+
+		$total_ht = 0;
+		$total_tva = 0;
+		$total_ttc = 0;
+		foreach ($rows as $row) {
+			$total_ht += (float) $row['ht'];
+			$total_tva += (float) $row['tva'];
+			$total_ttc += (float) $row['ttc'];
+		}
+		$rows[] = array(
+			'desc' => $outputlangs->transnoentities("BtpOrdersSummaryTotal"),
+			'date' => '',
+			'ht' => $total_ht,
+			'tva' => $total_tva,
+			'ttc' => $total_ttc,
+		);
+
+		$height = $line_height * (count($rows) + 1);
+
+		if (! empty($conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR)) {
+			$pdf->Rect($this->marge_gauche, $top, $table_width, $line_height, 'F', null, explode(',', $conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR));
+		} else {
+			$pdf->SetFillColor(240, 240, 240);
+			$pdf->Rect($this->marge_gauche, $top, $table_width, $line_height, 'F');
+			$pdf->SetFillColor(255, 255, 255);
+		}
+
+		$header_fill_color = array(240, 240, 240);
+		if (! empty($conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR)) {
+			$header_fill_color = explode(',', $conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR);
+		}
+
+		$pdf->SetDrawColor(128, 128, 128);
+		$pdf->SetLineWidth(0.1);
+		$pdf->Rect($this->marge_gauche, $top, $table_width, $height);
+		for ($i = 1; $i < count($col_positions); $i++) {
+			$pdf->Line($col_positions[$i], $top, $col_positions[$i], $top + $height);
+		}
+		for ($i = 1; $i <= count($rows); $i++) {
+			$pdf->Line($this->marge_gauche, $top + ($i * $line_height), $this->marge_gauche + $table_width, $top + ($i * $line_height));
+		}
+
+		$pdf->SetFont('', 'B', $default_font_size - 2);
+		$pdf->SetTextColor(0, 0, 0);
+		$pdf->SetFillColor($header_fill_color[0], $header_fill_color[1], $header_fill_color[2]);
+		$pdf->SetXY($this->marge_gauche + 1, $top + 1);
+		$pdf->MultiCell($desc_width - 2, $line_height - 1, $outputlangs->transnoentities("BtpOrdersSummaryDescription"), 0, 'L', 1);
+		$pdf->SetXY($col_positions[1] + 1, $top + 1);
+		$pdf->MultiCell($fixed_width - 2, $line_height - 1, $outputlangs->transnoentities("BtpOrdersSummaryDate"), 0, 'L', 1);
+		$pdf->SetXY($col_positions[2] + 1, $top + 1);
+		$pdf->MultiCell($fixed_width - 2, $line_height - 1, $outputlangs->transnoentities("BtpOrdersSummaryAmountHT"), 0, 'R', 1);
+		$pdf->SetXY($col_positions[3] + 1, $top + 1);
+		$pdf->MultiCell($fixed_width - 2, $line_height - 1, $outputlangs->transnoentities("BtpOrdersSummaryVAT"), 0, 'R', 1);
+		$pdf->SetXY($col_positions[4] + 1, $top + 1);
+		$pdf->MultiCell($fixed_width - 2, $line_height - 1, $outputlangs->transnoentities("BtpOrdersSummaryAmountTTC"), 0, 'R', 1);
+
+		$pdf->SetFont('', '', $default_font_size - 2);
+		$row_index = 0;
+		foreach ($rows as $row) {
+			$y = $top + $line_height + ($row_index * $line_height);
+			$pdf->SetXY($this->marge_gauche + 1, $y + 1);
+			$pdf->MultiCell($desc_width - 2, $line_height - 1, $row['desc'], 0, 'L');
+
+			$date_value = '';
+			if (! empty($row['date'])) {
+				$date_value = dol_print_date($row['date'], "day", false, $outputlangs);
+			}
+			$pdf->SetXY($col_positions[1] + 1, $y + 1);
+			$pdf->MultiCell($fixed_width - 2, $line_height - 1, $date_value, 0, 'L');
+
+			$pdf->SetXY($col_positions[2] + 1, $y + 1);
+			$pdf->MultiCell($fixed_width - 2, $line_height - 1, price($row['ht'], 0, $outputlangs, 0, 0, 2), 0, 'R');
+			$pdf->SetXY($col_positions[3] + 1, $y + 1);
+			$pdf->MultiCell($fixed_width - 2, $line_height - 1, price($row['tva'], 0, $outputlangs, 0, 0, 2), 0, 'R');
+			$pdf->SetXY($col_positions[4] + 1, $y + 1);
+			$pdf->MultiCell($fixed_width - 2, $line_height - 1, price($row['ttc'], 0, $outputlangs, 0, 0, 2), 0, 'R');
+			$row_index++;
+		}
+
+		return $height;
+	}
+
+	/**
+	 * @param array $invoiceIds
+	 * @return array
+	 */
+	private function getLinkedOrdersByInvoiceIds($invoiceIds)
+	{
+		$ordersByInvoice = array();
+
+		if (empty($invoiceIds) || ! is_array($invoiceIds)) {
+			return $ordersByInvoice;
+		}
+
+		$filteredInvoiceIds = array();
+		foreach ($invoiceIds as $invoiceId) {
+			$invoiceId = (int) $invoiceId;
+			if ($invoiceId > 0) {
+				$filteredInvoiceIds[$invoiceId] = $invoiceId;
+			}
+		}
+		if (empty($filteredInvoiceIds)) {
+			return $ordersByInvoice;
+		}
+
+		$sql = "SELECT ee.fk_source, ee.fk_target, ee.sourcetype, ee.targettype";
+		$sql.= " FROM ".MAIN_DB_PREFIX."element_element as ee";
+		$sql.= " WHERE (ee.sourcetype = 'facture'";
+		$sql.= " AND ee.fk_source IN (".implode(',', $filteredInvoiceIds).")";
+		$sql.= " AND ee.targettype = 'commande')";
+		$sql.= " OR (ee.targettype = 'facture'";
+		$sql.= " AND ee.fk_target IN (".implode(',', $filteredInvoiceIds).")";
+		$sql.= " AND ee.sourcetype = 'commande')";
+
+		$resql = $this->db->query($sql);
+		if (! $resql) {
+			return $ordersByInvoice;
+		}
+
+		while ($obj = $this->db->fetch_object($resql)) {
+			$invoiceId = ($obj->sourcetype === 'facture') ? (int) $obj->fk_source : (int) $obj->fk_target;
+			$orderId = ($obj->sourcetype === 'facture') ? (int) $obj->fk_target : (int) $obj->fk_source;
+			if ($invoiceId <= 0 || $orderId <= 0) {
+				continue;
+			}
+			if (empty($ordersByInvoice[$invoiceId])) {
+				$ordersByInvoice[$invoiceId] = array();
+			}
+			$ordersByInvoice[$invoiceId][$orderId] = $orderId;
+		}
+
+		foreach ($ordersByInvoice as $invoiceId => $orderIds) {
+			$ordersByInvoice[$invoiceId] = array_values($orderIds);
+		}
+
+		return $ordersByInvoice;
+	}
+
+	/**
+	 * @param array $orderIds
+	 * @return array
+	 */
+	private function getOrdersInfo($orderIds)
+	{
+		$ordersInfo = array();
+
+		if (empty($orderIds) || ! is_array($orderIds)) {
+			return $ordersInfo;
+		}
+
+		foreach ($orderIds as $orderId) {
+			$orderId = (int) $orderId;
+			if ($orderId <= 0) {
+				continue;
+			}
+			$order = new Commande($this->db);
+			if ($order->fetch($orderId) <= 0) {
+				continue;
+			}
+			$ordersInfo[$orderId] = array(
+				'id' => $orderId,
+				'ref' => $order->ref,
+				'ref_client' => $order->ref_client,
+				'total_ht' => $order->total_ht,
+				'total_tva' => $order->total_tva,
+				'total_ttc' => $order->total_ttc,
+				'date' => $order->date_commande,
+			);
+		}
+
+		return $ordersInfo;
 	}
 
 
@@ -3306,10 +3610,87 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 									,'date_derniere_situation'=>$facDerniereSituation->date
 								);
 
+		$situationInvoices = array();
+		if (! empty($TPreviousIncoice)) {
+			foreach ($TPreviousIncoice as $previousInvoice) {
+				if (! empty($previousInvoice->id)) {
+					$situationInvoices[$previousInvoice->id] = $previousInvoice;
+				}
+			}
+		}
+		if (! empty($object->id)) {
+			$situationInvoices[$object->id] = $object;
+		}
+		if (! empty($object->tab_next_situation_invoice) && is_array($object->tab_next_situation_invoice)) {
+			foreach ($object->tab_next_situation_invoice as $nextInvoice) {
+				if (! empty($nextInvoice->id)) {
+					$situationInvoices[$nextInvoice->id] = $nextInvoice;
+				}
+			}
+		}
+
+		$ordersByInvoice = $this->getLinkedOrdersByInvoiceIds(array_keys($situationInvoices));
+		$allOrderIds = array();
+		foreach ($ordersByInvoice as $orderIds) {
+			foreach ($orderIds as $orderId) {
+				$allOrderIds[$orderId] = $orderId;
+			}
+		}
+		$ordersInfo = $this->getOrdersInfo($allOrderIds);
+
+		$firstSituationInvoice = null;
+		foreach ($situationInvoices as $invoice) {
+			if ($firstSituationInvoice === null) {
+				$firstSituationInvoice = $invoice;
+				continue;
+			}
+			$invoiceDate = (int) $invoice->date;
+			$firstDate = (int) $firstSituationInvoice->date;
+			if ($invoiceDate > 0 && ($firstDate == 0 || $invoiceDate < $firstDate)) {
+				$firstSituationInvoice = $invoice;
+			}
+		}
+
+		$mainOrderInfo = null;
+		if ($firstSituationInvoice && ! empty($ordersByInvoice[$firstSituationInvoice->id])) {
+			foreach ($ordersByInvoice[$firstSituationInvoice->id] as $orderId) {
+				if (empty($ordersInfo[$orderId])) {
+					continue;
+				}
+				if ($mainOrderInfo === null) {
+					$mainOrderInfo = $ordersInfo[$orderId];
+					continue;
+				}
+				$orderDate = (int) $ordersInfo[$orderId]['date'];
+				$mainOrderDate = (int) $mainOrderInfo['date'];
+				if ($orderDate > 0 && ($mainOrderDate == 0 || $orderDate < $mainOrderDate)) {
+					$mainOrderInfo = $ordersInfo[$orderId];
+				}
+			}
+		}
+
+		$additionalOrders = array();
+		foreach ($ordersInfo as $orderInfo) {
+			if (! empty($mainOrderInfo) && $orderInfo['id'] == $mainOrderInfo['id']) {
+				continue;
+			}
+			$additionalOrders[] = $orderInfo;
+		}
+		if (! empty($additionalOrders)) {
+			$additionalOrderDates = array();
+			$additionalOrderRefs = array();
+			foreach ($additionalOrders as $index => $orderInfo) {
+				$additionalOrderDates[$index] = (int) $orderInfo['date'];
+				$additionalOrderRefs[$index] = $orderInfo['ref'];
+			}
+			array_multisort($additionalOrderDates, SORT_ASC, $additionalOrderRefs, SORT_ASC, $additionalOrders);
+		}
+
 		$del_lines = array();
 
 		
 		$cumul_anterieur_ht = $cumul_anterieur_tva = $retenue_garantie = 0;
+		$vat_rates = array();
 	
 		if(!empty($TPreviousIncoice)) {
 			foreach($TPreviousIncoice as $fac) {
@@ -3324,6 +3705,19 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 					$fac_total_ht += (float) $line->total_ht;
 					$fac_total_tva += (float) $line->total_tva;
 					$fac_total_ttc += (float) $line->total_ttc;
+					// EN: Collect VAT totals per rate for previous invoices.
+					// FR: Collecter les totaux de TVA par taux pour les factures précédentes.
+					$vat_rate = price2num($line->tva_tx, 'MU');
+					$vat_rate_key = (string) $vat_rate;
+					if (! isset($vat_rates[$vat_rate_key])) {
+						$vat_rates[$vat_rate_key] = array(
+							'rate' => $vat_rate,
+							'cumul_anterieur' => 0,
+							'mois' => 0,
+							'nouveau_cumul' => 0
+						);
+					}
+					$vat_rates[$vat_rate_key]['cumul_anterieur'] += (float) $line->total_tva;
 				}
 				$cumul_anterieur_ht += $fac_total_ht;
 				$cumul_anterieur_tva += $fac_total_tva;
@@ -3365,6 +3759,19 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$total_ht += (float) $line->total_ht;
 			$total_tva += (float) $line->total_tva;
 			$total_ttc += (float) $line->total_ttc;
+			// EN: Collect VAT totals per rate for the current invoice.
+			// FR: Collecter les totaux de TVA par taux pour la facture courante.
+			$vat_rate = price2num($line->tva_tx, 'MU');
+			$vat_rate_key = (string) $vat_rate;
+			if (! isset($vat_rates[$vat_rate_key])) {
+				$vat_rates[$vat_rate_key] = array(
+					'rate' => $vat_rate,
+					'cumul_anterieur' => 0,
+					'mois' => 0,
+					'nouveau_cumul' => 0
+				);
+			}
+			$vat_rates[$vat_rate_key]['mois'] += (float) $line->total_tva;
 		}
 
 		$nouveau_cumul = $cumul_anterieur_ht + $total_ht;
@@ -3390,6 +3797,36 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$TDataSituation['delegation_paiement'] = '';
 		$TDataSituation['mpvalo_nouveau_cumul'] = $mpvalo_nouveau_cumul;
 		$TDataSituation['total_ttc'] = $TDataSituation['nouveau_cumul_ttc'] - $TDataSituation['retenue_garantie'] - $TDataSituation['compte_prorata'] + $TDataSituation['mpvalo_nouveau_cumul'];
+
+		foreach ($vat_rates as $vat_rate_key => $vat_rate_info) {
+			$vat_rates[$vat_rate_key]['nouveau_cumul'] = $vat_rate_info['cumul_anterieur'] + $vat_rate_info['mois'];
+		}
+		$vat_rates_keys = array_keys($vat_rates);
+		sort($vat_rates_keys, SORT_NUMERIC);
+		$vat_rates_sorted = array();
+		foreach ($vat_rates_keys as $vat_rate_key) {
+			$vat_rates_sorted[$vat_rate_key] = $vat_rates[$vat_rate_key];
+		}
+		$TDataSituation['vat_rates'] = $vat_rates_sorted;
+
+		$marcheInitial = $nouveau_cumul;
+		$marcheInitialTva = $nouveau_cumul_tva;
+		$marcheInitialTtc = $TDataSituation['nouveau_cumul_ttc'];
+		$marcheInitialDate = '';
+		if (! empty($mainOrderInfo) && isset($mainOrderInfo['total_ht'])) {
+			$marcheInitial = (float) $mainOrderInfo['total_ht'];
+			$marcheInitialTva = (float) $mainOrderInfo['total_tva'];
+			$marcheInitialTtc = (float) $mainOrderInfo['total_ttc'];
+			$marcheInitialDate = $mainOrderInfo['date'];
+		}
+		$TDataSituation['marche_initial'] = $marcheInitial;
+		$TDataSituation['main_order_ref'] = (! empty($mainOrderInfo) ? $mainOrderInfo['ref'] : '');
+		$TDataSituation['main_order_ref_client'] = (! empty($mainOrderInfo) ? $mainOrderInfo['ref_client'] : '');
+		$TDataSituation['main_order_date'] = $marcheInitialDate;
+		$TDataSituation['main_order_total_ht'] = $marcheInitial;
+		$TDataSituation['main_order_total_tva'] = $marcheInitialTva;
+		$TDataSituation['main_order_total_ttc'] = $marcheInitialTtc;
+		$TDataSituation['additional_orders'] = $additionalOrders;
 		
 		$TDataSituation['mois'] = $total_ht;
 		$TDataSituation['mois_tva'] = $total_tva;
