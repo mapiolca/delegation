@@ -43,7 +43,7 @@ function delegation_setup_print_on_off($label, $constname, $help = '')
 	global $bc, $var, $langs, $form;
 
 	$var = ! $var;
-	print '<tr '.$bc[$var].'>';
+	print '<tr class="oddeven"'.$bc[$var].'>';
 	print '<td align="left">';
 	if (! empty($help)) {
 		print $form->textwithtooltip($label, $help, 2, 1, img_info());
@@ -77,7 +77,7 @@ function delegation_setup_print_input_form_part($label, $inputhtml, $action, $bu
 	global $bc, $var, $langs, $form;
 
 	$var = ! $var;
-	print '<tr '.$bc[$var].'>';
+	print '<tr class="oddeven"'.$bc[$var].'>';
 	print '<td align="left">';
 	if (! empty($help)) {
 		print $form->textwithtooltip($label, $help, 2, 1, img_info());
