@@ -81,6 +81,7 @@ class modDelegation extends DolibarrModules
 		$this->picto = 'delegation@delegation';
 
 		$this->editor_name = 'Les Métiers du Bâtiment';
+		$this->editor_url = 'https://lesmetiersdubatiment.fr';
 
 		// Defined all module parts (triggers, login, substitutions, menus, css, etc...)
 		// for default path (eg: /mymodule/core/xxxxx) (0=disable, 1=enable)
