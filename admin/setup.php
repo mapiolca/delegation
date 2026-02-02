@@ -271,7 +271,7 @@ if (method_exists($formbank, 'select_comptes')) {
 } else {
 	$options = array();
 	$sql = "SELECT rowid, label FROM ".MAIN_DB_PREFIX."bank_account";
-	$sql.= " WHERE entity = ".(int) $conf->entity;
+	$sql.= " WHERE entity IN (".getEntity('bank_account').")";
 	$sql.= " ORDER BY label";
 	$resql = $db->query($sql);
 	if ($resql) {

@@ -3357,7 +3357,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$default_font_size = pdf_getPDFFontSize($outputlangs);
 		$line_height = 5;
 		$table_width = $this->page_largeur - $this->marge_gauche - $this->marge_droite;
-		$fixed_width = 25;
+		$fixed_width = 23;
 		$desc_width = $table_width - ($fixed_width * 4);
 		$col_positions = array(
 			$this->marge_gauche,
@@ -3429,7 +3429,24 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			'ttc' => $total_ttc,
 		);
 
-		$height = $line_height * (count($rows) + 1);
+		$row_heights = array();
+		$height = $line_height;
+		foreach ($rows as $row) {
+			$row_height = $line_height;
+			if (method_exists($pdf, 'getStringHeight')) {
+				$date_value = '';
+				if (! empty($row['date'])) {
+					$date_value = dol_print_date($row['date'], "day", false, $outputlangs);
+				}
+				$row_height = max(
+					$line_height,
+					$pdf->getStringHeight($desc_width - 2, $row['desc']),
+					$pdf->getStringHeight($fixed_width - 2, $date_value)
+				) + 1;
+			}
+			$row_heights[] = $row_height;
+			$height += $row_height;
+		}
 
 		if (! empty($conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR)) {
 			$pdf->Rect($this->marge_gauche, $top, $table_width, $line_height, 'F', null, explode(',', $conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR));
@@ -3450,8 +3467,10 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		for ($i = 1; $i < count($col_positions); $i++) {
 			$pdf->Line($col_positions[$i], $top, $col_positions[$i], $top + $height);
 		}
-		for ($i = 1; $i <= count($rows); $i++) {
-			$pdf->Line($this->marge_gauche, $top + ($i * $line_height), $this->marge_gauche + $table_width, $top + ($i * $line_height));
+		$current_y = $top + $line_height;
+		foreach ($row_heights as $row_height) {
+			$current_y += $row_height;
+			$pdf->Line($this->marge_gauche, $current_y, $this->marge_gauche + $table_width, $current_y);
 		}
 
 		$pdf->SetFont('', 'B', $default_font_size - 2);
@@ -3469,26 +3488,26 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$pdf->MultiCell($fixed_width - 2, $line_height - 1, $outputlangs->transnoentities("BtpOrdersSummaryAmountTTC"), 0, 'R', 1);
 
 		$pdf->SetFont('', '', $default_font_size - 2);
-		$row_index = 0;
-		foreach ($rows as $row) {
-			$y = $top + $line_height + ($row_index * $line_height);
-			$pdf->SetXY($this->marge_gauche + 1, $y + 1);
-			$pdf->MultiCell($desc_width - 2, $line_height - 1, $row['desc'], 0, 'L');
+		$current_y = $top + $line_height;
+		foreach ($rows as $row_index => $row) {
+			$row_height = $row_heights[$row_index];
+			$pdf->SetXY($this->marge_gauche + 1, $current_y + 1);
+			$pdf->MultiCell($desc_width - 2, $row_height - 1, $row['desc'], 0, 'L');
 
 			$date_value = '';
 			if (! empty($row['date'])) {
 				$date_value = dol_print_date($row['date'], "day", false, $outputlangs);
 			}
-			$pdf->SetXY($col_positions[1] + 1, $y + 1);
-			$pdf->MultiCell($fixed_width - 2, $line_height - 1, $date_value, 0, 'L');
+			$pdf->SetXY($col_positions[1] + 1, $current_y + 1);
+			$pdf->MultiCell($fixed_width - 2, $row_height - 1, $date_value, 0, 'L');
 
-			$pdf->SetXY($col_positions[2] + 1, $y + 1);
-			$pdf->MultiCell($fixed_width - 2, $line_height - 1, price($row['ht'], 0, $outputlangs, 0, 0, 2), 0, 'R');
-			$pdf->SetXY($col_positions[3] + 1, $y + 1);
-			$pdf->MultiCell($fixed_width - 2, $line_height - 1, price($row['tva'], 0, $outputlangs, 0, 0, 2), 0, 'R');
-			$pdf->SetXY($col_positions[4] + 1, $y + 1);
-			$pdf->MultiCell($fixed_width - 2, $line_height - 1, price($row['ttc'], 0, $outputlangs, 0, 0, 2), 0, 'R');
-			$row_index++;
+			$pdf->SetXY($col_positions[2] + 1, $current_y + 1);
+			$pdf->MultiCell($fixed_width - 2, $row_height - 1, price($row['ht'], 0, $outputlangs, 0, 0, 2), 0, 'R');
+			$pdf->SetXY($col_positions[3] + 1, $current_y + 1);
+			$pdf->MultiCell($fixed_width - 2, $row_height - 1, price($row['tva'], 0, $outputlangs, 0, 0, 2), 0, 'R');
+			$pdf->SetXY($col_positions[4] + 1, $current_y + 1);
+			$pdf->MultiCell($fixed_width - 2, $row_height - 1, price($row['ttc'], 0, $outputlangs, 0, 0, 2), 0, 'R');
+			$current_y += $row_height;
 		}
 
 		return $height;
