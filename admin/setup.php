@@ -333,7 +333,7 @@ print '<br>';
 // FR: SECTION ONGLETS
 
 print load_fiche_titre($langs->trans('TabSetup'), '', 'on');
-print '<div class="underbanner opacitymedium">'.$langs->trans('TimesheetWeekDailyRateOptionsHelp').'</div>';
+print '<div class="underbanner opacitymedium">'.$langs->trans('TabSetupHelp').'</div>';
 print '<div class="div-table-responsive-no-min">';
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
@@ -370,7 +370,7 @@ print '<br>';
 // FR: SECTION OPTIONS
 
 print load_fiche_titre($langs->trans('Options'), '', 'on');
-print '<div class="underbanner opacitymedium">'.$langs->trans('TimesheetWeekDailyRateOptionsHelp').'</div>';
+print '<div class="underbanner opacitymedium">'.$langs->trans('OptionsHelp').'</div>';
 print '<div class="div-table-responsive-no-min">';
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
@@ -390,7 +390,7 @@ print '<br>';
 // FR: SECTION AUTO-LIQUIDATION TVA
 
 print load_fiche_titre($langs->trans('DelegationVatReverseCharge'), '', 'vat');
-print '<div class="underbanner opacitymedium">'.$langs->trans('TimesheetWeekDailyRateOptionsHelp').'</div>';
+print '<div class="underbanner opacitymedium">'.$langs->trans('DelegationVatReverseChargeHelp').'</div>';
 print '<div class="div-table-responsive-no-min">';
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
