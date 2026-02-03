@@ -375,8 +375,8 @@ class modDelegation extends DolibarrModules
 
 		//Societe
 		$ext->addExtraField('lmdb_compte_tiers', 'lmdb_compte_tiers', 'varchar', 100, 255, 'societe', 0, 0, '', '', 1, '', 1, '', '', '', 'delegation@delegation', '$conf->delegation->enabled');
-		$ext->addExtraField('lmdb_representant', 'lmdb_representant', 'varchar', 0, 255, 'societe', 0, 1, '', '', 1, '', 1, 'lmdb_representant_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
-		$ext->addExtraField('lmdb_qualite_representant', 'lmdb_qualite_representant', 'varchar', 0, 255, 'societe', 0, 1, '', '', 1, '', 1, 'lmdb_qualite_representant_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
+		//$ext->addExtraField('lmdb_representant', 'lmdb_representant', 'varchar', 0, 255, 'societe', 0, 1, '', '', 1, '', 1, 'lmdb_representant_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
+		//$ext->addExtraField('lmdb_qualite_representant', 'lmdb_qualite_representant', 'varchar', 0, 255, 'societe', 0, 1, '', '', 1, '', 1, 'lmdb_qualite_representant_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
 
 		//Factures
 		$ext->addExtraField('lmdb_compte_prorata', 'lmdb_compte_prorata', 'varchar', 2, 255, 'facture', 0, 0, '', '', 1, '', 1, 'lmdb_compte_prorata_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
