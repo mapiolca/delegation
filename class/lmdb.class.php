@@ -30,6 +30,11 @@ function lmdb_prepare_head()
 	$head[$h][1] = $langs->trans("SetupG");
 	$head[$h][2] = 'SetupG';
 	$h++;
+	
+	$head[$h][0] = "../../delegation/admin/about.php";
+	$head[$h][1] = $langs->trans("About");
+	$head[$h][2] = 'About';
+	$h++;
 
 	return $head;
 }

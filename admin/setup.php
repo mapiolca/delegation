@@ -239,28 +239,36 @@ if ($user->admin && $action == 'set_vat_reverse_charge_legal_text') {
 /*
 *	View
 */
-
+$title = $langs->trans('ModuleSetup', 'Timesheetweek');
+$helpurl = '';
 llxHeader('', $langs->trans("DelegationSetup"), '', '', 0, 0, array(), array(), '', $langs->trans("DelegationSetup"));
 
-$linkback='<a href="'.DOL_URL_ROOT.'/admin/modules.php">'.$langs->trans("BackToModuleList").'</a>';
-print_fiche_titre($langs->trans("DelegationSetup"), $linkback);
+$linkback = '<a href="'.($backtopage ? $backtopage : DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_values=1').'">'.$langs->trans("BackToModuleList").'</a>';
+print load_fiche_titre($langs->trans($title), $linkback, 'title_setup');
 // Configuration header
 
 $head = lmdb_prepare_head();
-dol_fiche_head($head, 'SetupG', $langs->trans("DelegationSetup"), 0, "delegation@delegation");
-
-print '<br>';
-print '<table class="noborder" width="100%">'."\n";
-print '<tr class="liste_titre">';
-print '<td>'.$langs->trans("Name").'</td>';
-print '<td align="center" width="300">'.$langs->trans("Value").'</td>';
-print '</tr>';
+print dol_get_fiche_head($head, 'SetupG', $langs->trans("DelegationSetup"), -1, "delegation@delegation");
+print '<div class="underbanner opacitymedium">'.$langs->trans('DelegationSetupPage').'</div>';
+print '</div>';
+print '<div class="fichecenter">';
 
 $form = new Form($db);
 $formbank = new FormBank($db);
 $var = false;
 
-delegation_setup_print_title($langs->trans("DelegationClearingAccountSection"));
+// FR: SECTION DELEGATION
+
+// EN: Display the helper switches dedicated to the daily-rate contract workflows.
+print load_fiche_titre($langs->trans('DelegationPaymentMode'), '', 'invoicing');
+print '<div class="underbanner opacitymedium">'.$langs->trans('DelegationHelp').'</div>';
+print '<div class="div-table-responsive-no-min">';
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<th>'.$langs->trans('Name').'</th>';
+//print '<th>'.$langs->trans('Description').'</th>';
+print '<th class="center">'.$langs->trans('Status').'/'.$langs->trans('Value').'</th>';
+print '</tr>';
 
 // EN: Render clearing account selector.
 // FR: Afficher le sélecteur du compte de passage.
@@ -283,8 +291,11 @@ if (method_exists($formbank, 'select_comptes')) {
 }
 delegation_setup_print_input_form_part($langs->trans("DelegationClearingBankAccount"), $accountSelect, 'set_clearing_account');
 delegation_setup_print_input_form_part($langs->trans("DelegationCreateClearingAccount"), '', 'create_clearing_account', $langs->trans("DelegationCreateClearingAccount"));
+print '</table>';
+print '</div>';
+print '<br>';
 
-delegation_setup_print_title($langs->trans("DelegationMpValoSection"));
+// FR: SECTION REVISION/VALORISATION
 
 $serviceOptions = array();
 $sql = "SELECT rowid, ref, label FROM ".MAIN_DB_PREFIX."product";
@@ -302,11 +313,34 @@ if ($resql) {
 	}
 }
 $serviceSelect = $form->selectarray('delegation_mpvalo_product_id', $serviceOptions, getDolGlobalInt('LMDB_MPVALO_PRODUCT_ID'), 1);
+
+print load_fiche_titre($langs->trans('DelegationMpValoSection'), '', 'graph');
+print '<div class="underbanner opacitymedium">'.$langs->trans('DelegationMpValoSectionHelp').'</div>';
+
+print '<div class="div-table-responsive-no-min">';
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<th>'.$langs->trans('Name').'</th>';
+//print '<th>'.$langs->trans('Description').'</th>';
+print '<th class="center">'.$langs->trans('Status').'/'.$langs->trans('Value').'</th>';
+print '</tr>';
 delegation_setup_print_input_form_part($langs->trans("DelegationMpValoSelectProduct"), $serviceSelect, 'set_mpvalo_product');
 delegation_setup_print_input_form_part($langs->trans("DelegationMpValoCreateProduct"), '', 'create_mpvalo_product', $langs->trans("DelegationMpValoCreateProductButton"));
+print '</table>';
+print '</div>';
+print '<br>';
 
-delegation_setup_print_title($langs->trans("DelegationTabsSection"));
+// FR: SECTION ONGLETS
 
+print load_fiche_titre($langs->trans('TabSetup'), '', 'on');
+print '<div class="underbanner opacitymedium">'.$langs->trans('TabSetupHelp').'</div>';
+print '<div class="div-table-responsive-no-min">';
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<th>'.$langs->trans('Name').'</th>';
+//print '<th>'.$langs->trans('Description').'</th>';
+print '<th class="center">'.$langs->trans('Status').'/'.$langs->trans('Value').'</th>';
+print '</tr>';
 $tabs = array(
 	'DELEGATION_ENABLE_TAB_DELEGATION' => array(
 		'label' => 'DelegationTabDelegationLabel',
@@ -329,15 +363,41 @@ $tabs = array(
 foreach ($tabs as $constName => $tabInfo) {
 	delegation_setup_print_on_off($langs->trans($tabInfo['label']), $constName, $langs->trans($tabInfo['help']));
 }
+print '</table>';
+print '</div>';
+print '<br>';
 
-delegation_setup_print_title($langs->trans("DelegationImportSection"));
+// FR: SECTION OPTIONS
+
+print load_fiche_titre($langs->trans('Options'), '', 'on');
+print '<div class="underbanner opacitymedium">'.$langs->trans('OptionsHelp').'</div>';
+print '<div class="div-table-responsive-no-min">';
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<th>'.$langs->trans('Name').'</th>';
+//print '<th>'.$langs->trans('Description').'</th>';
+print '<th class="center">'.$langs->trans('Status').'/'.$langs->trans('Value').'</th>';
+print '</tr>';
 delegation_setup_print_on_off(
 	$langs->trans("DelegationEnableImportLinkedObjectLines"),
 	'MAIN_ENABLE_IMPORT_LINKED_OBJECT_LINES',
 	$langs->trans("DelegationEnableImportLinkedObjectLinesHelp")
 );
+print '</table>';
+print '</div>';
+print '<br>';
 
-delegation_setup_print_title($langs->trans("DelegationVatReverseChargeSection"));
+// FR: SECTION AUTO-LIQUIDATION TVA
+
+print load_fiche_titre($langs->trans('DelegationVatReverseCharge'), '', 'vat');
+print '<div class="underbanner opacitymedium">'.$langs->trans('DelegationVatReverseChargeHelp').'</div>';
+print '<div class="div-table-responsive-no-min">';
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<th>'.$langs->trans('Name').'</th>';
+//print '<th>'.$langs->trans('Description').'</th>';
+print '<th class="center">'.$langs->trans('Status').'/'.$langs->trans('Value').'</th>';
+print '</tr>';
 delegation_setup_print_on_off($langs->trans("DelegationEnableVatReverseCharge"), 'DELEGATION_ENABLE_VAT_REVERSE_CHARGE');
 delegation_setup_print_on_off($langs->trans("DelegationVatReverseChargeForceVat0"), 'DELEGATION_VAT_REVERSE_CHARGE_FORCE_VAT0');
 
@@ -353,8 +413,9 @@ $defaultText = $langs->trans('DelegationVatReverseChargeLegalTextDefault');
 $currentText = getDolGlobalString('DELEGATION_VAT_REVERSE_CHARGE_LEGAL_TEXT', $defaultText);
 $legalTextInput = '<textarea name="delegation_vat_reverse_charge_legal_text" class="flat" rows="3" cols="40">'.dol_escape_htmltag($currentText).'</textarea>';
 delegation_setup_print_input_form_part($langs->trans("DelegationVatReverseChargeLegalText"), $legalTextInput, 'set_vat_reverse_charge_legal_text');
-
 print '</table>';
-
+print '</div>';
+print '<br>';
+print dol_get_fiche_end();
 llxFooter();
 $db->close();
