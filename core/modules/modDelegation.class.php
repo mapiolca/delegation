@@ -396,16 +396,16 @@ class modDelegation extends DolibarrModules
 		$ext->addExtraField('lmdb_project_amount', 'lmdb_project_amount', 'price', 2, 255, 'projet', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
 
 		//Commandes Fournisseurs
-		$ext->addExtraField('lmdb_n_devis_fourn', 'lmdb_n_devis_fourn', 'varchar', 1, '255', 'commande_fournisseur', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
-		$ext->addExtraField('lmdb_date_devis_fourn', 'lmdb_date_devis_fourn', 'date', 2, '', 'commande_fournisseur', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
-		$ext->addExtraField('lmdb_poste', 'lmdb_poste_info', 'varchar', 2, '255', 'commande_fournisseur', 0, 0, '', '', 1, '', 1, 'lmdb_poste_info_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
-		$ext->addExtraField('lmdb_link', 'lmdb_link', 'url', 1, '', 'commande_fournisseur', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
+		//$ext->addExtraField('lmdb_n_devis_fourn', 'lmdb_n_devis_fourn', 'varchar', 1, '255', 'commande_fournisseur', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
+		//$ext->addExtraField('lmdb_date_devis_fourn', 'lmdb_date_devis_fourn', 'date', 2, '', 'commande_fournisseur', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
+		//$ext->addExtraField('lmdb_poste', 'lmdb_poste_info', 'varchar', 2, '255', 'commande_fournisseur', 0, 0, '', '', 1, '', 1, 'lmdb_poste_info_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
+		//$ext->addExtraField('lmdb_link', 'lmdb_link', 'url', 1, '', 'commande_fournisseur', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
 
 		//Proposition Fournisseurs
-		$ext->addExtraField('lmdb_n_devis_fourn', 'lmdb_n_devis_fourn', 'varchar', 1, '255', 'supplier_proposal', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
-		$ext->addExtraField('lmdb_date_devis_fourn', 'lmdb_date_devis_fourn', 'date', 2, '', 'supplier_proposal', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
-		$ext->addExtraField('lmdb_poste', 'lmdb_poste_info', 'varchar', 0, '255', 'supplier_proposal', 0, 0, '', '', 1, '', 1, 'lmdb_poste_info_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
-		$ext->addExtraField('lmdb_link', 'lmdb_link', 'url', 1, '', 'supplier_proposal', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
+		//$ext->addExtraField('lmdb_n_devis_fourn', 'lmdb_n_devis_fourn', 'varchar', 1, '255', 'supplier_proposal', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
+		//$ext->addExtraField('lmdb_date_devis_fourn', 'lmdb_date_devis_fourn', 'date', 2, '', 'supplier_proposal', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
+		//$ext->addExtraField('lmdb_poste', 'lmdb_poste_info', 'varchar', 0, '255', 'supplier_proposal', 0, 0, '', '', 1, '', 1, 'lmdb_poste_info_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
+		//$ext->addExtraField('lmdb_link', 'lmdb_link', 'url', 1, '', 'supplier_proposal', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
 
 		//Produits/Services
 		//$ext->addExtraField('lmdb_marque', 'lmdb_marque', 'varchar', 1, '255', 'product', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
