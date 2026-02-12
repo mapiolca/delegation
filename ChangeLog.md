@@ -1,5 +1,8 @@
 # Délégation ChangeLog
 
+## 1.2.1 (2026-02-12)
+- Corrige un probème d'affichage des montants dans les lignes des sous-totaux du modèle BTP LMDB
+
 ## 1.2.0 (2026-02-02)
 - Réduit la constante de largeur des colonnes fixes en résumé BTP de 25 à 23 pour agrandir la colonne description dans _tableauBtpOrdersSummary du fichier core/modules/facture/doc/pdf_crabe_btp_inpose.modules.php.
 - Calcule désormais une hauteur par ligne ($row_heights) en utilisant getStringHeight quand disponible afin d'adapter la hauteur des lignes au contenu (description et date) et additionne ces hauteurs pour obtenir la hauteur totale dans _tableauBtpOrdersSummary.
