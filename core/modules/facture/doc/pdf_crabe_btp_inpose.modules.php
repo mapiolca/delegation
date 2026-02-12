@@ -769,19 +769,21 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 					}
 
 					// Situation progress
-					if ($this->getColumnStatus('progress'))
-					{
-						if ($this->situationinvoice && ! empty($this->TDataSituation['date_derniere_situation'])) {
-							$progress = price($TInfosLigneSituationPrecedente['progress_prec'] + $object->lines[$i]->situation_percent, 0, $outputlangs, 0, 0, 2).'%';
-						} else {
-							$progress = pdf_getlineprogress($object, $i, $outputlangs, $hidedetails);
+					if(!class_exists('TSubtotal') || !TSubtotal::isModSubtotalLine($object->lines[$i])){
+						if ($this->getColumnStatus('progress'))
+						{
+							if ($this->situationinvoice && ! empty($this->TDataSituation['date_derniere_situation'])) {
+								$progress = price($TInfosLigneSituationPrecedente['progress_prec'] + $object->lines[$i]->situation_percent, 0, $outputlangs, 0, 0, 2).'%';
+							} else {
+								$progress = pdf_getlineprogress($object, $i, $outputlangs, $hidedetails);
+							}
+							if ($progress !== '' && $progress !== null) {
+								$progress_value = price2num(str_replace('%', '', $progress));
+								$progress = price($progress_value, 0, $outputlangs, 0, 0, 2).'%';
+							}
+							$this->printStdColumnContent($pdf, $curY, 'progress', $progress);
+							$nexY = max($pdf->GetY(),$nexY);
 						}
-						if ($progress !== '' && $progress !== null) {
-							$progress_value = price2num(str_replace('%', '', $progress));
-							$progress = price($progress_value, 0, $outputlangs, 0, 0, 2).'%';
-						}
-						$this->printStdColumnContent($pdf, $curY, 'progress', $progress);
-						$nexY = max($pdf->GetY(),$nexY);
 					}
 
 					// Unit
