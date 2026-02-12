@@ -722,33 +722,39 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
                     $pdf->SetFont('','', $default_font_size - 1);   // On repositionne la police par defaut
 
                     // VAT Rate
-                    if ($this->getColumnStatus('vat'))
-                    {
-					$vat_rate = pdf_getlinevatrate($object, $i, $outputlangs, $hidedetails);
-					if ($vat_rate !== '' && $vat_rate !== null) {
-						$vat_rate_value = price2num(str_replace('%', '', $vat_rate));
-						$vat_rate = price($vat_rate_value, 0, $outputlangs, 0, 0, 2).'%';
+                    if(!class_exists('TSubtotal') || !TSubtotal::isModSubtotalLine($object->lines[$i])){
+						if ($this->getColumnStatus('vat'))
+						{
+						$vat_rate = pdf_getlinevatrate($object, $i, $outputlangs, $hidedetails);
+						if ($vat_rate !== '' && $vat_rate !== null) {
+							$vat_rate_value = price2num(str_replace('%', '', $vat_rate));
+							$vat_rate = price($vat_rate_value, 0, $outputlangs, 0, 0, 2).'%';
+						}
+							$this->printStdColumnContent($pdf, $curY, 'vat', $vat_rate);
+							$nexY = max($pdf->GetY(),$nexY);
+						}
 					}
-                        $this->printStdColumnContent($pdf, $curY, 'vat', $vat_rate);
-                        $nexY = max($pdf->GetY(),$nexY);
-                    }
 
 					// Unit price before discount
-					if ($this->getColumnStatus('subprice'))
-					{
-						$up_excl_tax_value = ($conf->multicurrency->enabled && $object->multicurrency_tx != 1) ? $object->lines[$i]->multicurrency_subprice : $object->lines[$i]->subprice;
-						$up_excl_tax = price($up_excl_tax_value, 0, $outputlangs, 0, 0, 2);
-						$this->printStdColumnContent($pdf, $curY, 'subprice', $up_excl_tax);
-						$nexY = max($pdf->GetY(),$nexY);
+					if(!class_exists('TSubtotal') || !TSubtotal::isModSubtotalLine($object->lines[$i])){
+						if ($this->getColumnStatus('subprice'))
+						{
+							$up_excl_tax_value = ($conf->multicurrency->enabled && $object->multicurrency_tx != 1) ? $object->lines[$i]->multicurrency_subprice : $object->lines[$i]->subprice;
+							$up_excl_tax = price($up_excl_tax_value, 0, $outputlangs, 0, 0, 2);
+							$this->printStdColumnContent($pdf, $curY, 'subprice', $up_excl_tax);
+							$nexY = max($pdf->GetY(),$nexY);
+						}
 					}
 
                     // Quantity
 					// Enough for 6 chars
-					if ($this->getColumnStatus('qty'))
-					{
-						$qty = pdf_getlineqty($object, $i, $outputlangs, $hidedetails);
-						$this->printStdColumnContent($pdf, $curY, 'qty', $qty);
-						$nexY = max($pdf->GetY(),$nexY);
+					if(!class_exists('TSubtotal') || !TSubtotal::isModSubtotalLine($object->lines[$i])){
+						if ($this->getColumnStatus('qty'))
+						{
+							$qty = pdf_getlineqty($object, $i, $outputlangs, $hidedetails);
+							$this->printStdColumnContent($pdf, $curY, 'qty', $qty);
+							$nexY = max($pdf->GetY(),$nexY);
+						}
 					}
 
 					// EN: Load previous situation line info for cumulative columns
@@ -757,14 +763,16 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 						'total_ht' => 0,
 						'progress_prec' => 0,
 					);
-					if ($this->situationinvoice && ! empty($this->TDataSituation['date_derniere_situation'])) {
-						$TInfosLigneSituationPrecedente = $this->_getInfosLineDerniereSituation($object, $object->lines[$i]);
-						if (! is_array($TInfosLigneSituationPrecedente)) {
-							$TInfosLigneSituationPrecedente = array(
-								'total_ht_without_progress' => 0,
-								'total_ht' => 0,
-								'progress_prec' => 0,
-							);
+					if(!class_exists('TSubtotal') || !TSubtotal::isModSubtotalLine($object->lines[$i])){
+						if ($this->situationinvoice && ! empty($this->TDataSituation['date_derniere_situation'])) {
+							$TInfosLigneSituationPrecedente = $this->_getInfosLineDerniereSituation($object, $object->lines[$i]);
+							if (! is_array($TInfosLigneSituationPrecedente)) {
+								$TInfosLigneSituationPrecedente = array(
+									'total_ht_without_progress' => 0,
+									'total_ht' => 0,
+									'progress_prec' => 0,
+								);
+							}
 						}
 					}
 
@@ -807,12 +815,14 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 					}
 
 					// Total HT line
-					if ($this->getColumnStatus('totalexcltax'))
-					{
-						$total_excl_tax_value = ($conf->multicurrency->enabled && $object->multicurrency_tx != 1) ? $object->lines[$i]->multicurrency_total_ht : $object->lines[$i]->total_ht;
-						$total_excl_tax = price($total_excl_tax_value, 0, $outputlangs, 0, 0, 2);
-						$this->printStdColumnContent($pdf, $curY, 'totalexcltax', $total_excl_tax);
-						$nexY = max($pdf->GetY(),$nexY);
+					if(!class_exists('TSubtotal') || !TSubtotal::isModSubtotalLine($object->lines[$i])){
+						if ($this->getColumnStatus('totalexcltax'))
+						{
+							$total_excl_tax_value = ($conf->multicurrency->enabled && $object->multicurrency_tx != 1) ? $object->lines[$i]->multicurrency_total_ht : $object->lines[$i]->total_ht;
+							$total_excl_tax = price($total_excl_tax_value, 0, $outputlangs, 0, 0, 2);
+							$this->printStdColumnContent($pdf, $curY, 'totalexcltax', $total_excl_tax);
+							$nexY = max($pdf->GetY(),$nexY);
+						}
 					}
 					// "Sommes"
 					if(!class_exists('TSubtotal') || !TSubtotal::isModSubtotalLine($object->lines[$i])){
