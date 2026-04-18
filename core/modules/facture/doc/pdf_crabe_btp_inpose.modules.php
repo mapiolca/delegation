@@ -1904,9 +1904,10 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$total_delegation = (float) $delegation->getSumDelegation();
 		}
 
-		$total_restant_ttc = $total_ttc - $total_delegation - $retenue_de_garantie_ttc - $compte_prorata_ttc + $mpvalo_total_ttc;
+		$total_restant_ttc = $total_ttc - $retenue_de_garantie_ttc - $compte_prorata_ttc + $mpvalo_total_ttc;
 		$total_restant_ht = $total_ht - $total_delegation_ht - $retenue_de_garantie_ht - $compte_prorata_ht + $mpvalo_total_ht;
 		$total_restant_tva = $total_tva - $total_delegation_tva - $retenue_de_garantie_tva - $compte_prorata_tva + $mpvalo_total_tva;
+		$total_apayer_ttc = $total_restant_ttc - $total_delegation;
 
 		$index++;
 		$pdf->SetFillColor(255,255,255);
@@ -2017,7 +2018,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$pdf->SetXY($colTvaX, $tab2_top + $tab2_hl * $index);
 			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_restant_tva, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 			$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_restant_ttc, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_apayer_ttc, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 
 			$pdf->SetTextColor(0,0,0);
 		}
