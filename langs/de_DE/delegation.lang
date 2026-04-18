@@ -66,6 +66,7 @@ DelegationPreviousSituationsLabel=Vorherige Situationen
 DelegationCurrentSituationLabel=Aktuelle Situation
 DelegationTotalDueAtMaturity=Gesamtbetrag zum Fälligkeitsdatum
 DelegationSelectSupplierInvoice=Lieferantenrechnung hinzufügen
+DelegationSelectSupplierInvoiceHelp=Zulässige Rechnungen: unbezahlt, im Status unbezahlt, Zahlungsart \"Zahlungsdelegation\", mit demselben Projekt verknüpft und noch nicht mit einer Zahlungsdelegation verknüpft.
 DelegationSupplierInvoices=Keine geeigneten Lieferantenrechnungen
 DelegationConfigMissingClearingAccount=Bitte ein Durchlaufkonto für die Zahlungsdelegation konfigurieren.
 DelegationSupplierInvoiceMissing=Bitte eine Lieferantenrechnung auswählen.

@@ -66,6 +66,7 @@ DelegationPreviousSituationsLabel=Situazioni precedenti
 DelegationCurrentSituationLabel=Situazione attuale
 DelegationTotalDueAtMaturity=Totale da pagare a scadenza
 DelegationSelectSupplierInvoice=Aggiungi una fattura fornitore
+DelegationSelectSupplierInvoiceHelp=Fatture idonee: non pagate, in stato non pagato, con modalità di pagamento \"Delega di pagamento\", collegate allo stesso progetto e non già collegate a una delega di pagamento.
 DelegationSupplierInvoices=Nessuna fattura fornitore idonea
 DelegationConfigMissingClearingAccount=Configura un conto di transito per la delega di pagamento.
 DelegationSupplierInvoiceMissing=Seleziona una fattura fornitore.

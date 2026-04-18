@@ -214,7 +214,7 @@ class Delegation extends CommonObject
 
 		// EN: Load supplier invoice data and validate eligibility.
 		// FR: Charger les données de facture fournisseur et valider l'éligibilité.
-		$sql = "SELECT rowid, ref, total_ttc, fk_mode_reglement, fk_projet";
+		$sql = "SELECT rowid, ref, total_ttc, fk_mode_reglement, fk_projet, fk_statut, paye";
 		$sql.= " FROM ".MAIN_DB_PREFIX."facture_fourn";
 		$sql.= " WHERE rowid = ".(int) $fkFactureFourn;
 		$sql.= " AND entity = ".(int) $conf->entity;
@@ -232,6 +232,11 @@ class Delegation extends CommonObject
 		}
 
 		if (! empty($object->fk_project) && (int) $invoiceData->fk_projet !== (int) $object->fk_project) {
+			$this->error = $langs->trans('DelegationSupplierInvoiceNotAllowed');
+			return -2;
+		}
+
+		if ((int) $invoiceData->fk_statut !== 1 || (int) $invoiceData->paye !== 0) {
 			$this->error = $langs->trans('DelegationSupplierInvoiceNotAllowed');
 			return -2;
 		}
@@ -257,8 +262,7 @@ class Delegation extends CommonObject
 		// EN: Prevent duplicate links for the same supplier invoice.
 		// FR: Empêcher les doublons pour la même facture fournisseur.
 		$sql = "SELECT rowid FROM ".MAIN_DB_PREFIX."delegation_det";
-		$sql.= " WHERE fk_object = ".(int) $object->id;
-		$sql.= " AND fk_element = '".$this->db->escape($object->element)."'";
+		$sql.= " WHERE fk_element = '".$this->db->escape($object->element)."'";
 		$sql.= " AND fk_facture_fourn = ".(int) $fkFactureFourn;
 		$resql = $this->db->query($sql);
 		if ($resql && $this->db->num_rows($resql) > 0) {
