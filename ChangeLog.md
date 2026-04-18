@@ -5,6 +5,9 @@
 - Conserve la déduction des délégations sur la ligne dédiée « Total des Délégations à déduire » et fiabilise l'affichage du « Montant à payer » en HT/TVA/TTC.
 - Harmonise le style de la ligne « Situation actuelle » avec la ligne « Total à payer à échéance », sans impacter les lignes suivantes.
 - Simplifie le libellé FR « CompteProrataTTCDeduit » en « Compte Prorata ».
+- Durcit l’onglet Délégation des factures client : suppression de l’édition inline, actions limitées à l’ajout/suppression et protection CSRF sur la suppression.
+- Filtre les factures fournisseurs éligibles : uniquement impayées et non déjà liées à une délégation de paiement.
+- Met à jour le tableau de délégation avec les colonnes « Montant HT » et « TVA », retire « Déjà réglé », « Reste à payer » et « Montant », et masque le bouton « Ajouter » s’il n’y a aucune facture éligible.
 
 ## 1.2.1 (2026-02-12)
 - Corrige un probème d'affichage des montants dans les lignes des sous-totaux du modèle BTP LMDB
