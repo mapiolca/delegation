@@ -600,7 +600,7 @@ class modDelegation extends DolibarrModules
 		}
 
 		$sql = "SELECT rowid FROM ".$table;
-		$sql .= " WHERE element = 'supplier_order'";
+		$sql .= " WHERE element = 'order_supplier'";
 		$sql .= " AND source = 'external'";
 		$sql .= " AND code = 'DELEGDC4'";
 		if ($hasEntityColumn) {
@@ -614,7 +614,7 @@ class modDelegation extends DolibarrModules
 		}
 
 		$columns = "element, source, code, libelle, position, active";
-		$values = "'supplier_order', 'external', 'DELEGDC4', '".$this->db->escape('Représentant DC4 et délégations de paiement')."', 120, 1";
+		$values = "'order_supplier', 'external', 'DELEGDC4', '".$this->db->escape('Représentant DC4 et délégations de paiement')."', 120, 1";
 		if ($hasEntityColumn) {
 			$columns .= ", entity";
 			$values .= ", ".((int) $conf->entity);
