@@ -170,7 +170,7 @@ for ($i = 0; $i < $numLines; $i++) {
 				</a>
 			<?php } ?>
 			<?php if ($canDeleteLines) { ?>
-				<a href="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=deleteline&amp;lineid='.$line->rowid; ?>">
+				<a href="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=deleteline&amp;lineid='.$line->rowid.'&amp;token='.newToken(); ?>">
 					<?php echo img_delete(); ?>
 				</a>
 			<?php } ?>
