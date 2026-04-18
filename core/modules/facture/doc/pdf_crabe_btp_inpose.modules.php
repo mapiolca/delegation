@@ -1972,6 +1972,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		}
 
 		$index++;
+		$pdf->SetFillColor(224,224,224);
 		$pdf->SetXY($colLabelX, $tab2_top + $tab2_hl * $index);
 		$pdf->MultiCell($labelWidth, $tab2_hl, $outputlangs->transnoentities('DelegationCurrentSituationLabel'), 0, 'L', 1);
 		$pdf->SetXY($colHtX, $tab2_top + $tab2_hl * $index);
