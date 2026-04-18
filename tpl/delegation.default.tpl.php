@@ -94,10 +94,9 @@ print '<div class="underbanner clearboth"></div>';
 		<td><?php echo $langs->trans('Supplier'); ?></td>
 		<td><?php echo $langs->trans('Ref'); ?></td>
 		<td><?php echo $langs->trans('Date'); ?></td>
+		<td><?php echo $langs->trans('AmountHT'); ?></td>
+		<td><?php echo $langs->trans('VAT'); ?></td>
 		<td><?php echo $langs->trans('AmountTTC'); ?></td>
-		<td><?php echo $langs->trans('AlreadyPaid'); ?></td>
-		<td><?php echo $langs->trans('RemainToPay'); ?></td>
-		<td><?php echo $langs->trans('Amount'); ?></td>
 		<td width="50">&nbsp;</td>
 	</tr>
 
@@ -136,10 +135,9 @@ for ($i = 0; $i < $numLines; $i++) {
 			}
 			?>
 		</td>
+		<td><?php echo ! empty($line->supplier_invoice) ? price($line->supplier_invoice->total_ht) : '&nbsp;'; ?></td>
+		<td><?php echo ! empty($line->supplier_invoice) ? price($line->supplier_invoice->total_tva) : '&nbsp;'; ?></td>
 		<td><?php echo ! empty($line->supplier_invoice) ? price($line->supplier_invoice->total_ttc) : '&nbsp;'; ?></td>
-		<td><?php echo ! empty($line->supplier_invoice) ? price($line->supplier_invoice_paid) : '&nbsp;'; ?></td>
-		<td><?php echo ! empty($line->supplier_invoice) ? price($line->supplier_invoice_remaining) : '&nbsp;'; ?></td>
-		<td><?php echo price($line->amount); ?></td>
 		<td align="right">
 			<?php if ($canDeleteLines) { ?>
 				<a href="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=deleteline&amp;lineid='.$line->rowid.'&amp;token='.newToken(); ?>">
@@ -159,7 +157,7 @@ for ($i = 0; $i < $numLines; $i++) {
 <?php if ($canAddLines){ ?>
 
 <tr class="liste_titre nodrag nodrop">
-	<td colspan="8"><?php echo $langs->trans("DelegationSelectSupplierInvoice"); ?></td>
+	<td colspan="7"><?php echo $form->textwithpicto($langs->trans("DelegationSelectSupplierInvoice"), $langs->trans("DelegationSelectSupplierInvoiceHelp")); ?></td>
 </tr>
 
 <form action="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id; ?>" method="POST">
@@ -167,8 +165,8 @@ for ($i = 0; $i < $numLines; $i++) {
 <input type="hidden" name="action" value="addsupplierinvoice" />
 <input type="hidden" name="id" value="<?php echo $object->id; ?>" />
 
-	<tr class="pair">
-		<td colspan="7">
+		<tr class="pair">
+			<td colspan="6">
 			<?php
 			if (! empty($supplierInvoiceOptions)) {
 				echo $form->selectarray('fk_facture_fourn', $supplierInvoiceOptions, '', 1);

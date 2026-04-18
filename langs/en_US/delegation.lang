@@ -66,6 +66,7 @@ DelegationPreviousSituationsLabel=Previous situations
 DelegationCurrentSituationLabel=Current situation
 DelegationTotalDueAtMaturity=Total due at maturity
 DelegationSelectSupplierInvoice=Add a supplier invoice
+DelegationSelectSupplierInvoiceHelp=Eligible invoices: unpaid, in unpaid status, payment mode \"Payment delegation\", linked to the same project, and not already linked to a payment delegation.
 DelegationSupplierInvoices=No eligible supplier invoices
 DelegationConfigMissingClearingAccount=Please configure a clearing account for payment delegation.
 DelegationSupplierInvoiceMissing=Please select a supplier invoice.

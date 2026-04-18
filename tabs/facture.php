@@ -174,7 +174,7 @@ $supplierInvoiceOptions = array();
 $paymentModeId = ! empty($conf->global->DELEGATION_PAYMENT_MODE_ID) ? (int) $conf->global->DELEGATION_PAYMENT_MODE_ID : 0;
 
 if (! empty($project->id) && $paymentModeId > 0) {
-	$sql = "SELECT f.rowid, f.ref, f.total_ttc, f.datef, s.rowid as socid, s.nom as thirdparty_name,";
+	$sql = "SELECT f.rowid, f.ref, f.total_ht, f.total_tva, f.total_ttc, f.datef, s.rowid as socid, s.nom as thirdparty_name,";
 	$sql.= " COALESCE(SUM(pf.amount), 0) as paid";
 	$sql.= " FROM ".MAIN_DB_PREFIX."facture_fourn as f";
 	$sql.= " JOIN ".MAIN_DB_PREFIX."societe as s ON s.rowid = f.fk_soc";
@@ -187,7 +187,7 @@ if (! empty($project->id) && $paymentModeId > 0) {
 	$sql.= " AND NOT EXISTS (SELECT 1 FROM ".MAIN_DB_PREFIX."delegation_det as dd";
 	$sql.= " WHERE dd.fk_facture_fourn = f.rowid";
 	$sql.= " AND dd.fk_element = 'facture')";
-	$sql.= " GROUP BY f.rowid, f.ref, f.total_ttc, f.datef, s.rowid, s.nom";
+	$sql.= " GROUP BY f.rowid, f.ref, f.total_ht, f.total_tva, f.total_ttc, f.datef, s.rowid, s.nom";
 	$sql.= " ORDER BY f.datef DESC";
 
 	$resql = $db->query($sql);
@@ -211,13 +211,13 @@ foreach ($delegation->lines as $line) {
 $supplierInvoiceIds = array_unique($supplierInvoiceIds);
 
 if (! empty($supplierInvoiceIds)) {
-	$sql = "SELECT f.rowid, f.ref, f.total_ttc, f.datef, s.rowid as socid, s.nom as thirdparty_name,";
+	$sql = "SELECT f.rowid, f.ref, f.total_ht, f.total_tva, f.total_ttc, f.datef, s.rowid as socid, s.nom as thirdparty_name,";
 	$sql.= " COALESCE(SUM(pf.amount), 0) as paid";
 	$sql.= " FROM ".MAIN_DB_PREFIX."facture_fourn as f";
 	$sql.= " JOIN ".MAIN_DB_PREFIX."societe as s ON s.rowid = f.fk_soc";
 	$sql.= " LEFT JOIN ".MAIN_DB_PREFIX."paiementfourn_facturefourn as pf ON pf.fk_facturefourn = f.rowid";
 	$sql.= " WHERE f.rowid IN (".implode(',', $supplierInvoiceIds).")";
-	$sql.= " GROUP BY f.rowid, f.ref, f.total_ttc, f.datef, s.rowid, s.nom";
+	$sql.= " GROUP BY f.rowid, f.ref, f.total_ht, f.total_tva, f.total_ttc, f.datef, s.rowid, s.nom";
 
 	$resql = $db->query($sql);
 	if ($resql) {
@@ -225,6 +225,8 @@ if (! empty($supplierInvoiceIds)) {
 			$invoice = new FactureFournisseur($db);
 			$invoice->id = (int) $obj->rowid;
 			$invoice->ref = $obj->ref;
+			$invoice->total_ht = (float) $obj->total_ht;
+			$invoice->total_tva = (float) $obj->total_tva;
 			$invoice->total_ttc = (float) $obj->total_ttc;
 			$invoice->datef = $obj->datef;
 			$invoice->thirdparty = new Societe($db);
