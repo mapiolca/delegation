@@ -70,7 +70,7 @@ class modDelegation extends DolibarrModules
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Module pour gérer la délégation de paiement, les contrats de sous-traitance et les formulaires DC4.";
 		// Possible values for version are: 'development', 'experimental', 'dolibarr' or version
-		$this->version = '1.2.2';
+		$this->version = '1.3.0';
 		// Key used in llx_const table to save module status enabled/disabled (where MYMODULE is value of property name of module in uppercase)
 		$this->const_name = 'MAIN_MODULE_'.strtoupper($this->name);
 		// Where to store the module in setup page (0=common,1=interface,2=others,3=very specific)
@@ -434,6 +434,7 @@ class modDelegation extends DolibarrModules
 			// EN: Ensure schema and dictionaries are up to date.
 			// FR: Garantir que le schéma et les dictionnaires sont à jour.
 			$this->ensureDelegationSchema();
+			$this->ensureSupplierOrderDc4ContactType();
 			$this->ensurePaymentMode();
 			$this->cleanupObsoleteData();
 		}
@@ -580,6 +581,47 @@ class modDelegation extends DolibarrModules
 			$sql = "ALTER TABLE ".MAIN_DB_PREFIX."delegation_det ADD UNIQUE KEY uk_delegation_facture_fourn (fk_object, fk_element, fk_facture_fourn)";
 			$this->db->query($sql);
 		}
+	}
+
+	/**
+	 * Ensure the supplier order external contact type DELEGDC4 exists.
+	 *
+	 * @return void
+	 */
+	private function ensureSupplierOrderDc4ContactType()
+	{
+		global $conf;
+
+		$table = MAIN_DB_PREFIX.'c_type_contact';
+		$hasEntityColumn = false;
+		$resql = $this->db->query("SHOW COLUMNS FROM ".$table." LIKE 'entity'");
+		if ($resql && $this->db->num_rows($resql) > 0) {
+			$hasEntityColumn = true;
+		}
+
+		$sql = "SELECT rowid FROM ".$table;
+		$sql .= " WHERE element = 'order_supplier'";
+		$sql .= " AND source = 'external'";
+		$sql .= " AND code = 'DELEGDC4'";
+		if ($hasEntityColumn) {
+			$sql .= " AND entity IN (0, ".((int) $conf->entity).")";
+		}
+		$sql .= " ORDER BY rowid ASC";
+
+		$resql = $this->db->query($sql);
+		if ($resql && $this->db->num_rows($resql) > 0) {
+			return;
+		}
+
+		$columns = "element, source, code, libelle, position, active";
+		$values = "'order_supplier', 'external', 'DELEGDC4', '".$this->db->escape('Représentant DC4 et délégations de paiement')."', 120, 1";
+		if ($hasEntityColumn) {
+			$columns .= ", entity";
+			$values .= ", ".((int) $conf->entity);
+		}
+
+		$sql = "INSERT INTO ".$table." (".$columns.") VALUES (".$values.")";
+		$this->db->query($sql);
 	}
 
 	/**

@@ -1,5 +1,11 @@
 # Délégation ChangeLog
 
+## 1.3.0 (2026-04-18)
+- Ajoute un type de contact externe `DELEGDC4` pour les commandes fournisseurs et l’exploite comme représentant DC4 / délégation de paiement.
+- Remplace l’usage des extrafields `lmdb_representant` / `lmdb_qualite_representant` par le contact externe `DELEGDC4` dans les modèles fournisseurs concernés.
+- Fiabilise la récupération des informations du représentant (nom, poste, affichage) via une librairie dédiée.
+- Corrige un crash de génération du PDF `dc42017` quand le tiers fournisseur n’est pas chargé au moment de la récupération bancaire.
+
 ## 1.2.2 (2026-04-18)
 - Corrige les calculs du tableau des montants du PDF BTP LMDB : la ligne « Total à payer à échéance » ne déduit plus les délégations en HT/TVA.
 - Conserve la déduction des délégations sur la ligne dédiée « Total des Délégations à déduire » et fiabilise l'affichage du « Montant à payer » en HT/TVA/TTC.

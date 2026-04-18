@@ -498,22 +498,32 @@ class pdf_DC42017 extends ModelePDFSuppliersOrders
 
 					}
 
-				//Banque
+					//Banque
 
-					require_once DOL_DOCUMENT_ROOT . '/societe/class/companybankaccount.class.php';
-					$object->thirdparty->bac = new CompanyBankAccount($this->db);
-					$object->thirdparty->bac->fetch(0,$object->thirdparty->id);
+						require_once DOL_DOCUMENT_ROOT . '/societe/class/companybankaccount.class.php';
+						$thirdpartyforbank = null;
+						if (is_object($object->thirdparty) && !empty($object->thirdparty->id)) {
+							$thirdpartyforbank = $object->thirdparty;
+						} elseif (!empty($object->socid)) {
+							$thirdpartyforbank = new Societe($this->db);
+							$thirdpartyforbank->fetch((int) $object->socid);
+						}
 
-					//$pdf->writeHTMLCell(60,10, 30, 245, $outputlangs->convToOutputCharset($object->thirdparty->bac->code_banque),0,1);
-					//$pdf->writeHTMLCell(60,10, 59, 245, $outputlangs->convToOutputCharset($object->thirdparty->bac->code_guichet),0,1);
-					//$pdf->writeHTMLCell(60,10, 65, 245, $outputlangs->convToOutputCharset($object->thirdparty->bac->number),0,1);
-					//$pdf->writeHTMLCell(60,10, 92, 245, $outputlangs->convToOutputCharset($object->thirdparty->bac->cle_rib),0,1);
-					
-					$IBAN = 'IBAN : '.$object->thirdparty->bac->iban.'<br>BIC/SWIFT : '.$object->thirdparty->bac->bic.'';
+						$bac = new CompanyBankAccount($this->db);
+						if (is_object($thirdpartyforbank) && !empty($thirdpartyforbank->id)) {
+							$bac->fetch(0, $thirdpartyforbank->id);
+						}
 
-					$pdf->writeHTMLCell(100,10, 70, 257, $outputlangs->convToOutputCharset($IBAN),0,1);
+						//$pdf->writeHTMLCell(60,10, 30, 245, $outputlangs->convToOutputCharset($object->thirdparty->bac->code_banque),0,1);
+						//$pdf->writeHTMLCell(60,10, 59, 245, $outputlangs->convToOutputCharset($object->thirdparty->bac->code_guichet),0,1);
+						//$pdf->writeHTMLCell(60,10, 65, 245, $outputlangs->convToOutputCharset($object->thirdparty->bac->number),0,1);
+						//$pdf->writeHTMLCell(60,10, 92, 245, $outputlangs->convToOutputCharset($object->thirdparty->bac->cle_rib),0,1);
+						
+						$IBAN = 'IBAN : '.$bac->iban.'<br>BIC/SWIFT : '.$bac->bic.'';
 
-					$pdf->writeHTMLCell(60,10, 70, 252, $outputlangs->convToOutputCharset($object->thirdparty->bac->bank),0,1);
+						$pdf->writeHTMLCell(100,10, 70, 257, $outputlangs->convToOutputCharset($IBAN),0,1);
+
+						$pdf->writeHTMLCell(60,10, 70, 252, $outputlangs->convToOutputCharset($bac->bank),0,1);
 
 					if ($dc4_line->avance == '1') {
 					
@@ -948,4 +958,3 @@ class pdf_DC42017 extends ModelePDFSuppliersOrders
 	}
 
 }
-
