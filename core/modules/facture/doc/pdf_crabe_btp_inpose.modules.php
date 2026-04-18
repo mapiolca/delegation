@@ -1902,6 +1902,43 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$delegation->fetch();
 			$del_lines = $delegation->lines;
 			$total_delegation = (float) $delegation->getSumDelegation();
+			$supplierInvoicesCache = array();
+			foreach ($del_lines as $delegation_line)
+			{
+				if (empty($delegation_line->fk_facture_fourn) || empty($delegation_line->amount))
+				{
+					continue;
+				}
+
+				$fkFactureFourn = (int) $delegation_line->fk_facture_fourn;
+				if (! isset($supplierInvoicesCache[$fkFactureFourn]))
+				{
+					$supplierInvoicesCache[$fkFactureFourn] = array(
+						'total_ht' => 0.0,
+						'total_tva' => 0.0,
+						'total_ttc' => 0.0,
+					);
+
+					$supplierInvoice = new FactureFournisseur($this->db);
+					if ($supplierInvoice->fetch($fkFactureFourn) > 0)
+					{
+						$supplierInvoicesCache[$fkFactureFourn]['total_ht'] = (float) $supplierInvoice->total_ht;
+						$supplierInvoicesCache[$fkFactureFourn]['total_tva'] = (float) $supplierInvoice->total_tva;
+						$supplierInvoicesCache[$fkFactureFourn]['total_ttc'] = (float) $supplierInvoice->total_ttc;
+					}
+				}
+
+				$lineTtc = (float) $delegation_line->amount;
+				$supplierInvoiceTotalTtc = (float) $supplierInvoicesCache[$fkFactureFourn]['total_ttc'];
+				if ($supplierInvoiceTotalTtc <= 0)
+				{
+					continue;
+				}
+
+				$ratio = $lineTtc / $supplierInvoiceTotalTtc;
+				$total_delegation_ht += (float) $supplierInvoicesCache[$fkFactureFourn]['total_ht'] * $ratio;
+				$total_delegation_tva += (float) $supplierInvoicesCache[$fkFactureFourn]['total_tva'] * $ratio;
+			}
 		}
 
 		$total_restant_ttc = $total_ttc - $retenue_de_garantie_ttc - $compte_prorata_ttc + $mpvalo_total_ttc;
