@@ -1890,6 +1890,20 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$compte_prorata_ht = $total_ht * $object->array_options['options_lmdb_compte_prorata'] / 100;
 		$compte_prorata_tva = $total_tva * $object->array_options['options_lmdb_compte_prorata'] / 100;
 
+		$total_delegation = 0;
+		$total_delegation_ht = 0;
+		$total_delegation_tva = 0;
+		$del_lines = array();
+		if (! empty($conf->delegation->enabled))
+		{
+			dol_include_once("/delegation/class/delegation.class.php");
+
+			$delegation = new Delegation($this->db);
+			$delegation->fetch();
+			$del_lines = $delegation->lines;
+			$total_delegation = (float) $delegation->getSumDelegation();
+		}
+
 		$total_restant_ttc = $total_ttc - $total_delegation - $retenue_de_garantie_ttc - $compte_prorata_ttc + $mpvalo_total_ttc;
 		$total_restant_ht = $total_ht - $total_delegation_ht - $retenue_de_garantie_ht - $compte_prorata_ht + $mpvalo_total_ht;
 		$total_restant_tva = $total_tva - $total_delegation_tva - $retenue_de_garantie_tva - $compte_prorata_tva + $mpvalo_total_tva;
@@ -1980,43 +1994,32 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$depositsamount=$object->getSumDepositsUsed();
 
 
-		$total_delegation = 0;
-		$del_lines = array();
-		
-		if ($conf->delegation->enabled)
+		if (! empty($conf->delegation->enabled) && ! empty($del_lines))
 		{
-			dol_include_once("/delegation/class/delegation.class.php");
-			
-			$delegation = new Delegation($this->db);
-			$delegation->fetch();
-			$del_lines = $delegation->lines;
-			$total_delegation = $delegation->getSumDelegation();
-			
-			// Write delegations
-			if (sizeof($del_lines) > 0)
-			{
+			$index++;
+			$pdf->SetFillColor(248,248,248);
+			$pdf->SetXY($colLabelX, $tab2_top + $tab2_hl * $index);
+			$pdf->MultiCell($labelWidth, $tab2_hl, $outputlangs->transnoentities('LMDBtotaldelegationdeduit'), 0, 'L', 1);
+			$pdf->SetXY($colHtX, $tab2_top + $tab2_hl * $index);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$total_delegation_ht, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
+			$pdf->SetXY($colTvaX, $tab2_top + $tab2_hl * $index);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$total_delegation_tva, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
+			$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * -$total_delegation, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 
-			// Total Délégation à Déduire
-			    $index++;
-			    $pdf->SetFont('','', $default_font_size - 1);
-			    $pdf->SetFillColor(248,248,248);
-			    $pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
-			    $pdf->MultiCell($col1x, $tab2_hl, $outputlangs->transnoentities('LMDBtotaldelegationdeduit'), 0, 'L', 1);
-			    
-			    $pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-			    $pdf->MultiCell($largcol2, $tab2_hl, price(-1 * $total_delegation, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
-			
-			// Total à Payer
-				$index++;
-				$pdf->SetTextColor(0,0,255);
-				$pdf->SetFillColor(255,255,255);
-				$pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
-				$pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("LMDBAmounttopay"), $useborder, 'L', 1);
-				$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
-				$pdf->MultiCell($largcol2, $tab2_hl, price($total_ttc_restant - $total_delegation, 0, $outputlangs, 0, 0, 2), $useborder, 'R', 1);	
-			}
-			
-			$pdf->SetTextColor(0,0,0);		
+			$index++;
+			$pdf->SetTextColor(0,0,255);
+			$pdf->SetFillColor(255,255,255);
+			$pdf->SetXY($colLabelX, $tab2_top + $tab2_hl * $index);
+			$pdf->MultiCell($labelWidth, $tab2_hl, $outputlangs->transnoentities("LMDBAmounttopay"), 0, 'L', 1);
+			$pdf->SetXY($colHtX, $tab2_top + $tab2_hl * $index);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_restant_ht, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
+			$pdf->SetXY($colTvaX, $tab2_top + $tab2_hl * $index);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_restant_tva, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
+			$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
+			$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $total_restant_ttc, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
+
+			$pdf->SetTextColor(0,0,0);
 		}
 
 
