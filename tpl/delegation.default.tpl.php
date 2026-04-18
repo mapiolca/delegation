@@ -157,7 +157,7 @@ for ($i = 0; $i < $numLines; $i++) {
 <?php if ($canAddLines){ ?>
 
 <tr class="liste_titre nodrag nodrop">
-	<td colspan="7"><?php echo $langs->trans("DelegationSelectSupplierInvoice"); ?></td>
+	<td colspan="7"><?php echo $form->textwithpicto($langs->trans("DelegationSelectSupplierInvoice"), $langs->trans("DelegationSelectSupplierInvoiceHelp")); ?></td>
 </tr>
 
 <form action="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id; ?>" method="POST">

@@ -66,6 +66,7 @@ DelegationPreviousSituationsLabel=Situations précédentes
 DelegationCurrentSituationLabel=Situation actuelle
 DelegationTotalDueAtMaturity=Total à payer à échéance
 DelegationSelectSupplierInvoice=Ajouter une facture fournisseur
+DelegationSelectSupplierInvoiceHelp=Factures éligibles : impayées, au statut impayé, mode de règlement « Délégation de paiement », liées au même projet et non déjà liées à une délégation de paiement.
 DelegationSupplierInvoices=Aucune facture fournisseur éligible
 DelegationConfigMissingClearingAccount=Veuillez configurer un compte de passage pour la délégation de paiement.
 DelegationSupplierInvoiceMissing=Veuillez sélectionner une facture fournisseur.
