@@ -1,5 +1,11 @@
 # Délégation ChangeLog
 
+## 1.2.2 (2026-04-18)
+- Corrige les calculs du tableau des montants du PDF BTP LMDB : la ligne « Total à payer à échéance » ne déduit plus les délégations en HT/TVA.
+- Conserve la déduction des délégations sur la ligne dédiée « Total des Délégations à déduire » et fiabilise l'affichage du « Montant à payer » en HT/TVA/TTC.
+- Harmonise le style de la ligne « Situation actuelle » avec la ligne « Total à payer à échéance », sans impacter les lignes suivantes.
+- Simplifie le libellé FR « CompteProrataTTCDeduit » en « Compte Prorata ».
+
 ## 1.2.1 (2026-02-12)
 - Corrige un probème d'affichage des montants dans les lignes des sous-totaux du modèle BTP LMDB
 
