@@ -1981,6 +1981,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $current_total_tva, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
 		$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
 		$pdf->MultiCell($colWidth, $tab2_hl, price($sign * $current_total_ttc, 0, $outputlangs, 0, 0, 2), 0, 'R', 1);
+		$pdf->SetFillColor(255,255,255);
 
 		if ($retenue_de_garantie_ttc != 0) {
 			$index++;
