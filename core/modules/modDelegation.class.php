@@ -434,6 +434,7 @@ class modDelegation extends DolibarrModules
 			// EN: Ensure schema and dictionaries are up to date.
 			// FR: Garantir que le schéma et les dictionnaires sont à jour.
 			$this->ensureDelegationSchema();
+			$this->ensureSupplierOrderDc4ContactType();
 			$this->ensurePaymentMode();
 			$this->cleanupObsoleteData();
 		}
@@ -580,6 +581,47 @@ class modDelegation extends DolibarrModules
 			$sql = "ALTER TABLE ".MAIN_DB_PREFIX."delegation_det ADD UNIQUE KEY uk_delegation_facture_fourn (fk_object, fk_element, fk_facture_fourn)";
 			$this->db->query($sql);
 		}
+	}
+
+	/**
+	 * Ensure the supplier order external contact type DELEGDC4 exists.
+	 *
+	 * @return void
+	 */
+	private function ensureSupplierOrderDc4ContactType()
+	{
+		global $conf;
+
+		$table = MAIN_DB_PREFIX.'c_type_contact';
+		$hasEntityColumn = false;
+		$resql = $this->db->query("SHOW COLUMNS FROM ".$table." LIKE 'entity'");
+		if ($resql && $this->db->num_rows($resql) > 0) {
+			$hasEntityColumn = true;
+		}
+
+		$sql = "SELECT rowid FROM ".$table;
+		$sql .= " WHERE element = 'supplier_order'";
+		$sql .= " AND source = 'external'";
+		$sql .= " AND code = 'DELEGDC4'";
+		if ($hasEntityColumn) {
+			$sql .= " AND entity IN (0, ".((int) $conf->entity).")";
+		}
+		$sql .= " ORDER BY rowid ASC";
+
+		$resql = $this->db->query($sql);
+		if ($resql && $this->db->num_rows($resql) > 0) {
+			return;
+		}
+
+		$columns = "element, source, code, libelle, position, active";
+		$values = "'supplier_order', 'external', 'DELEGDC4', '".$this->db->escape('Représentant DC4 et délégations de paiement')."', 120, 1";
+		if ($hasEntityColumn) {
+			$columns .= ", entity";
+			$values .= ", ".((int) $conf->entity);
+		}
+
+		$sql = "INSERT INTO ".$table." (".$columns.") VALUES (".$values.")";
+		$this->db->query($sql);
 	}
 
 	/**
