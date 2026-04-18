@@ -167,20 +167,22 @@ for ($i = 0; $i < $numLines; $i++) {
 <input type="hidden" name="action" value="addsupplierinvoice" />
 <input type="hidden" name="id" value="<?php echo $object->id; ?>" />
 
-<tr class="pair">
-	<td colspan="7">
-		<?php
-		if (! empty($supplierInvoiceOptions)) {
-			echo $form->selectarray('fk_facture_fourn', $supplierInvoiceOptions, '', 1);
-		} else {
-			echo $langs->trans('DelegationSupplierInvoices');
-		}
-		?>
-	</td>
-	<td align="right">
-		<input type="submit" class="button" value="<?php echo $langs->trans("Add"); ?>" name="addline" />
-	</td>
-</tr>
+	<tr class="pair">
+		<td colspan="7">
+			<?php
+			if (! empty($supplierInvoiceOptions)) {
+				echo $form->selectarray('fk_facture_fourn', $supplierInvoiceOptions, '', 1);
+			} else {
+				echo $langs->trans('DelegationSupplierInvoices');
+			}
+			?>
+		</td>
+		<td align="right">
+			<?php if (! empty($supplierInvoiceOptions)) { ?>
+			<input type="submit" class="button" value="<?php echo $langs->trans("Add"); ?>" name="addline" />
+			<?php } ?>
+		</td>
+	</tr>
 
 </form>
 <?php } ?>

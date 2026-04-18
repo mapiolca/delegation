@@ -182,7 +182,11 @@ if (! empty($project->id) && $paymentModeId > 0) {
 	$sql.= " WHERE f.entity = ".(int) $conf->entity;
 	$sql.= " AND f.fk_projet = ".(int) $project->id;
 	$sql.= " AND f.fk_mode_reglement = ".(int) $paymentModeId;
+	$sql.= " AND f.fk_statut = 1";
 	$sql.= " AND f.paye = 0";
+	$sql.= " AND NOT EXISTS (SELECT 1 FROM ".MAIN_DB_PREFIX."delegation_det as dd";
+	$sql.= " WHERE dd.fk_facture_fourn = f.rowid";
+	$sql.= " AND dd.fk_element = 'facture')";
 	$sql.= " GROUP BY f.rowid, f.ref, f.total_ttc, f.datef, s.rowid, s.nom";
 	$sql.= " ORDER BY f.datef DESC";
 
