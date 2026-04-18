@@ -105,16 +105,7 @@ print '<div class="underbanner clearboth"></div>';
 
 for ($i = 0; $i < $numLines; $i++) {
 	$line = $delegation->lines[$i];
-
-	if ($action == 'editline' && $lineid == $line->rowid){ ?>
-
-	<form action="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id; ?>" method="POST">
-	<input type="hidden" name="token" value="<?php echo newToken(); ?>" />
-	<input type="hidden" name="action" value="updateline" />
-	<input type="hidden" name="id" value="<?php echo $object->id; ?>" />
-	<input type="hidden" name="lineid" value="<?php echo $line->rowid; ?>" />
-
-	<?php } ?>
+	?>
 
 	<tr class="<?php echo ($i%2==0 ? 'impair' : 'pair'); ?>">
 		<td>
@@ -148,37 +139,18 @@ for ($i = 0; $i < $numLines; $i++) {
 		<td><?php echo ! empty($line->supplier_invoice) ? price($line->supplier_invoice->total_ttc) : '&nbsp;'; ?></td>
 		<td><?php echo ! empty($line->supplier_invoice) ? price($line->supplier_invoice_paid) : '&nbsp;'; ?></td>
 		<td><?php echo ! empty($line->supplier_invoice) ? price($line->supplier_invoice_remaining) : '&nbsp;'; ?></td>
-		<td>
-			<?php if ($action == 'editline' && $lineid == $line->rowid){ ?>
-				<input type="text" size="8" id="amount" name="amount" value="<?php echo price($line->amount); ?>" />
-				<input type="hidden" id="label" name="label" value="<?php echo dol_escape_htmltag($line->label); ?>" />
-			<?php }else{
-				echo price($line->amount);
-			} ?>
-		</td>
-
-		<?php if ($action == 'editline' && $lineid == $line->rowid){ ?>
+		<td><?php echo price($line->amount); ?></td>
 		<td align="right">
-			<input type="submit" class="button" name="save" value="<?php echo $langs->trans("Save"); ?>" />&nbsp;<input type="submit" class="button" name="cancel" value="<?php echo $langs->trans("Cancel"); ?>" />
-		</td>
-
-		<?php }else{ ?>
-			<td align="right">
-			<?php if ($canAddLines) { ?>
-				<a href="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=editline&amp;lineid='.$line->rowid; ?>">
-					<?php echo img_edit(); ?>
-				</a>
-			<?php } ?>
 			<?php if ($canDeleteLines) { ?>
-				<a href="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=deleteline&amp;lineid='.$line->rowid; ?>">
+				<a href="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=deleteline&amp;lineid='.$line->rowid.'&amp;token='.newToken(); ?>">
 					<?php echo img_delete(); ?>
 				</a>
 			<?php } ?>
-			</td>
-		<?php } ?>
+		</td>
 	</tr>
-	</form>
-<?php } ?>
+<?php
+}
+?>
 
 
 <?php } ?>

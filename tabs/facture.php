@@ -69,6 +69,11 @@ $cancel = GETPOST('cancel') ? true : false;
 $error = false;
 $message = '';
 $formconfirm = null;
+$allowedActions = array('addline', 'addsupplierinvoice', 'deleteline');
+
+if (! in_array($action, $allowedActions, true)) {
+	$action = '';
+}
 
 $form = new Form($db);
 $object = new Facture($db);
