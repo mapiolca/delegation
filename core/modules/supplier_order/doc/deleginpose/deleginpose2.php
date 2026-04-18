@@ -4,6 +4,7 @@
 
 */
 
+require_once DOL_DOCUMENT_ROOT.'/custom/delegation/lib/delegation_contact.lib.php';
 
 $object->fetch_projet();
 $company = new Societe($this->db);
@@ -17,6 +18,7 @@ if ($dc4_line->dc4_object_declaration == 3) {
 
 
 if ($company->idprof1 == "") {$company_idprof1 = $outputlangs->transnoentities("non_renseigne");}else{$company_idprof1 = $company->idprof1;}
+$dc4Representative = delegationGetSupplierOrderRepresentativeData($this->db, $object);
 
 $text = '
 
@@ -44,7 +46,7 @@ $text = '
 <p><b>La Société '.$company->name.',</b><br/>immatriculée SIREN/CIF '.$company_idprof1.', <br/>ayant son siège social '.$company->address.' '.$company->zip.' '.$company->town.', <br/>représentée par '.$company->array_options['options_lmdb_representant'].', agissant en sa qualité de '.$company->array_options['options_lmdb_qualite_representant'].', dument habilité </p>
 <p>ci-après désignée par &#34;<b>le Délégué</b>&#34; </p>
 <p><b>et </b></p>
-<p><b>La Société '.$outputlangs->convToOutputCharset($object->thirdparty->name).',</b> <br/>immatriculée  SIREN/CIF '.$object->thirdparty->idprof1.''.$outputlangs->convToOutputCharset($object->thirdparty->cif).', <br/>ayant son siège social '.$outputlangs->convToOutputCharset($object->thirdparty->address).' '.$outputlangs->convToOutputCharset($object->thirdparty->zip).' '.$outputlangs->convToOutputCharset($object->thirdparty->town).', <br/>représentée par '.$outputlangs->convToOutputCharset($object->thirdparty->array_options['options_lmdb_representant']).', agissant en sa qualité de '.$outputlangs->convToOutputCharset($object->thirdparty->array_options['options_lmdb_qualite_representant']).', dument habilité </p>
+<p><b>La Société '.$outputlangs->convToOutputCharset($object->thirdparty->name).',</b> <br/>immatriculée  SIREN/CIF '.$object->thirdparty->idprof1.''.$outputlangs->convToOutputCharset($object->thirdparty->cif).', <br/>ayant son siège social '.$outputlangs->convToOutputCharset($object->thirdparty->address).' '.$outputlangs->convToOutputCharset($object->thirdparty->zip).' '.$outputlangs->convToOutputCharset($object->thirdparty->town).', <br/>représentée par '.$outputlangs->convToOutputCharset($dc4Representative['name']).', agissant en sa qualité de '.$outputlangs->convToOutputCharset($dc4Representative['job']).', dument habilité </p>
 <p>ci-après désignée par &#34;<b>le Délégataire</b>&#34; </p>
 <p>Le Délégant, le Délégué et le Délégataire étant ci-après collectivement dénommés les « Parties ». </p>
 
@@ -134,7 +136,7 @@ $text3 = '
     <tr><p></p></tr>
     <tr>
         <td><b>Le Délégataire</b></td>
-        <td>M./Mme '.$outputlangs->convToOutputCharset($object->thirdparty->array_options['options_lmdb_representant']).'</td>
+        <td>M./Mme '.$outputlangs->convToOutputCharset($dc4Representative['name']).'</td>
         <td></td>
     </tr>
     <br/><br/>

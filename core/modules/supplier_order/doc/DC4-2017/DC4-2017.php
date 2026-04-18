@@ -3,6 +3,8 @@
  /* Copyright (C) 2018      Pierre Ardoin         <pierre.ardoin@gmail.com>
 
 */
+
+require_once DOL_DOCUMENT_ROOT.'/custom/delegation/lib/delegation_contact.lib.php';
 	$object->fetch_projet();
 
 	if ($object->element == 'order_supplier') {
@@ -49,7 +51,8 @@
 
 		$Forme_Juridique_SousTraitant = getFormeJuridiqueLabel($object->thirdparty->forme_juridique_code) ;
 
-		$Representant_SousTraitant = ''.$object->thirdparty->array_options['options_lmdb_representant'].', '.$object->thirdparty->array_options['options_lmdb_qualite_representant'].'';
+		$dc4Representative = delegationGetSupplierOrderRepresentativeData($this->db, $object);
+		$Representant_SousTraitant = $dc4Representative['display'];
 
 
 

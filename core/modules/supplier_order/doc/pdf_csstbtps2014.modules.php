@@ -37,6 +37,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/pdf.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/custom/delegation/class/delegation.class.php';
 require_once DOL_DOCUMENT_ROOT.'/custom/delegation/class/dc4.class.php';
 require_once DOL_DOCUMENT_ROOT.'/custom/delegation/class/detailprojet.class.php';
+require_once DOL_DOCUMENT_ROOT.'/custom/delegation/lib/delegation_contact.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
@@ -380,8 +381,9 @@ class pdf_csstbtps2014 extends ModelePDFSuppliersOrders
 
 					$pdf->writeHTMLCell(190,4, 71, 94, dol_htmlentitiesbr($outputlangs->convToOutputCharset($SIRETCIFsst)),0,1);
 
-					$pdf->writeHTMLCell(190,4, 71, 105.2, dol_htmlentitiesbr($outputlangs->convToOutputCharset($object->thirdparty->array_options['options_lmdb_representant'])),0,1);
-					$pdf->writeHTMLCell(190,4, 71, 110.6, dol_htmlentitiesbr($outputlangs->convToOutputCharset($object->thirdparty->array_options['options_lmdb_qualite_representant'])),0,1);
+					$dc4Representative = delegationGetSupplierOrderRepresentativeData($this->db, $object);
+					$pdf->writeHTMLCell(190,4, 71, 105.2, dol_htmlentitiesbr($outputlangs->convToOutputCharset($dc4Representative['name'])),0,1);
+					$pdf->writeHTMLCell(190,4, 71, 110.6, dol_htmlentitiesbr($outputlangs->convToOutputCharset($dc4Representative['job'])),0,1);
 
 					$object->fetch_projet();
 
@@ -1089,4 +1091,3 @@ class pdf_csstbtps2014 extends ModelePDFSuppliersOrders
 	}
 
 }
-
