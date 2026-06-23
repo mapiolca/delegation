@@ -1,6 +1,6 @@
 # Délégation ChangeLog
 
-## Non publié
+## 1.3.1 (2026-06-23)
 - Corrige l'erreur 500 sur la liste native des modèles de courrier lorsque le module est activé, en supprimant la déclaration parasite de substitutions Stancer dans le module Délégation.
 
 ## 1.3.0 (2026-04-18)
