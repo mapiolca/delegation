@@ -1,5 +1,8 @@
 # Délégation ChangeLog
 
+## Non publié
+- Corrige l'erreur 500 sur la liste native des modèles de courrier lorsque le module est activé, en supprimant la déclaration parasite de substitutions Stancer dans le module Délégation.
+
 ## 1.3.0 (2026-04-18)
 - Ajoute un type de contact externe `DELEGDC4` pour les commandes fournisseurs et l’exploite comme représentant DC4 / délégation de paiement.
 - Remplace l’usage des extrafields `lmdb_representant` / `lmdb_qualite_representant` par le contact externe `DELEGDC4` dans les modèles fournisseurs concernés.

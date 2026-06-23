@@ -102,7 +102,7 @@ class modDelegation extends DolibarrModules
 		//							'workflow' => array('WORKFLOW_MODULE1_YOURACTIONTYPE_MODULE2'=>array('enabled'=>'! empty($conf->module1->enabled) && ! empty($conf->module2->enabled)', 'picto'=>'yourpicto@mymodule')) // Set here all workflow context managed by module
 		//                        );
 		$this->module_parts = array(
-			'substitutions' => 1,
+			'substitutions' => 0,
 			'models' => 1,
 			'hooks' => array('thirdpartycard', 'propalcard', 'ordercard', 'invoicecard', 'contractcard', 'pdfgeneration')
 		);

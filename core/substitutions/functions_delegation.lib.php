@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2023 Eric Seigne <eric.seigne@cap-rel.fr>
+/* Copyright (C) 2026	Pierre Ardoin		<developpeur@lesmetiersdubatiment.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -8,45 +8,30 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- * or see http://www.gnu.org/
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 /**
- *	\file			htdocs/core/modules/substitutions/functions_stancer.lib.php
- *	\brief			A set of functions for Dolibarr
- *					This file contains functions for plugin stancer.
- */
-
-
-/**
- * 		Function called to complete substitution array (before generating on ODT, or a personalized email)
- * 		functions xxx_completesubstitutionarray are called by make_substitutions() if file
- * 		is inside directory htdocs/core/substitutions
+ * Complete substitution array for the Delegation module.
  *
- *		@param	array		$substitutionarray	Array with substitution key=>val
- *		@param	Translate	$outlangs			Output langs
- *		@param	Object		$object				Object to use to get values
- * 		@return	void							The entry parameter $substitutionarray is modified
+ * Dolibarr calls functions named <modulekey>_completesubstitutionarray()
+ * from files declared through module_parts['substitutions'].
+ *
+ * @param	array<string,string|float|null>	$substitutionarray	Array with substitution key => value
+ * @param	Translate						$outputlangs		Output language handler
+ * @param	?CommonObject					$object				Source object
+ * @param	?mixed							$parameters			Additional parameters
+ * @return	void
  */
-//dol_include_once('/stancer/lib/stancer.lib.php');
-
-function stancer_completesubstitutionarray(&$substitutionarray, $outlangs, $object)
+function delegation_completesubstitutionarray(&$substitutionarray, $outputlangs, $object = null, $parameters = null)
 {
-	global $conf;
-
-	//TODO
-	if (is_object($object) && ($object->id > 0 || $object->specimen)) {	// We do not add substitution entries if object is not instantiated (->id not > 0)
-		$substitutionarray['__STANCER_SEPA_RUM__']=0000000;
-		$substitutionarray['__STANCER_SEPA_DELAIS__']=getDolGlobalString('STANCER_DELAY_SEPA');
-		//$substitutionarray['__STANCER_SEPA_URL__']=stancerShowOnlineCBLinkForCustomer($object->thirdparty);
-
-		// $substitutionarray['__ONLINE_PAYMENT_URL__'] = 0000000;
-		// $substitutionarray['__ONLINE_PAYMENT_TEXT_AND_URL__'] = 0000000;
-		// DOL_MAIN_URL_ROOT.'/custom/stancer/public/newpayment.php
+	if (! is_object($object)) {
+		return;
 	}
+
+	// No module-specific substitution is required yet.
 }
