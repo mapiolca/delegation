@@ -133,13 +133,13 @@ DelegationRightVatReverseChargeWrite=Activar/Desactivar la inversión del sujeto
 
 lmdb_for=para
 
-lmdb_envoi_auto=Envío automático
+lmdb_envoi_auto=Envío automático (heredado, desactivado)
 
-lmdb_envoi_auto_help=Marque la casilla si el correo debe enviarse automáticamente después de la generación.
+lmdb_envoi_auto_help=Campo histórico conservado para preservar los datos; la función se eliminó en la versión 1.4.0.
 
-lmdb_template=Plantilla de correo automático
+lmdb_template=Plantilla de correo automático (heredada, desactivada)
 
-lmdb_template_help=Elija la plantilla de correo que se enviará automáticamente cuando se valide la factura.
+lmdb_template_help=Campo histórico conservado para preservar la plantilla seleccionada; la función se eliminó en la versión 1.4.0.
 
 lmdb_commande_account=Cuenta bancaria
 

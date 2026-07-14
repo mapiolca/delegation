@@ -1,5 +1,11 @@
 # Délégation ChangeLog
 
+## 1.4.0 (2026-07-14)
+- Supprime la tâche planifiée et la méthode d’envoi automatique des factures, sans modifier l’envoi manuel natif de Dolibarr.
+- Supprime la copie locale de la classe core `Facture` utilisée uniquement par cette fonctionnalité.
+- Désactive et masque les extrafields historiques `lmdb_envoi_auto` et `lmdb_template` sur les factures et factures récurrentes, tout en conservant leurs colonnes et leurs valeurs existantes.
+- Nettoie de manière idempotente les anciennes tâches cron d’envoi automatique dans toutes les entités lors de l’activation du module.
+
 ## 1.3.1 (2026-06-23)
 - Corrige l'erreur 500 sur la liste native des modèles de courrier lorsque le module est activé, en supprimant la déclaration parasite de substitutions Stancer dans le module Délégation.
 

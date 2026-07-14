@@ -70,7 +70,7 @@ class modDelegation extends DolibarrModules
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Module pour gérer la délégation de paiement, les contrats de sous-traitance et les formulaires DC4.";
 		// Possible values for version are: 'development', 'experimental', 'dolibarr' or version
-		$this->version = '1.3.1';
+		$this->version = '1.4.0';
 		// Key used in llx_const table to save module status enabled/disabled (where MYMODULE is value of property name of module in uppercase)
 		$this->const_name = 'MAIN_MODULE_'.strtoupper($this->name);
 		// Where to store the module in setup page (0=common,1=interface,2=others,3=very specific)
@@ -176,33 +176,6 @@ class modDelegation extends DolibarrModules
         // Boxes
 		// Add here list of php file(s) stored in includes/boxes that contains class to show a box.
         $this->boxes = array();			// List of boxes
-
-
-        // Cronjobs (List of cron jobs entries to add when module is enabled)
-		// unit_frequency must be 60 for minute, 3600 for hour, 86400 for day, 604800 for week
-		/* BEGIN MODULEBUILDER CRON */
-		$this->cronjobs = array(
-			  0 => array(
-			      'label' => 'Envoyer les factures validées à la date de la facture avec un template personnalisé.',
-			      'jobtype' => 'method',
-			      'class' => 'custom/delegation/class/facture.class.php',
-			      'objectname' => 'Facture',
-			      'method' => 'sendEmailsNotificationOnInvoiceDate',
-			      'parameters' => '',
-			      'comment' => 'Envoi automatiquement la facture par email lorsque celle-ci est crée depuis un modèle récurrent et dont la fonction et le modèle de courriel ont été choisi.',
-			      'frequency' => 1,
-			      'unitfrequency' => 86400,
-			      'status' => 1,
-			      'test' => 'isModEnabled("delegation")',
-			      'priority' => 50,
-			  ),
-		);
-		/* END MODULEBUILDER CRON */
-		// Example: $this->cronjobs=array(
-		//    0=>array('label'=>'My label', 'jobtype'=>'method', 'class'=>'/dir/class/file.class.php', 'objectname'=>'MyClass', 'method'=>'myMethod', 'parameters'=>'param1, param2', 'comment'=>'Comment', 'frequency'=>2, 'unitfrequency'=>3600, 'status'=>0, 'test'=>'isModEnabled("jpsun")', 'priority'=>50),
-		//    1=>array('label'=>'My label', 'jobtype'=>'command', 'command'=>'', 'parameters'=>'param1, param2', 'comment'=>'Comment', 'frequency'=>1, 'unitfrequency'=>3600*24, 'status'=>0, 'test'=>'isModEnabled("jpsun")', 'priority'=>50)
-		// );
-
 		// Permissions
 		$this->rights = array();		// Permission array used by this module
 		$r = 0;
@@ -380,18 +353,6 @@ class modDelegation extends DolibarrModules
 
 		//Factures
 		$ext->addExtraField('lmdb_compte_prorata', 'lmdb_compte_prorata', 'varchar', 2, 255, 'facture', 0, 0, '', '', 1, '', 1, 'lmdb_compte_prorata_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
-
-		$ext->addExtraField('lmdb_envoi_auto', 'lmdb_envoi_auto', 'boolean', 3, '', 'facture', 0, 0, 0, '', 0, '', 0, 'lmdb_envoi_auto_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled', );
-
-		$ext->addExtraField('lmdb_template', 'lmdb_template', 'sellist', 4, '', 'facture', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:89:"c_email_templates:label:rowid::((type_template:=:\'facture_send\') AND (entity:=:$ENTITY$))";N;}}', 0, '', 0, 'lmdb_template_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled', );
-
-		//Factures  récurentes
-
-		$ext->addExtraField('lmdb_envoi_auto', 'lmdb_envoi_auto', 'boolean', 3, '', 'facture_rec', 0, 0, 0, '', 1, '', 1, 'lmdb_envoi_auto_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled', );
-
-		$ext->addExtraField('lmdb_template', 'lmdb_template', 'sellist', 4, '', 'facture_rec', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:89:"c_email_templates:label:rowid::((type_template:=:\'facture_send\') AND (entity:=:$ENTITY$))";N;}}', 1, '', 1, 'lmdb_template_help', '', 0, 'delegation@delegation', '$conf->delegation->enabled', 0,0, );
-
-
 		//Projets
 		$ext->addExtraField('lmdb_project_amount', 'lmdb_project_amount', 'price', 2, 255, 'projet', 0, 0, '', '', 1, '', 1, '', '', 0, 'delegation@delegation', '$conf->delegation->enabled');
 
@@ -431,6 +392,11 @@ class modDelegation extends DolibarrModules
 		$result = $this->_init($sql);
 
 		if ($result > 0) {
+			$migrationResult = $this->retireLegacyInvoiceAutoSend();
+			if ($migrationResult < 0) {
+				return -1;
+			}
+
 			// EN: Ensure schema and dictionaries are up to date.
 			// FR: Garantir que le schéma et les dictionnaires sont à jour.
 			$this->ensureDelegationSchema();
@@ -440,6 +406,64 @@ class modDelegation extends DolibarrModules
 		}
 
 		return $result;
+	}
+
+	/**
+	 * EN: Disable legacy automatic invoice sending fields and remove its scheduled jobs.
+	 * FR: Désactiver les champs historiques d'envoi automatique et supprimer ses tâches planifiées.
+	 *
+	 * The extrafield definitions are kept so their database columns and existing values are preserved.
+	 * Cron jobs are removed for every entity because the callable implementation no longer exists.
+	 *
+	 * @return int 1 on success, -1 on error
+	 */
+	private function retireLegacyInvoiceAutoSend()
+	{
+		if ($this->db->begin() <= 0) {
+			$this->error = $this->db->lasterror();
+			$this->errors = array($this->error);
+			dol_syslog(__METHOD__.': '.$this->error, LOG_ERR);
+			return -1;
+		}
+
+		$sql = "UPDATE ".MAIN_DB_PREFIX."extrafields";
+		$sql .= " SET enabled = '0', list = '0'";
+		$sql .= " WHERE elementtype IN ('facture', 'facture_rec')";
+		$sql .= " AND name IN ('lmdb_envoi_auto', 'lmdb_template')";
+		$sql .= " AND langfile = 'delegation@delegation'";
+		$resql = $this->db->query($sql);
+		if (!$resql) {
+			$this->error = $this->db->lasterror();
+			$this->errors = array($this->error);
+			$this->db->rollback();
+			dol_syslog(__METHOD__.': '.$this->error, LOG_ERR);
+			return -1;
+		}
+		$disabledFields = (int) $this->db->affected_rows($resql);
+
+		$sql = "DELETE FROM ".MAIN_DB_PREFIX."cronjob";
+		$sql .= " WHERE module_name = 'delegation'";
+		$sql .= " AND methodename = 'sendEmailsNotificationOnInvoiceDate'";
+		$resql = $this->db->query($sql);
+		if (!$resql) {
+			$this->error = $this->db->lasterror();
+			$this->errors = array($this->error);
+			$this->db->rollback();
+			dol_syslog(__METHOD__.': '.$this->error, LOG_ERR);
+			return -1;
+		}
+		$deletedCronJobs = (int) $this->db->affected_rows($resql);
+
+		if ($this->db->commit() <= 0) {
+			$this->error = $this->db->lasterror();
+			$this->errors = array($this->error);
+			$this->db->rollback();
+			dol_syslog(__METHOD__.': '.$this->error, LOG_ERR);
+			return -1;
+		}
+		dol_syslog(__METHOD__.': disabled legacy extrafields='.$disabledFields.', deleted cron jobs='.$deletedCronJobs, LOG_INFO);
+
+		return 1;
 	}
 
 	/**

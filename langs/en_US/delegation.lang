@@ -129,13 +129,13 @@ DelegationRightTabDc4CustomerWrite=Edit DC4 tab (customer order)
 
 lmdb_for=for
 
-lmdb_envoi_auto=Automatic sending
+lmdb_envoi_auto=Automatic sending (legacy, disabled)
 
-lmdb_envoi_auto_help=Check the box if the email must be sent automatically after generation.
+lmdb_envoi_auto_help=Legacy field kept to preserve existing data; the feature was removed in version 1.4.0.
 
-lmdb_template=Automatic email template
+lmdb_template=Automatic email template (legacy, disabled)
 
-lmdb_template_help=Choose the email template sent automatically when the invoice is validated.
+lmdb_template_help=Legacy field kept to preserve the selected template; the feature was removed in version 1.4.0.
 
 lmdb_commande_account=Bank account
 
