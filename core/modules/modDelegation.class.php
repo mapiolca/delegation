@@ -430,7 +430,7 @@ class modDelegation extends DolibarrModules
 		$sql .= " SET enabled = '0', list = '0'";
 		$sql .= " WHERE elementtype IN ('facture', 'facture_rec')";
 		$sql .= " AND name IN ('lmdb_envoi_auto', 'lmdb_template')";
-		$sql .= " AND langfile = 'delegation@delegation'";
+		$sql .= " AND langs = 'delegation@delegation'";
 		$resql = $this->db->query($sql);
 		if (!$resql) {
 			$this->error = $this->db->lasterror();
