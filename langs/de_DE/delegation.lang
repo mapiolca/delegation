@@ -133,13 +133,13 @@ DelegationRightVatReverseChargeWrite=Autoliquidation auf Dokumenten aktivieren/d
 
 lmdb_for=für
 
-lmdb_envoi_auto=Automatischer Versand
+lmdb_envoi_auto=Automatischer Versand (veraltet, deaktiviert)
 
-lmdb_envoi_auto_help=Aktivieren, wenn die E-Mail nach der Erstellung automatisch versendet werden soll.
+lmdb_envoi_auto_help=Historisches Feld zur Erhaltung vorhandener Daten; die Funktion wurde in Version 1.4.0 entfernt.
 
-lmdb_template=Automatische E-Mail-Vorlage
+lmdb_template=Automatische E-Mail-Vorlage (veraltet, deaktiviert)
 
-lmdb_template_help=Wählen Sie die E-Mail-Vorlage, die beim Validieren der Rechnung automatisch versendet wird.
+lmdb_template_help=Historisches Feld zur Erhaltung der ausgewählten Vorlage; die Funktion wurde in Version 1.4.0 entfernt.
 
 lmdb_commande_account=Bankkonto
 

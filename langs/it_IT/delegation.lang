@@ -133,13 +133,13 @@ DelegationRightVatReverseChargeWrite=Attivare/Disattivare il reverse charge sui 
 
 lmdb_for=per
 
-lmdb_envoi_auto=Invio automatico
+lmdb_envoi_auto=Invio automatico (obsoleto, disattivato)
 
-lmdb_envoi_auto_help=Seleziona la casella se l'email deve essere inviata automaticamente dopo la generazione.
+lmdb_envoi_auto_help=Campo storico conservato per preservare i dati; la funzionalità è stata rimossa nella versione 1.4.0.
 
-lmdb_template=Modello email automatico
+lmdb_template=Modello email automatico (obsoleto, disattivato)
 
-lmdb_template_help=Scegli il modello email che verrà inviato automaticamente alla convalida della fattura.
+lmdb_template_help=Campo storico conservato per preservare il modello selezionato; la funzionalità è stata rimossa nella versione 1.4.0.
 
 lmdb_commande_account=Conto bancario
 

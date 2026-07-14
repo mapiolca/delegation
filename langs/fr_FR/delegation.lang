@@ -133,13 +133,13 @@ DelegationRightVatReverseChargeWrite=Activer/Désactiver l'autoliquidation sur l
 
 lmdb_for = pour
 
-lmdb_envoi_auto = Envoi automatique
+lmdb_envoi_auto = Envoi automatique (hérité, désactivé)
 
-lmdb_envoi_auto_help = Cochez la case si le mail doit partir automatiquement après sa génération.
+lmdb_envoi_auto_help = Champ historique conservé pour préserver les données ; la fonctionnalité a été supprimée dans la version 1.4.0.
 
-lmdb_template = Modèle de courriel automatique
+lmdb_template = Modèle de courriel automatique (hérité, désactivé)
 
-lmdb_template_help = Choisissez le modèle de courriel qui sera envoyé automatiquement lors de la validation de la facture.
+lmdb_template_help = Champ historique conservé pour préserver le modèle sélectionné ; la fonctionnalité a été supprimée dans la version 1.4.0.
 
 lmdb_commande_account = Compte Bancaire
 
