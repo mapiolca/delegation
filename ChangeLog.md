@@ -1,5 +1,10 @@
 # Délégation ChangeLog
 
+## 1.4.1 (2026-07-23)
+- Corrige les cumuls du PDF BTP LMDB avec Subtotal 3.29.1 en excluant les titres, textes libres et sous-totaux techniques des montants financiers.
+- Centralise les totaux des lignes facturables pour les situations courantes et antérieures, les taux de TVA, l’avancement global, les retenues et le total à échéance.
+- Conserve le traitement séparé de MPVALO, la multicurrency, les avoirs et les arrondis financiers natifs Dolibarr.
+
 ## 1.4.0 (2026-07-14)
 - Supprime la tâche planifiée et la méthode d’envoi automatique des factures, sans modifier l’envoi manuel natif de Dolibarr.
 - Supprime la copie locale de la classe core `Facture` utilisée uniquement par cette fonctionnalité.

@@ -42,7 +42,7 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT.'/commande/class/commande.class.php';
 
 // TSubtotal
-if (!empty($conf->subtotal->enabled)) dol_include_once('/subtotal/class/subtotal.class.php');
+if (isModEnabled('subtotal')) dol_include_once('/subtotal/class/subtotal.class.php');
 
 
 /**
@@ -106,6 +106,11 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 	 * @var float X position for the situation progress column
 	 */
 	public $posxprogress;
+
+	/**
+	 * @var array<string, mixed> Situation financial data
+	 */
+	public $TDataSituation = array();
 
 
 	/**
@@ -1095,7 +1100,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 	{
 		global $conf;
 
-		if (empty($conf->delegation->enabled))
+		if (!isModEnabled('delegation'))
 		{
 			return 0;
 		}
@@ -1676,43 +1681,63 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 				
 		$object->fetchPreviousNextSituationInvoice();
-		$TPreviousIncoice = $object->tab_previous_situation_invoice;
+		$TPreviousIncoice = !empty($object->tab_previous_situation_invoice) && is_array($object->tab_previous_situation_invoice)
+			? $object->tab_previous_situation_invoice
+			: array();
 
 		$mpvaloProductId = (int) getDolGlobalInt('LMDB_MPVALO_PRODUCT_ID');
-		$total_a_payer = 0;
-		foreach ($TPreviousIncoice as &$fac) {
-			$fac->fetch_lines();
-			foreach ($fac->lines as $line) {
-				if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
-					continue;
-				}
-				$total_a_payer += (float) $line->total_ht;
+		$useMulticurrency = isModEnabled('multicurrency')
+			&& isset($object->multicurrency_tx)
+			&& (float) $object->multicurrency_tx != 1.0;
+		$currentFinancialTotals = $this->getBtpFinancialTotals(
+			isset($object->lines) && is_array($object->lines) ? $object->lines : array(),
+			$useMulticurrency,
+			$mpvaloProductId
+		);
+		$previousFinancialTotals = array(
+			'total_ht' => 0.0,
+			'total_tva' => 0.0,
+			'total_ttc' => 0.0,
+		);
+		$previousInvoiceFinancialTotals = array();
+		foreach ($TPreviousIncoice as $fac) {
+			if (empty($fac->lines) || !is_array($fac->lines)) {
+				$fac->fetch_lines();
 			}
+			$facFinancialTotals = $this->getBtpFinancialTotals(
+				isset($fac->lines) && is_array($fac->lines) ? $fac->lines : array(),
+				$useMulticurrency,
+				$mpvaloProductId
+			);
+			$previousInvoiceFinancialTotals[] = $facFinancialTotals;
+			$previousFinancialTotals['total_ht'] += $facFinancialTotals['total_ht'];
+			$previousFinancialTotals['total_tva'] += $facFinancialTotals['total_tva'];
+			$previousFinancialTotals['total_ttc'] += $facFinancialTotals['total_ttc'];
 		}
-		foreach ($object->lines as $line) {
-			if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
-				continue;
-			}
-			$total_a_payer += (float) $line->total_ht;
-		}
+		$previousFinancialTotals['total_ht'] = (float) price2num($previousFinancialTotals['total_ht'], 'MT');
+		$previousFinancialTotals['total_tva'] = (float) price2num($previousFinancialTotals['total_tva'], 'MT');
+		$previousFinancialTotals['total_ttc'] = (float) price2num($previousFinancialTotals['total_ttc'], 'MT');
+
+		$cumulativeFinancialTotals = array(
+			'total_ht' => (float) price2num($previousFinancialTotals['total_ht'] + $currentFinancialTotals['total_ht'], 'MT'),
+			'total_tva' => (float) price2num($previousFinancialTotals['total_tva'] + $currentFinancialTotals['total_tva'], 'MT'),
+			'total_ttc' => (float) price2num($previousFinancialTotals['total_ttc'] + $currentFinancialTotals['total_ttc'], 'MT'),
+		);
+		$total_a_payer = $cumulativeFinancialTotals['total_ht'];
 
 		// pourcentage global d'avancement
-		$percent = 0;
-		$i=0;
 		$SOMMES = 0;
 		foreach ($object->lines as $line)
 		{
-			if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
+			if (!$this->isBtpFinancialLine($line, $mpvaloProductId)) {
 				continue;
 			}
-			if(!class_exists('TSubtotal') || !TSubtotal::isModSubtotalLine($line)){
-				$percent += $line->situation_percent;
-				$SOMMES += ($line->subprice * $line->qty);
-				$i++;
-			}
+			$SOMMES += (isset($line->subprice) ? (float) $line->subprice : 0.0)
+				* (isset($line->qty) ? (float) $line->qty : 0.0);
 		}
 
-		$avancementGlobal = price($total_a_payer / $SOMMES * 100, 0, $outputlangs, 0, 0, 2);
+		$avancementGlobalValue = $SOMMES != 0.0 ? $total_a_payer / $SOMMES * 100 : 0.0;
+		$avancementGlobal = price($avancementGlobalValue, 0, $outputlangs, 0, 0, 2);
 
 		
 		$deja_paye = 0;
@@ -1732,15 +1757,12 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 
 			$posy += $tab2_hl;
 
-			foreach ($TPreviousIncoice as &$fac){
-				$fac->fetch_lines();
-				$fac_total_ht = 0;
-				foreach ($fac->lines as $line) {
-					if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
-						continue;
-					}
-					$fac_total_ht += (float) $line->total_ht;
-				}
+			$previousInvoiceIndex = 0;
+			foreach ($TPreviousIncoice as $fac){
+				$fac_total_ht = isset($previousInvoiceFinancialTotals[$previousInvoiceIndex])
+					? (float) $previousInvoiceFinancialTotals[$previousInvoiceIndex]['total_ht']
+					: 0.0;
+				$previousInvoiceIndex++;
 
 				if($posy  > 180 ) {
 					$this->_pagefoot($pdf,$object,$outputlangs,1);
@@ -1781,35 +1803,29 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		}
 		
 		// Compute totals without MP_VALO service lines.
-		$total_ht = 0;
-		$total_tva = 0;
-		$total_ttc = 0;
+		$total_ht = $currentFinancialTotals['total_ht'];
+		$total_tva = $currentFinancialTotals['total_tva'];
+		$total_ttc = $currentFinancialTotals['total_ttc'];
 		$mpvalo_total_ht = 0;
 		$mpvalo_total_tva = 0;
 		$mpvalo_total_ttc = 0;
 		foreach ($object->lines as $line) {
-			if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
-				if ($conf->multicurrency->enabled && $object->multicurrency_tx != 1) {
-					$mpvalo_total_ht += (float) $line->multicurrency_total_ht;
-					$mpvalo_total_tva += (float) $line->multicurrency_total_tva;
-					$mpvalo_total_ttc += (float) $line->multicurrency_total_ttc;
-				} else {
-					$mpvalo_total_ht += (float) $line->total_ht;
-					$mpvalo_total_tva += (float) $line->total_tva;
-					$mpvalo_total_ttc += (float) $line->total_ttc;
-				}
+			if (!$this->isBtpFinancialLine($line) || $mpvaloProductId <= 0 || !isset($line->fk_product) || (int) $line->fk_product !== $mpvaloProductId) {
 				continue;
 			}
-			if ($conf->multicurrency->enabled && $object->multicurrency_tx != 1) {
-				$total_ht += (float) $line->multicurrency_total_ht;
-				$total_tva += (float) $line->multicurrency_total_tva;
-				$total_ttc += (float) $line->multicurrency_total_ttc;
+			if ($useMulticurrency) {
+				$mpvalo_total_ht += isset($line->multicurrency_total_ht) ? (float) $line->multicurrency_total_ht : 0.0;
+				$mpvalo_total_tva += isset($line->multicurrency_total_tva) ? (float) $line->multicurrency_total_tva : 0.0;
+				$mpvalo_total_ttc += isset($line->multicurrency_total_ttc) ? (float) $line->multicurrency_total_ttc : 0.0;
 			} else {
-				$total_ht += (float) $line->total_ht;
-				$total_tva += (float) $line->total_tva;
-				$total_ttc += (float) $line->total_ttc;
+				$mpvalo_total_ht += isset($line->total_ht) ? (float) $line->total_ht : 0.0;
+				$mpvalo_total_tva += isset($line->total_tva) ? (float) $line->total_tva : 0.0;
+				$mpvalo_total_ttc += isset($line->total_ttc) ? (float) $line->total_ttc : 0.0;
 			}
 		}
+		$mpvalo_total_ht = (float) price2num($mpvalo_total_ht, 'MT');
+		$mpvalo_total_tva = (float) price2num($mpvalo_total_tva, 'MT');
+		$mpvalo_total_ttc = (float) price2num($mpvalo_total_ttc, 'MT');
 
 		$colLabelX = $col1x;
 		$colHtX = $col1x + 55;
@@ -1836,65 +1852,40 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$pdf->SetXY($colTtcX, $tab2_top + $tab2_hl * $index);
 		$pdf->MultiCell($colWidth, $tab2_hl, $outputlangs->transnoentities('DelegationTotalsHeaderTTC'), 0, 'R', 1);
 
-		$prev_total_ht = 0;
-		$prev_total_tva = 0;
-		$prev_total_ttc = 0;
-		if (! empty($TPreviousIncoice)) {
-			foreach ($TPreviousIncoice as &$fac) {
-				$fac->fetch_lines();
-				foreach ($fac->lines as $line) {
-					if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
-						continue;
-					}
-					if ($conf->multicurrency->enabled && $object->multicurrency_tx != 1) {
-						$prev_total_ht += (float) $line->multicurrency_total_ht;
-						$prev_total_tva += (float) $line->multicurrency_total_tva;
-						$prev_total_ttc += (float) $line->multicurrency_total_ttc;
-					} else {
-						$prev_total_ht += (float) $line->total_ht;
-						$prev_total_tva += (float) $line->total_tva;
-						$prev_total_ttc += (float) $line->total_ttc;
-					}
-				}
-			}
-		}
-
-		$current_total_ht = 0;
-		$current_total_tva = 0;
-		$current_total_ttc = 0;
-		foreach ($object->lines as $line) {
-			if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
-				continue;
-			}
-			if ($conf->multicurrency->enabled && $object->multicurrency_tx != 1) {
-				$current_total_ht += (float) $line->multicurrency_total_ht;
-				$current_total_tva += (float) $line->multicurrency_total_tva;
-				$current_total_ttc += (float) $line->multicurrency_total_ttc;
-			} else {
-				$current_total_ht += (float) $line->total_ht;
-				$current_total_tva += (float) $line->total_tva;
-				$current_total_ttc += (float) $line->total_ttc;
-			}
-		}
-		$cumulative_total_ht = $prev_total_ht + $current_total_ht;
-		$cumulative_total_tva = $prev_total_tva + $current_total_tva;
-		$cumulative_total_ttc = $prev_total_ttc + $current_total_ttc;
+		$prev_total_ht = $previousFinancialTotals['total_ht'];
+		$prev_total_tva = $previousFinancialTotals['total_tva'];
+		$prev_total_ttc = $previousFinancialTotals['total_ttc'];
+		$current_total_ht = $currentFinancialTotals['total_ht'];
+		$current_total_tva = $currentFinancialTotals['total_tva'];
+		$current_total_ttc = $currentFinancialTotals['total_ttc'];
+		$cumulative_total_ht = $cumulativeFinancialTotals['total_ht'];
+		$cumulative_total_tva = $cumulativeFinancialTotals['total_tva'];
+		$cumulative_total_ttc = $cumulativeFinancialTotals['total_ttc'];
 
 		$retained_warranty_rate = (! empty($object->retained_warranty) ? $object->retained_warranty : 0);
+		$prorataRate = !empty($object->array_options['options_lmdb_compte_prorata'])
+			? (float) $object->array_options['options_lmdb_compte_prorata']
+			: 0.0;
 
-		$retenue_de_garantie_ttc = $total_ttc * $retained_warranty_rate / 100;
-		$retenue_de_garantie_ht = $total_ht * $retained_warranty_rate / 100;
-		$retenue_de_garantie_tva = $total_tva * $retained_warranty_rate / 100;
+		$rawRetenueGarantieTtc = $total_ttc * $retained_warranty_rate / 100;
+		$rawRetenueGarantieHt = $total_ht * $retained_warranty_rate / 100;
+		$rawRetenueGarantieTva = $total_tva * $retained_warranty_rate / 100;
+		$retenue_de_garantie_ttc = (float) price2num($rawRetenueGarantieTtc, 'MT');
+		$retenue_de_garantie_ht = (float) price2num($rawRetenueGarantieHt, 'MT');
+		$retenue_de_garantie_tva = (float) price2num($rawRetenueGarantieTva, 'MT');
 
-		$compte_prorata_ttc = $total_ttc * $object->array_options['options_lmdb_compte_prorata'] / 100;
-		$compte_prorata_ht = $total_ht * $object->array_options['options_lmdb_compte_prorata'] / 100;
-		$compte_prorata_tva = $total_tva * $object->array_options['options_lmdb_compte_prorata'] / 100;
+		$rawCompteProrataTtc = $total_ttc * $prorataRate / 100;
+		$rawCompteProrataHt = $total_ht * $prorataRate / 100;
+		$rawCompteProrataTva = $total_tva * $prorataRate / 100;
+		$compte_prorata_ttc = (float) price2num($rawCompteProrataTtc, 'MT');
+		$compte_prorata_ht = (float) price2num($rawCompteProrataHt, 'MT');
+		$compte_prorata_tva = (float) price2num($rawCompteProrataTva, 'MT');
 
 		$total_delegation = 0;
 		$total_delegation_ht = 0;
 		$total_delegation_tva = 0;
 		$del_lines = array();
-		if (! empty($conf->delegation->enabled))
+		if (isModEnabled('delegation'))
 		{
 			dol_include_once("/delegation/class/delegation.class.php");
 
@@ -1941,12 +1932,12 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			}
 		}
 
-		$total_restant_ttc = $total_ttc - $retenue_de_garantie_ttc - $compte_prorata_ttc + $mpvalo_total_ttc;
-		$total_restant_ht = $total_ht - $retenue_de_garantie_ht - $compte_prorata_ht + $mpvalo_total_ht;
-		$total_restant_tva = $total_tva - $retenue_de_garantie_tva - $compte_prorata_tva + $mpvalo_total_tva;
-		$total_apayer_ht = $total_restant_ht - $total_delegation_ht;
-		$total_apayer_tva = $total_restant_tva - $total_delegation_tva;
-		$total_apayer_ttc = $total_restant_ttc - $total_delegation;
+		$total_restant_ttc = (float) price2num($total_ttc - $rawRetenueGarantieTtc - $rawCompteProrataTtc + $mpvalo_total_ttc, 'MT');
+		$total_restant_ht = (float) price2num($total_ht - $rawRetenueGarantieHt - $rawCompteProrataHt + $mpvalo_total_ht, 'MT');
+		$total_restant_tva = (float) price2num($total_tva - $rawRetenueGarantieTva - $rawCompteProrataTva + $mpvalo_total_tva, 'MT');
+		$total_apayer_ht = (float) price2num($total_ht - $rawRetenueGarantieHt - $rawCompteProrataHt + $mpvalo_total_ht - $total_delegation_ht, 'MT');
+		$total_apayer_tva = (float) price2num($total_tva - $rawRetenueGarantieTva - $rawCompteProrataTva + $mpvalo_total_tva - $total_delegation_tva, 'MT');
+		$total_apayer_ttc = (float) price2num($total_ttc - $rawRetenueGarantieTtc - $rawCompteProrataTtc + $mpvalo_total_ttc - $total_delegation, 'MT');
 
 		$index++;
 		$pdf->SetFillColor(255,255,255);
@@ -2036,7 +2027,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$depositsamount=$object->getSumDepositsUsed();
 
 
-		if (! empty($conf->delegation->enabled) && ! empty($del_lines))
+		if (isModEnabled('delegation') && ! empty($del_lines))
 		{
 			$index++;
 			$pdf->SetFillColor(248,248,248);
@@ -2517,7 +2508,8 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				$thirdparty = $mysoc;
 			}
 
-			if ($conf->delegation->enabled)
+			$total_delegation = 0.0;
+			if (isModEnabled('delegation'))
 			{
 				dol_include_once("/delegation/class/delegation.class.php");
 				
@@ -2532,43 +2524,56 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 			$carac_client=pdf_build_address($outputlangs,$this->emetteur,$mysoc,((!empty($object->contact))?$object->contact:null),$usecontact,'target',$object);
 
 			$object->fetchPreviousNextSituationInvoice();
-			$TPreviousIncoice = $object->tab_previous_situation_invoice;
+			$TPreviousIncoice = !empty($object->tab_previous_situation_invoice) && is_array($object->tab_previous_situation_invoice)
+				? $object->tab_previous_situation_invoice
+				: array();
 
 			// Compute totals without MP_VALO service lines.
 			$mpvaloProductId = (int) getDolGlobalInt('LMDB_MPVALO_PRODUCT_ID');
-			$total_ht = 0;
-			$total_tva = 0;
-			$total_ttc = 0;
-			foreach ($object->lines as $line) {
-				if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
-					continue;
-				}
-				if ($conf->multicurrency->enabled && $object->multicurrency_tx != 1) {
-					$total_ht += (float) $line->multicurrency_total_ht;
-					$total_tva += (float) $line->multicurrency_total_tva;
-					$total_ttc += (float) $line->multicurrency_total_ttc;
-				} else {
-					$total_ht += (float) $line->total_ht;
-					$total_tva += (float) $line->total_tva;
-					$total_ttc += (float) $line->total_ttc;
-				}
-			}
+			$useMulticurrency = isModEnabled('multicurrency')
+				&& isset($object->multicurrency_tx)
+				&& (float) $object->multicurrency_tx != 1.0;
+			$currentFinancialTotals = $this->getBtpFinancialTotals(
+				isset($object->lines) && is_array($object->lines) ? $object->lines : array(),
+				$useMulticurrency,
+				$mpvaloProductId
+			);
+			$total_ht = $currentFinancialTotals['total_ht'];
+			$total_tva = $currentFinancialTotals['total_tva'];
+			$total_ttc = $currentFinancialTotals['total_ttc'];
 
 				
 			$total_a_payer = 0;
-			foreach ($TPreviousIncoice as &$fac) $total_a_payer += $fac->total_ht;
-			$total_a_payer += $total_ht;
+			foreach ($TPreviousIncoice as $fac) {
+				if (empty($fac->lines) || !is_array($fac->lines)) {
+					$fac->fetch_lines();
+				}
+				$previousFinancialTotals = $this->getBtpFinancialTotals(
+					isset($fac->lines) && is_array($fac->lines) ? $fac->lines : array(),
+					$useMulticurrency,
+					$mpvaloProductId
+				);
+				$total_a_payer += $previousFinancialTotals['total_ht'];
+			}
+			$total_a_payer = (float) price2num($total_a_payer + $total_ht, 'MT');
 
-			$retained_warranty_rate = (! empty($object->retained_warranty) ? $object->retained_warranty : 0);
-			$retenue_de_garantie = $total_ttc * $retained_warranty_rate / 100 ;
-			$compte_prorata = $total_ttc * $object->array_options['options_lmdb_compte_prorata'] / 100 ;
+			$retained_warranty_rate = (! empty($object->retained_warranty) ? (float) $object->retained_warranty : 0.0);
+			$prorataRate = !empty($object->array_options['options_lmdb_compte_prorata'])
+				? (float) $object->array_options['options_lmdb_compte_prorata']
+				: 0.0;
+			$rawRetenueGarantie = $total_ttc * $retained_warranty_rate / 100;
+			$rawCompteProrata = $total_ttc * $prorataRate / 100;
+			$retenue_de_garantie = (float) price2num($rawRetenueGarantie, 'MT');
+			$compte_prorata = (float) price2num($rawCompteProrata, 'MT');
 
-			$retenue_de_garantie_ht = $total_ht * $retained_warranty_rate / 100 ;
-			$compte_prorata_ht = $total_ht * $object->array_options['options_lmdb_compte_prorata'] / 100 ;
+			$rawRetenueGarantieHt = $total_ht * $retained_warranty_rate / 100;
+			$rawCompteProrataHt = $total_ht * $prorataRate / 100;
+			$retenue_de_garantie_ht = (float) price2num($rawRetenueGarantieHt, 'MT');
+			$compte_prorata_ht = (float) price2num($rawCompteProrataHt, 'MT');
 
-			$total_ht_restant = $total_ht - $retenue_de_garantie_ht - $compte_prorata_ht ;
-			$total_ttc_restant = $total_ttc - $total_delegation - $retenue_de_garantie - $compte_prorata ;
-			$tva_restante = $total_ttc_restant - $total_ht_restant ;
+			$total_ht_restant = (float) price2num($total_ht - $rawRetenueGarantieHt - $rawCompteProrataHt, 'MT');
+			$total_ttc_restant = (float) price2num($total_ttc - $total_delegation - $rawRetenueGarantie - $rawCompteProrata, 'MT');
+			$tva_restante = (float) price2num($total_ttc_restant - $total_ht_restant, 'MT');
 
 
 		include DOL_DOCUMENT_ROOT.'/custom/delegation/core/modules/facture/doc/lcr/lcrtext.php';
@@ -3661,6 +3666,106 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		return $ordersInfo;
 	}
 
+	/**
+	 * Check whether a line contributes to BTP financial totals.
+	 *
+	 * Subtotal can populate total_ht/total_ttc on its technical lines during
+	 * PDF rendering. Those display-only totals must never be counted as
+	 * invoice amounts.
+	 *
+	 * @param object $line Invoice line
+	 * @param int $mpvaloProductId MPVALO product id excluded from standard totals
+	 * @return bool
+	 */
+	protected function isBtpFinancialLine($line, $mpvaloProductId = 0)
+	{
+		if (!is_object($line)) {
+			return false;
+		}
+
+		if (class_exists('TSubtotal') && TSubtotal::isModSubtotalLine($line)) {
+			return false;
+		}
+
+		// Fallback when Subtotal is disabled or unavailable: product_type 9 is
+		// reserved for technical lines (titles, free text and subtotals).
+		if (isset($line->product_type) && (int) $line->product_type === 9) {
+			return false;
+		}
+
+		if ($mpvaloProductId > 0 && isset($line->fk_product) && (int) $line->fk_product === $mpvaloProductId) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Sum financial values from billable BTP lines.
+	 *
+	 * @param array<int, object> $lines Invoice lines
+	 * @param bool $useMulticurrency Use multicurrency line totals
+	 * @param int $mpvaloProductId MPVALO product id excluded from standard totals
+	 * @return array{
+	 *     total_ht: float,
+	 *     total_tva: float,
+	 *     total_ttc: float,
+	 *     vat_rates: array<string, array{rate: float, total_tva: float}>
+	 * }
+	 */
+	protected function getBtpFinancialTotals($lines, $useMulticurrency = false, $mpvaloProductId = 0)
+	{
+		$totals = array(
+			'total_ht' => 0.0,
+			'total_tva' => 0.0,
+			'total_ttc' => 0.0,
+			'vat_rates' => array(),
+		);
+
+		if (!is_array($lines)) {
+			return $totals;
+		}
+
+		foreach ($lines as $line) {
+			if (!$this->isBtpFinancialLine($line, $mpvaloProductId)) {
+				continue;
+			}
+
+			$lineTotalHt = $useMulticurrency && isset($line->multicurrency_total_ht)
+				? (float) $line->multicurrency_total_ht
+				: (isset($line->total_ht) ? (float) $line->total_ht : 0.0);
+			$lineTotalTva = $useMulticurrency && isset($line->multicurrency_total_tva)
+				? (float) $line->multicurrency_total_tva
+				: (isset($line->total_tva) ? (float) $line->total_tva : 0.0);
+			$lineTotalTtc = $useMulticurrency && isset($line->multicurrency_total_ttc)
+				? (float) $line->multicurrency_total_ttc
+				: (isset($line->total_ttc) ? (float) $line->total_ttc : 0.0);
+
+			$totals['total_ht'] += $lineTotalHt;
+			$totals['total_tva'] += $lineTotalTva;
+			$totals['total_ttc'] += $lineTotalTtc;
+
+			$vatRate = isset($line->tva_tx) ? (float) price2num($line->tva_tx, 'MU') : 0.0;
+			$vatRateKey = (string) $vatRate;
+			if (!isset($totals['vat_rates'][$vatRateKey])) {
+				$totals['vat_rates'][$vatRateKey] = array(
+					'rate' => $vatRate,
+					'total_tva' => 0.0,
+				);
+			}
+			$totals['vat_rates'][$vatRateKey]['total_tva'] += $lineTotalTva;
+		}
+
+		$totals['total_ht'] = (float) price2num($totals['total_ht'], 'MT');
+		$totals['total_tva'] = (float) price2num($totals['total_tva'], 'MT');
+		$totals['total_ttc'] = (float) price2num($totals['total_ttc'], 'MT');
+		foreach ($totals['vat_rates'] as $vatRateKey => $vatRateInfo) {
+			$totals['vat_rates'][$vatRateKey]['total_tva'] = (float) price2num($vatRateInfo['total_tva'], 'MT');
+		}
+
+		return $totals;
+	}
+
 
 
 	function _getDataSituation(&$object) 
@@ -3676,14 +3781,19 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$mpvalo_mois = 0;
 		$mpvalo_nouveau_cumul = 0;
 		$mpvaloProductId = (int) getDolGlobalInt('LMDB_MPVALO_PRODUCT_ID');
+		$useMulticurrency = isModEnabled('multicurrency')
+			&& isset($object->multicurrency_tx)
+			&& (float) $object->multicurrency_tx != 1.0;
 
 
 		$object->fetchPreviousNextSituationInvoice();
-		$TPreviousIncoice = &$object->tab_previous_situation_invoice;
-		$facDerniereSituation = &end($TPreviousIncoice);
+		$TPreviousIncoice = !empty($object->tab_previous_situation_invoice) && is_array($object->tab_previous_situation_invoice)
+			? $object->tab_previous_situation_invoice
+			: array();
+		$facDerniereSituation = !empty($TPreviousIncoice) ? end($TPreviousIncoice) : null;
 		$TDataSituation = array(
 									'derniere_situation'=>$facDerniereSituation
-									,'date_derniere_situation'=>$facDerniereSituation->date
+									,'date_derniere_situation'=>(is_object($facDerniereSituation) && isset($facDerniereSituation->date) ? $facDerniereSituation->date : 0)
 								);
 
 		$situationInvoices = array();
@@ -3765,50 +3875,53 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		$del_lines = array();
 
 		
-		$cumul_anterieur_ht = $cumul_anterieur_tva = $retenue_garantie = 0;
+		$cumul_anterieur_ht = 0;
+		$cumul_anterieur_tva = 0;
+		$cumul_anterieur_ttc = 0;
+		$retenue_garantie = 0;
+		$retenue_garantie_anterieure = 0;
+		$compte_prorata_anterieur = 0;
 		$vat_rates = array();
 	
 		if(!empty($TPreviousIncoice)) {
 			foreach($TPreviousIncoice as $fac) {
-				$fac->fetch_lines();
-				$fac_total_ht = 0;
-				$fac_total_tva = 0;
-				$fac_total_ttc = 0;
-				foreach ($fac->lines as $line) {
-					if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
-						continue;
-					}
-					$fac_total_ht += (float) $line->total_ht;
-					$fac_total_tva += (float) $line->total_tva;
-					$fac_total_ttc += (float) $line->total_ttc;
-					// EN: Collect VAT totals per rate for previous invoices.
-					// FR: Collecter les totaux de TVA par taux pour les factures précédentes.
-					$vat_rate = price2num($line->tva_tx, 'MU');
-					$vat_rate_key = (string) $vat_rate;
-					if (! isset($vat_rates[$vat_rate_key])) {
+				if (empty($fac->lines) || !is_array($fac->lines)) {
+					$fac->fetch_lines();
+				}
+				$facFinancialTotals = $this->getBtpFinancialTotals(
+					isset($fac->lines) && is_array($fac->lines) ? $fac->lines : array(),
+					$useMulticurrency,
+					$mpvaloProductId
+				);
+				$fac_total_ht = $facFinancialTotals['total_ht'];
+				$fac_total_tva = $facFinancialTotals['total_tva'];
+				$fac_total_ttc = $facFinancialTotals['total_ttc'];
+				foreach ($facFinancialTotals['vat_rates'] as $vat_rate_key => $vatRateInfo) {
+					if (!isset($vat_rates[$vat_rate_key])) {
 						$vat_rates[$vat_rate_key] = array(
-							'rate' => $vat_rate,
-							'cumul_anterieur' => 0,
-							'mois' => 0,
-							'nouveau_cumul' => 0
+							'rate' => $vatRateInfo['rate'],
+							'cumul_anterieur' => 0.0,
+							'mois' => 0.0,
+							'nouveau_cumul' => 0.0,
 						);
 					}
-					$vat_rates[$vat_rate_key]['cumul_anterieur'] += (float) $line->total_tva;
+					$vat_rates[$vat_rate_key]['cumul_anterieur'] += $vatRateInfo['total_tva'];
 				}
 				$cumul_anterieur_ht += $fac_total_ht;
 				$cumul_anterieur_tva += $fac_total_tva;
-				$retained_warranty_rate = (! empty($fac->retained_warranty) ? $fac->retained_warranty : 0);
+				$cumul_anterieur_ttc += $fac_total_ttc;
+				$retained_warranty_rate = (!empty($fac->retained_warranty) ? (float) $fac->retained_warranty : 0.0);
 				$retenue_garantie_anterieure += $fac_total_ttc * $retained_warranty_rate / 100;
-				$compte_prorata_anterieur += $fac_total_ttc * $fac->array_options['options_lmdb_compte_prorata'] / 100;
-				if ($mpvaloProductId > 0) {
-					if (! isset($fac->lines) || ! is_array($fac->lines)) {
-						$fac->fetch_lines();
-					}
-					if (! empty($fac->lines)) {
-						foreach ($fac->lines as $line) {
-							if ((int) $line->fk_product === $mpvaloProductId) {
-								$mpvalo_cumul_anterieur += (float) $line->total_ttc;
-							}
+				$previousProrataRate = !empty($fac->array_options['options_lmdb_compte_prorata'])
+					? (float) $fac->array_options['options_lmdb_compte_prorata']
+					: 0.0;
+				$compte_prorata_anterieur += $fac_total_ttc * $previousProrataRate / 100;
+				if ($mpvaloProductId > 0 && !empty($fac->lines)) {
+					foreach ($fac->lines as $line) {
+						if ($this->isBtpFinancialLine($line) && isset($line->fk_product) && (int) $line->fk_product === $mpvaloProductId) {
+							$mpvalo_cumul_anterieur += $useMulticurrency && isset($line->multicurrency_total_ttc)
+								? (float) $line->multicurrency_total_ttc
+								: (isset($line->total_ttc) ? (float) $line->total_ttc : 0.0);
 						}
 					}
 				}
@@ -3816,66 +3929,80 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		}
 		if ($mpvaloProductId > 0) {
 			foreach ($object->lines as $line) {
-				if ((int) $line->fk_product === $mpvaloProductId) {
-					$mpvalo_mois += (float) $line->total_ttc;
+				if ($this->isBtpFinancialLine($line) && isset($line->fk_product) && (int) $line->fk_product === $mpvaloProductId) {
+					$mpvalo_mois += $useMulticurrency && isset($line->multicurrency_total_ttc)
+						? (float) $line->multicurrency_total_ttc
+						: (isset($line->total_ttc) ? (float) $line->total_ttc : 0.0);
 				}
 			}
 		}
-		$mpvalo_nouveau_cumul = $mpvalo_cumul_anterieur + $mpvalo_mois;
-		
-		
+		$mpvalo_cumul_anterieur = (float) price2num($mpvalo_cumul_anterieur, 'MT');
+		$mpvalo_mois = (float) price2num($mpvalo_mois, 'MT');
+		$mpvalo_nouveau_cumul = (float) price2num($mpvalo_cumul_anterieur + $mpvalo_mois, 'MT');
 
-		$total_ht = 0;
-		$total_tva = 0;
-		$total_ttc = 0;
-		foreach ($object->lines as $line) {
-			if ($mpvaloProductId > 0 && (int) $line->fk_product === $mpvaloProductId) {
-				continue;
-			}
-			$total_ht += (float) $line->total_ht;
-			$total_tva += (float) $line->total_tva;
-			$total_ttc += (float) $line->total_ttc;
-			// EN: Collect VAT totals per rate for the current invoice.
-			// FR: Collecter les totaux de TVA par taux pour la facture courante.
-			$vat_rate = price2num($line->tva_tx, 'MU');
-			$vat_rate_key = (string) $vat_rate;
-			if (! isset($vat_rates[$vat_rate_key])) {
+		$currentFinancialTotals = $this->getBtpFinancialTotals(
+			isset($object->lines) && is_array($object->lines) ? $object->lines : array(),
+			$useMulticurrency,
+			$mpvaloProductId
+		);
+		$total_ht = $currentFinancialTotals['total_ht'];
+		$total_tva = $currentFinancialTotals['total_tva'];
+		$total_ttc = $currentFinancialTotals['total_ttc'];
+		foreach ($currentFinancialTotals['vat_rates'] as $vat_rate_key => $vatRateInfo) {
+			if (!isset($vat_rates[$vat_rate_key])) {
 				$vat_rates[$vat_rate_key] = array(
-					'rate' => $vat_rate,
-					'cumul_anterieur' => 0,
-					'mois' => 0,
-					'nouveau_cumul' => 0
+					'rate' => $vatRateInfo['rate'],
+					'cumul_anterieur' => 0.0,
+					'mois' => 0.0,
+					'nouveau_cumul' => 0.0,
 				);
 			}
-			$vat_rates[$vat_rate_key]['mois'] += (float) $line->total_tva;
+			$vat_rates[$vat_rate_key]['mois'] += $vatRateInfo['total_tva'];
 		}
 
-		$nouveau_cumul = $cumul_anterieur_ht + $total_ht;
-		$nouveau_cumul_tva = $cumul_anterieur_tva + $total_tva;
-		$retained_warranty_rate = (! empty($object->retained_warranty) ? $object->retained_warranty : 0);
-		$retenue_garantie = $retenue_garantie_anterieure + ($total_ttc * $retained_warranty_rate / 100);
-		$compte_prorata = $compte_prorata_anterieur + ($total_ttc * $object->array_options['options_lmdb_compte_prorata'] / 100);
+		$cumul_anterieur_ht = (float) price2num($cumul_anterieur_ht, 'MT');
+		$cumul_anterieur_tva = (float) price2num($cumul_anterieur_tva, 'MT');
+		$cumul_anterieur_ttc = (float) price2num($cumul_anterieur_ttc, 'MT');
+		$rawRetenueGarantieAnterieure = $retenue_garantie_anterieure;
+		$rawCompteProrataAnterieur = $compte_prorata_anterieur;
+		$retenue_garantie_anterieure = (float) price2num($rawRetenueGarantieAnterieure, 'MT');
+		$compte_prorata_anterieur = (float) price2num($rawCompteProrataAnterieur, 'MT');
+		$nouveau_cumul = (float) price2num($cumul_anterieur_ht + $total_ht, 'MT');
+		$nouveau_cumul_tva = (float) price2num($cumul_anterieur_tva + $total_tva, 'MT');
+		$nouveau_cumul_ttc = (float) price2num($cumul_anterieur_ttc + $total_ttc, 'MT');
+		$retained_warranty_rate = (!empty($object->retained_warranty) ? (float) $object->retained_warranty : 0.0);
+		$currentProrataRate = !empty($object->array_options['options_lmdb_compte_prorata'])
+			? (float) $object->array_options['options_lmdb_compte_prorata']
+			: 0.0;
+		$rawRetenueGarantieMois = $total_ttc * $retained_warranty_rate / 100;
+		$rawCompteProrataMois = $total_ttc * $currentProrataRate / 100;
+		$rawRetenueGarantie = $rawRetenueGarantieAnterieure + $rawRetenueGarantieMois;
+		$rawCompteProrata = $rawCompteProrataAnterieur + $rawCompteProrataMois;
+		$retenue_garantie = (float) price2num($rawRetenueGarantie, 'MT');
+		$compte_prorata = (float) price2num($rawCompteProrata, 'MT');
 		
 		$TDataSituation['cumul_anterieur'] = $cumul_anterieur_ht;
 		$TDataSituation['cumul_anterieur_tva'] = $cumul_anterieur_tva;
-		$TDataSituation['cumul_anterieur_ttc'] = $cumul_anterieur_ht + $cumul_anterieur_tva;
+		$TDataSituation['cumul_anterieur_ttc'] = $cumul_anterieur_ttc;
 		$TDataSituation['retenue_garantie_anterieure'] = $retenue_garantie_anterieure;
 		$TDataSituation['compte_prorata_anterieur'] = $compte_prorata_anterieur;
 		$TDataSituation['delegation_paiement_anterieur'] = '';
 		$TDataSituation['mpvalo_cumul_anterieur'] = $mpvalo_cumul_anterieur;
-		$TDataSituation['total_ttc_anterieur'] = $TDataSituation['cumul_anterieur_ttc'] - $TDataSituation['retenue_garantie_anterieure'];
+		$TDataSituation['total_ttc_anterieur'] = (float) price2num($TDataSituation['cumul_anterieur_ttc'] - $rawRetenueGarantieAnterieure, 'MT');
 		
 		$TDataSituation['nouveau_cumul'] = $nouveau_cumul;
 		$TDataSituation['nouveau_cumul_tva'] = $nouveau_cumul_tva;
-		$TDataSituation['nouveau_cumul_ttc'] = $nouveau_cumul + $nouveau_cumul_tva;
+		$TDataSituation['nouveau_cumul_ttc'] = $nouveau_cumul_ttc;
 		$TDataSituation['retenue_garantie'] = $retenue_garantie;
 		$TDataSituation['compte_prorata'] = $compte_prorata;
 		$TDataSituation['delegation_paiement'] = '';
 		$TDataSituation['mpvalo_nouveau_cumul'] = $mpvalo_nouveau_cumul;
-		$TDataSituation['total_ttc'] = $TDataSituation['nouveau_cumul_ttc'] - $TDataSituation['retenue_garantie'] - $TDataSituation['compte_prorata'] + $TDataSituation['mpvalo_nouveau_cumul'];
+		$TDataSituation['total_ttc'] = (float) price2num($TDataSituation['nouveau_cumul_ttc'] - $rawRetenueGarantie - $rawCompteProrata + $TDataSituation['mpvalo_nouveau_cumul'], 'MT');
 
 		foreach ($vat_rates as $vat_rate_key => $vat_rate_info) {
-			$vat_rates[$vat_rate_key]['nouveau_cumul'] = $vat_rate_info['cumul_anterieur'] + $vat_rate_info['mois'];
+			$vat_rates[$vat_rate_key]['cumul_anterieur'] = (float) price2num($vat_rate_info['cumul_anterieur'], 'MT');
+			$vat_rates[$vat_rate_key]['mois'] = (float) price2num($vat_rate_info['mois'], 'MT');
+			$vat_rates[$vat_rate_key]['nouveau_cumul'] = (float) price2num($vat_rate_info['cumul_anterieur'] + $vat_rate_info['mois'], 'MT');
 		}
 		$vat_rates_keys = array_keys($vat_rates);
 		sort($vat_rates_keys, SORT_NUMERIC);
@@ -3906,12 +4033,12 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		
 		$TDataSituation['mois'] = $total_ht;
 		$TDataSituation['mois_tva'] = $total_tva;
-		$TDataSituation['mois_ttc'] = $TDataSituation['mois'] + $TDataSituation['mois_tva'];
-		$TDataSituation['retenue_garantie_mois'] = $retenue_garantie - $retenue_garantie_anterieure;
-		$TDataSituation['compte_prorata_mois'] = $compte_prorata - $compte_prorata_anterieur;
+		$TDataSituation['mois_ttc'] = $total_ttc;
+		$TDataSituation['retenue_garantie_mois'] = (float) price2num($rawRetenueGarantieMois, 'MT');
+		$TDataSituation['compte_prorata_mois'] = (float) price2num($rawCompteProrataMois, 'MT');
 		$TDataSituation['delegation_paiement_mois'] = $total_delegation;
 		$TDataSituation['mpvalo_mois'] = $mpvalo_mois;
-		$TDataSituation['total_ttc_mois'] = $TDataSituation['mois_ttc'] - $TDataSituation['retenue_garantie_mois'] - $TDataSituation['compte_prorata_mois'] - $TDataSituation['delegation_paiement_mois'] + $TDataSituation['mpvalo_mois'];
+		$TDataSituation['total_ttc_mois'] = (float) price2num($TDataSituation['mois_ttc'] - $rawRetenueGarantieMois - $rawCompteProrataMois - $TDataSituation['delegation_paiement_mois'] + $TDataSituation['mpvalo_mois'], 'MT');
 		
 		return $TDataSituation;
 		
@@ -4050,7 +4177,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 				continue;
 			}
 			foreach ($prevInvoice->lines as $prevLine) {
-				if ($prevLine->special_code == 9) {
+				if (!$this->isBtpFinancialLine($prevLine)) {
 					continue;
 				}
 				$prevLinesById[$prevLine->rowid] = $prevLine;
