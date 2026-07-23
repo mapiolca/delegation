@@ -1742,7 +1742,7 @@ class pdf_crabe_btp_inpose extends ModelePDFFactures
 		
 		$deja_paye = 0;
 		$i = 1;
-		if(!empty($TPreviousIncoice)){
+		if ($this->situationinvoice) {
 			$pdf->setY($tab2_top);
 			$posy = $pdf->GetY();
 
