@@ -5,6 +5,8 @@
 - Centralise les totaux des lignes facturables pour les situations courantes et antérieures, les taux de TVA, l’avancement global, les retenues et le total à échéance.
 - Affiche le pourcentage d’avancement global dès la première facture de situation.
 - Conserve le traitement séparé de MPVALO, la multicurrency, les avoirs et les arrondis financiers natifs Dolibarr.
+- Aligne les lignes « Payé », « Avoirs » et « Reste à payer » sur la grille HT/TVA/TTC du tableau des montants.
+- Place les versements sur une page A4 portrait dédiée, paginée et générée uniquement lorsqu’au moins un paiement existe.
 
 ## 1.4.0 (2026-07-14)
 - Supprime la tâche planifiée et la méthode d’envoi automatique des factures, sans modifier l’envoi manuel natif de Dolibarr.
